@@ -63,7 +63,11 @@ root.render(
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider
           chains={chains}
-          theme={darkTheme()}
+          theme={darkTheme({
+            accentColor: "#7b3fe4", //purple accent
+            fontStack: "system",
+            overlayBlur: "large",
+          })}
           showRecentTransactions={true}
           appInfo={{
             appName: "DCAStack",

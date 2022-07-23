@@ -4,9 +4,19 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Pages/Dashboard";
 import Trade from "./components/Pages/Trade";
 import Gas from "./components/Pages/Gas";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 function App() {
   return (
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
     <div className="App">
       <Navbar />
       <Routes>
@@ -14,8 +24,8 @@ function App() {
         <Route path="trade" element={<Trade />} />
         <Route path="gas" element={<Gas />} />
       </Routes>
-
     </div>
+    </ThemeProvider>
   );
 }
 
