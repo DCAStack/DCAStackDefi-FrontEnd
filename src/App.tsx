@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Pages/Dashboard";
 import Trade from "./components/Pages/Trade";
 import Gas from "./components/Pages/Gas";
-import { useAccount } from "wagmi";
 
 function App() {
   return (
@@ -15,6 +14,7 @@ function App() {
         <Route path="trade" element={<Trade />} />
         <Route path="gas" element={<Gas />} />
       </Routes>
+
     </div>
   );
 }

@@ -44,6 +44,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@mui/material": "^5.9.1",
+    "@rainbow-me/rainbowkit": "^0.4.4",
     "ethers": "^5.6.9",
     "react-router-dom": "^6.3.0",
     "wagmi": "^0.5.11"

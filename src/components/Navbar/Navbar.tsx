@@ -11,6 +11,7 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const pages = ["Dashboard", "Gas", "Trade"];
 
@@ -134,7 +135,7 @@ const ResponsiveAppBar = () => {
               </Button>
             ))}
           </Box>
-          <Button color="inherit">Connect Wallet</Button>
+          <ConnectButton />
         </Toolbar>
       </Container>
     </AppBar>
