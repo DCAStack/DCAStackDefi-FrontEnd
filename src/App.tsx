@@ -1,24 +1,20 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import Navbar from "./components/Navbar/Navbar";
+import { Routes, Route } from "react-router-dom";
+import Dashboard from "./components/Pages/Dashboard";
+import Trade from "./components/Pages/Trade";
+import Gas from "./components/Pages/Gas";
+import { useAccount } from "wagmi";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar />
+      <Routes>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="trade" element={<Trade />} />
+        <Route path="gas" element={<Gas />} />
+      </Routes>
     </div>
   );
 }

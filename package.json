@@ -39,5 +39,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@mui/material": "^5.9.1",
+    "ethers": "^5.6.9",
+    "react-router-dom": "^6.3.0",
+    "wagmi": "^0.5.11"
   }
 }
