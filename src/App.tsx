@@ -1,15 +1,18 @@
 import * as React from "react";
 import { Routes, Route } from "react-router-dom";
-// import { ThemeProvider, createTheme } from "@mui/material/styles";
-// import CssBaseline from "@mui/material/CssBaseline";
-
-// import Navbar from "./components/Navigation/Navbar";
-// import StickyFooter from "./components/Navigation/Footer";
-
-import { MantineProvider } from "@mantine/core";
-import { AppShell } from "@mantine/core";
+import {
+  MantineProvider,
+  AppShell,
+  Select,
+  Text,
+  TextInput,
+  Button,
+} from "@mantine/core";
 import { HeaderResponsive as Header } from "./components/Navigation/Header";
 import { FooterCentered as Footer } from "./components/Navigation/Footer";
+
+import { DatePicker } from "@mantine/dates";
+import { useForm } from "@mantine/form";
 
 import Home from "./components/Pages/Home";
 import Dashboard from "./components/Pages/Dashboard";
@@ -19,6 +22,10 @@ import Gas from "./components/Pages/Gas";
 function App() {
   const headerLinks = {
     links: [
+      {
+        link: "/",
+        label: "Home",
+      },
       {
         link: "/dashboard",
         label: "Dashboard",
@@ -59,6 +66,10 @@ function App() {
   const footerLinks = {
     links: [
       {
+        link: "/",
+        label: "Home",
+      },
+      {
         link: "/dashboard",
         label: "Dashboard",
       },
@@ -79,6 +90,18 @@ function App() {
         label: "TOS",
       },
     ],
+  };
+
+  const form = useForm({
+    initialValues: {
+      date: new Date(),
+      textInput: "",
+      select: "react",
+    },
+  });
+
+  const handleSubmit = (values: any) => {
+    console.log(values);
   };
 
   return (

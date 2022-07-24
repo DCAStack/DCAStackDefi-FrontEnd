@@ -64,7 +64,7 @@ root.render(
         <RainbowKitProvider
           chains={chains}
           theme={darkTheme({
-            accentColor: "#008dff",
+            accentColor: "#1971c2",
             fontStack: "system",
             overlayBlur: "large",
           })}

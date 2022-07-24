@@ -11,9 +11,7 @@ import {
   Center,
 } from "@mantine/core";
 import { useBooleanToggle } from "@mantine/hooks";
-// import { MantineLogo } from '../../shared/MantineLogo';
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { AB2 } from "tabler-icons-react";
 import { Link } from "react-router-dom";
 import { Anchor } from "@mantine/core";
 import { ChevronDown } from "tabler-icons-react";
@@ -172,7 +170,10 @@ export function HeaderResponsive({ links }: HeaderResponsiveProps) {
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
       <Container className={classes.header}>
-        <img src={process.env.PUBLIC_URL + "/logo.png"} />
+          <img
+            src={process.env.PUBLIC_URL + "/logo.png"}
+            alt={"Home"}
+          />
 
         <Group>
           <Group ml={50} spacing={5} className={classes.links}>

@@ -52,8 +52,10 @@ export function FooterCentered({ links }: FooterCenteredProps) {
   return (
     <div className={classes.footer}>
       <div className={classes.inner}>
-        {/* <MantineLogo /> */}
-        <img src={process.env.PUBLIC_URL + "/logo.png"} />
+      <img
+            src={process.env.PUBLIC_URL + "/logo.png"}
+            alt={"Home"}
+          />
         <Group className={classes.links}>{items}</Group>
         <Group spacing={0} position="right" noWrap>
           <ActionIcon size="lg">
