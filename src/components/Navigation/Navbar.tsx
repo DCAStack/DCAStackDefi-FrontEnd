@@ -13,7 +13,7 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import { Link } from "react-router-dom";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-const pages = ["Dashboard", "Gas", "Trade"];
+export const pages = ["Dashboard", "Gas", "Trade"];
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
