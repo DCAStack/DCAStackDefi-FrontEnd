@@ -35,7 +35,7 @@ interface FooterCenteredProps {
   links: { link: string; label: string }[];
 }
 
-export function FooterCentered({ links }: FooterCenteredProps) {
+function FooterCentered({ links }: FooterCenteredProps) {
   const { classes } = useStyles();
   const items = links.map((link) => (
     <Anchor<"a">
@@ -66,4 +66,37 @@ export function FooterCentered({ links }: FooterCenteredProps) {
       </div>
     </div>
   );
+}
+
+const footerLinks = {
+  links: [
+    {
+      link: "/",
+      label: "Home",
+    },
+    {
+      link: "/dashboard",
+      label: "Dashboard",
+    },
+    {
+      link: "/gas",
+      label: "Gas",
+    },
+    {
+      link: "/trade",
+      label: "Trade",
+    },
+    {
+      link: "#",
+      label: "Privacy",
+    },
+    {
+      link: "#",
+      label: "TOS",
+    },
+  ],
+};
+
+export function FooterPopulated() {
+  return <FooterCentered links={footerLinks.links} />;
 }

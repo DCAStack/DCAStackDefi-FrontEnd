@@ -69,7 +69,7 @@ function Feature({
   );
 }
 
-const mockdata = [
+const data = [
   {
     icon: Key,
     title: "Your Keys",
@@ -97,7 +97,7 @@ const mockdata = [
 ];
 
 export function FeaturesAsymmetrical() {
-  const items = mockdata.map((item) => <Feature {...item} key={item.title} />);
+  const items = data.map((item) => <Feature {...item} key={item.title} />);
 
   return (
     <Container mt={30} mb={30} size="lg">

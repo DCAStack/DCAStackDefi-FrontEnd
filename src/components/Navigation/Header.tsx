@@ -108,7 +108,7 @@ interface HeaderResponsiveProps {
   }[];
 }
 
-export function HeaderResponsive({ links }: HeaderResponsiveProps) {
+function HeaderResponsive({ links }: HeaderResponsiveProps) {
   const [opened, toggleOpened] = useBooleanToggle(false);
   const [active, setActive] = useState(links[0].link);
   const { classes, cx } = useStyles();
@@ -197,4 +197,51 @@ export function HeaderResponsive({ links }: HeaderResponsiveProps) {
       </Container>
     </Header>
   );
+}
+
+const headerLinks = {
+  links: [
+    {
+      link: "/",
+      label: "Home",
+    },
+    {
+      link: "/dashboard",
+      label: "Dashboard",
+    },
+    {
+      link: "/gas",
+      label: "Gas",
+    },
+    {
+      link: "/trade",
+      label: "Trade",
+    },
+    {
+      link: "#1",
+      label: "Help",
+      links: [
+        {
+          link: "https://docs.dcastack.com/",
+          label: "Documentation",
+        },
+        {
+          link: "https://github.com/",
+          label: "Report An Issue",
+        },
+        {
+          link: "/community",
+          label: "Contact Us",
+        },
+        {
+          link: "/blog",
+          label: "Server Status",
+        },
+      ],
+    },
+  ],
+};
+
+export function HeaderPopulated() {
+  return <HeaderResponsive links={headerLinks.links} />;
 }
