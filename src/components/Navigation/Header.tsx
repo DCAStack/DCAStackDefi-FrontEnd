@@ -9,11 +9,11 @@ import {
   Transition,
   Menu,
   Center,
+  Anchor,
 } from "@mantine/core";
 import { useBooleanToggle } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Link } from "react-router-dom";
-import { Anchor } from "@mantine/core";
 import { ChevronDown } from "tabler-icons-react";
 
 const HEADER_HEIGHT = 60;
@@ -162,6 +162,7 @@ export function HeaderResponsive({ links }: HeaderResponsiveProps) {
       >
         <Anchor component={Link} to={`${link.link}`}>
           {link.label}
+          {/* needs to include entire componenet */}
         </Anchor>
       </a>
     );
@@ -169,11 +170,8 @@ export function HeaderResponsive({ links }: HeaderResponsiveProps) {
 
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
-      <Container className={classes.header}>
-          <img
-            src={process.env.PUBLIC_URL + "/logo.png"}
-            alt={"Home"}
-          />
+      <Container className={classes.header} fluid>
+        <img src={process.env.PUBLIC_URL + "/logo.png"} alt={"Home"} />
 
         <Group>
           <Group ml={50} spacing={5} className={classes.links}>

@@ -74,7 +74,7 @@ const mockdata = [
     icon: Key,
     title: "Your Keys",
     description:
-      "As electricity builds up inside its body, it becomes more aggressive. One theory is that the electricity.",
+      "Your keys never leave you. Everything takes place on the blockchain via your wallet.",
   },
   {
     icon: Coin,

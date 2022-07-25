@@ -4,6 +4,7 @@ import { BrandTwitter, BrandGithub } from "tabler-icons-react";
 import { Link } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
+  // could improve this
   footer: {
     marginTop: 120,
     borderTop: `1px solid ${
@@ -52,10 +53,7 @@ export function FooterCentered({ links }: FooterCenteredProps) {
   return (
     <div className={classes.footer}>
       <div className={classes.inner}>
-      <img
-            src={process.env.PUBLIC_URL + "/logo.png"}
-            alt={"Home"}
-          />
+        <img src={process.env.PUBLIC_URL + "/logo.png"} alt={"Home"} />
         <Group className={classes.links}>{items}</Group>
         <Group spacing={0} position="right" noWrap>
           <ActionIcon size="lg">

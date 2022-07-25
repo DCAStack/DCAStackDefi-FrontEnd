@@ -10,9 +10,10 @@ import {
 import { Dots } from "./Dots";
 
 const useStyles = createStyles((theme) => ({
+  // could improve this
   wrapper: {
     position: "relative",
-    paddingTop: 120,
+    paddingTop: 20,
     paddingBottom: 80,
 
     "@media (max-width: 755px)": {
