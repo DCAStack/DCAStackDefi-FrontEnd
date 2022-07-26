@@ -34,7 +34,7 @@ const { chains, provider, webSocketProvider } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "RainbowKit demo",
+  appName: "DCAStack",
   chains,
 });
 
