@@ -28,7 +28,7 @@ const { chains, provider, webSocketProvider } = configureChains(
       : []),
   ],
   [
-    alchemyProvider({ alchemyId: "_gg7wSSi0KMBsdKnGVfHDueq6xMB9EkC" }),
+    alchemyProvider({ alchemyId: "Lq61gi9ZudTC_-u8ZvfmowXkrf6Eqeut" }),
     publicProvider(),
   ]
 );
