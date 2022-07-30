@@ -10,15 +10,35 @@ import {
   RainbowKitProvider,
   darkTheme,
   DisclaimerComponent,
+  Chain,
 } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import App from "./App";
 
+const localChain: Chain = {
+  id: 31337,
+  name: "Local ETH",
+  network: "local",
+  iconUrl: "https://www.svgrepo.com/show/13701/home.svg",
+  iconBackground: "#fff",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Local ETH",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: "http://127.0.0.1:8545/",
+  },
+  testnet: false,
+};
+
 const { chains, provider, webSocketProvider } = configureChains(
   [
+    localChain,
     chain.mainnet,
     chain.polygon,
     chain.optimism,
@@ -28,8 +48,9 @@ const { chains, provider, webSocketProvider } = configureChains(
       : []),
   ],
   [
-    alchemyProvider({ alchemyId: "Lq61gi9ZudTC_-u8ZvfmowXkrf6Eqeut" }),
+    alchemyProvider({ apiKey: "Lq61gi9ZudTC_-u8ZvfmowXkrf6Eqeut" }),
     publicProvider(),
+    jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default }) }),
   ]
 );
 

@@ -13,9 +13,6 @@ const useStyles = createStyles((theme) => ({
 export default function GasToken() {
   const { classes } = useStyles();
   const { chain, chains } = useNetwork();
-
-  console.log(chain, chains);
-
   const currentChain: number = chain?.id as keyof typeof gasTokens;
 
   return (

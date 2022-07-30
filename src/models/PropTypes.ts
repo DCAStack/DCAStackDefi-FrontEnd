@@ -1,4 +1,4 @@
-import { IToken } from "./Interfaces";
+import { IToken, IContract } from "./Interfaces";
 
 interface BaseProps {
     children?: React.ReactNode;
@@ -8,4 +8,8 @@ interface BaseProps {
 
 export interface TokenBadgeProps extends BaseProps {
     token: IToken;
+}
+
+export interface ContractInfoProps extends BaseProps {
+    contract: IContract;
 }

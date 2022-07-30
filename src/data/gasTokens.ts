@@ -16,6 +16,13 @@ const gasTokens: Record<number, IToken> = {
         name: "Ethereum",
         symbol: "ETH"
     },
+    31337: {
+        address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        decimals: 18,
+        logoURI: "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
+        name: "Ethereum",
+        symbol: "ETH"
+    },
     137: {
         address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
         decimals: 18,
