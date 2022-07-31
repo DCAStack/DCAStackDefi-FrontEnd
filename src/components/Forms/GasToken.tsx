@@ -1,7 +1,7 @@
 import { createStyles } from "@mantine/core";
 import { useNetwork } from "wagmi";
 import { Button } from "@mantine/core";
-import TokenBadge from "./../TokenBadge";
+import TokenBadge from "./TokenBadge";
 import gasTokens from "./../../data/gasTokens";
 
 const useStyles = createStyles((theme) => ({
@@ -10,13 +10,13 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function GasToken() {
+export default function GasToken( ) {
   const { classes } = useStyles();
   const { chain, chains } = useNetwork();
   const currentChain: number = chain?.id as keyof typeof gasTokens;
 
   return (
-    <Button variant="light" radius="xs" size="xl">
+    <Button variant="light" radius="xl" size="xl" compact>
       <TokenBadge
         token={
           gasTokens[`${currentChain}`]

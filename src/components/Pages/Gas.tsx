@@ -3,8 +3,8 @@ import { useEffect, useState, useContext } from "react";
 
 import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
 
-import WithdrawFunds from "../Forms/Withdraw";
-import DepositFunds from "../Forms/Deposit";
+import WithdrawGas from "../Forms/WithdrawGas";
+import DepositGas from "../Forms/DepositGas";
 
 import { useNetwork } from "wagmi";
 
@@ -49,11 +49,11 @@ const Gas = () => {
       console.log("Get User Gas Success", data);
       data
         ? setUserGasBal(String(formatEther(data.toString())))
-        : setUserGasBal("?");
+        : setUserGasBal("0");
     },
     onError(error) {
       console.log("Get User Gas Error", error);
-      setUserGasBal("?");
+      setUserGasBal("0");
     },
   });
 
@@ -79,11 +79,11 @@ const Gas = () => {
 
       <Space h="xl" />
       <Paper shadow="xl" radius="xl" p="xl" withBorder>
-        <WithdrawFunds />
+        <WithdrawGas />
         <Space h="xl" />
         <Space h="xl" />
 
-        <DepositFunds />
+        <DepositGas />
       </Paper>
     </Container>
   );

@@ -1,7 +1,5 @@
-import { TokenBadgeProps } from "../models/PropTypes";
-import {
-  createStyles,
-} from "@mantine/core";
+import { TokenBadgeProps } from "../../models/PropTypes";
+import { createStyles } from "@mantine/core";
 
 const useStyles = createStyles((theme) => ({
   imgDim: {
