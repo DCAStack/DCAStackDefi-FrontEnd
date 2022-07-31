@@ -80,19 +80,19 @@ const data = [
     icon: Coin,
     title: "Your Coins",
     description:
-      "Slakoth’s heart beats just once a minute. Whatever happens, it is content to loaf around motionless.",
+      "Maintain custody of your funds at all times. Interact with smart contracts to trustlessly trade.",
   },
   {
     icon: ShieldLock,
     title: "Your Security",
     description:
-      "Thought to have gone extinct, Relicanth was given a name that is a variation of the name of the person who discovered.",
+      "No more trusting centralized exchanges. Take security into your own hands and remove the intermediary.",
   },
   {
     icon: World,
     title: "All Defi",
     description:
-      "Thought to have gone extinct, Relicanth was given a name that is a variation of the name of the person who discovered.",
+      "Use the wonders of decentralized finance to automate your dollar cost averaging. Trustless, Transparent, Transactions. ",
   },
 ];
 
