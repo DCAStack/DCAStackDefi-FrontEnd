@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import {
   Group,
@@ -25,6 +25,7 @@ import {
 import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "./../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { ContractContext } from "../../App";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -32,7 +33,9 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function DepositFunds({ contract }: ContractInfoProps) {
+export default function DepositFunds() {
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
   const [depositAmount, setDeposit] = useState(0);
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -43,8 +46,8 @@ export default function DepositFunds({ contract }: ContractInfoProps) {
     error: depositGasError,
     isError: prepareDepositGasError,
   } = usePrepareContractWrite({
-    addressOrName: contract.address,
-    contractInterface: contract.abi,
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
     functionName: "depositGas",
     overrides: {
       from: address,
@@ -113,6 +116,7 @@ export default function DepositFunds({ contract }: ContractInfoProps) {
     isLoading,
   } = useBalance({
     addressOrName: address,
+    watch: true,
     onSuccess(data) {
       console.log("Get User Wallet Balance Success", data);
     },

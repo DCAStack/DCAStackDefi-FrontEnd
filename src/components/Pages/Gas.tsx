@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
 
@@ -15,7 +15,7 @@ import { useContractRead } from "wagmi";
 import { useAccount } from "wagmi";
 import { formatEther } from "ethers/lib/utils";
 
-import { ContractInfoProps } from "./../../models/PropTypes";
+import { ContractContext } from "../../App";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -26,20 +26,22 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Gas = ({ contract }: ContractInfoProps) => {
+const Gas = () => {
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
   const { classes } = useStyles();
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
-  const [curUserGasBal, setUserGasBal] = useState("?");
+  const [curUserGasBal, setUserGasBal] = useState("0");
 
   const {
     data: userGasBalance,
     isError,
     isLoading,
   } = useContractRead({
-    addressOrName: contract.address,
-    contractInterface: contract.abi,
-    functionName: "userGasBalances(address)",
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "userGasBalances",
     args: address,
     cacheOnBlock: true,
     watch: true,
@@ -50,7 +52,7 @@ const Gas = ({ contract }: ContractInfoProps) => {
         : setUserGasBal("?");
     },
     onError(error) {
-      console.log("Get User Gas Success Error", error);
+      console.log("Get User Gas Error", error);
       setUserGasBal("?");
     },
   });
@@ -77,11 +79,11 @@ const Gas = ({ contract }: ContractInfoProps) => {
 
       <Space h="xl" />
       <Paper shadow="xl" radius="xl" p="xl" withBorder>
-        <WithdrawFunds contract={contract} />
+        <WithdrawFunds />
         <Space h="xl" />
         <Space h="xl" />
 
-        <DepositFunds contract={contract} />
+        <DepositFunds />
       </Paper>
     </Container>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import {
   Group,
@@ -24,6 +24,7 @@ import {
 import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "./../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { ContractContext } from "../../App";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -31,9 +32,9 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function WithdrawFunds(
-  { contract }: ContractInfoProps,
-) {
+export default function WithdrawFunds() {
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
   const [withdrawAmount, setWithdraw] = useState(0);
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -44,8 +45,8 @@ export default function WithdrawFunds(
     error: withdrawGasError,
     isError: prepareWithdrawGasError,
   } = usePrepareContractWrite({
-    addressOrName: contract.address,
-    contractInterface: contract.abi,
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
     functionName: "withdrawGas",
     args: parseEther(String(withdrawAmount)),
     overrides: {
@@ -113,10 +114,12 @@ export default function WithdrawFunds(
     isError,
     isLoading,
   } = useContractRead({
-    addressOrName: contract.address,
-    contractInterface: contract.abi,
-    functionName: "userGasBalances(address)",
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "userGasBalances",
     args: address,
+    cacheOnBlock: true,
+    watch: true,
     onSuccess(data) {
       console.log("Get User Gas for withdraw Success", data);
     },
@@ -124,6 +127,8 @@ export default function WithdrawFunds(
       console.log("Get User Gas for withdraw Error", error);
     },
   });
+
+  console.log("Max withdraw is", maxWithdraw);
 
   return (
     <Container my="withdraw_funds">
