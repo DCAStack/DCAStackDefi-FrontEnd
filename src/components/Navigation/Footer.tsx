@@ -1,5 +1,5 @@
 import React from "react";
-import { createStyles, Anchor, Group, ActionIcon } from "@mantine/core";
+import { createStyles, Anchor, Group, ActionIcon, Image } from "@mantine/core";
 import { BrandTwitter, BrandGithub } from "tabler-icons-react";
 import { Link } from "react-router-dom";
 
@@ -53,8 +53,9 @@ function FooterCentered({ links }: FooterCenteredProps) {
   return (
     <div className={classes.footer}>
       <div className={classes.inner}>
-        <img src={process.env.PUBLIC_URL + "/logo.png"} alt={"Home"} />
-        <Group className={classes.links}>{items}</Group>
+
+        <Group className={classes.links}>
+          {items}</Group>
         <Group spacing={0} position="right" noWrap>
           <ActionIcon size="lg">
             <BrandTwitter size={18} />

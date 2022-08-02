@@ -10,10 +10,11 @@ import {
   Menu,
   Center,
   Anchor,
+  Image,
 } from "@mantine/core";
 import { useBooleanToggle } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "tabler-icons-react";
 
 const HEADER_HEIGHT = 60;
@@ -109,13 +110,22 @@ interface HeaderResponsiveProps {
 }
 
 function HeaderResponsive({ links }: HeaderResponsiveProps) {
+  const location = useLocation();
   const [opened, toggleOpened] = useBooleanToggle(false);
-  const [active, setActive] = useState(links[0].link);
+  const [active, setActive] = useState(location.pathname);
   const { classes, cx } = useStyles();
 
   const items = links.map((link) => {
     const menuItems = link.links?.map((item) => (
-      <Menu.Item key={item.link}>{item.label}</Menu.Item>
+      <Menu.Item
+        key={item.link}
+        component="a"
+        href={item.link}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {item.label}
+      </Menu.Item>
     ));
 
     if (menuItems) {
@@ -162,7 +172,6 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
       >
         <Anchor component={Link} to={`${link.link}`}>
           {link.label}
-          {/* needs to include entire componenet */}
         </Anchor>
       </a>
     );
@@ -171,7 +180,13 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
       <Container className={classes.header} fluid>
-        <img src={process.env.PUBLIC_URL + "/logo.png"} alt={"Home"} />
+        <Image
+          radius={10}
+          src={process.env.PUBLIC_URL + "/logo.png"}
+          alt={"Logo"}
+          height={350}
+          width={350}
+        />
 
         <Group>
           <Group ml={50} spacing={5} className={classes.links}>
@@ -230,11 +245,11 @@ const headerLinks = {
           label: "Report An Issue",
         },
         {
-          link: "/community",
+          link: "https://github.com/",
           label: "Contact Us",
         },
         {
-          link: "/blog",
+          link: "https://status.dcastack.com/",
           label: "Server Status",
         },
       ],
