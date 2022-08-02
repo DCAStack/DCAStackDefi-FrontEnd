@@ -1,5 +1,12 @@
 import React from "react";
-import { createStyles, Anchor, Group, ActionIcon, Image } from "@mantine/core";
+import {
+  createStyles,
+  Anchor,
+  Group,
+  ActionIcon,
+  Image,
+  Text,
+} from "@mantine/core";
 import { BrandTwitter, BrandGithub } from "tabler-icons-react";
 import { Link } from "react-router-dom";
 
@@ -38,24 +45,26 @@ interface FooterCenteredProps {
 function FooterCentered({ links }: FooterCenteredProps) {
   const { classes } = useStyles();
   const items = links.map((link) => (
-    <Anchor<"a">
-      color="dimmed"
+    <a
       key={link.label}
       href={link.link}
-      sx={{ lineHeight: 1 }}
       onClick={(event) => event.preventDefault()}
-      size="sm"
     >
-      {link.label}
-    </Anchor>
+      <Anchor component={Link} to={`${link.link}`}>
+        {link.label}
+      </Anchor>
+    </a>
   ));
 
   return (
     <div className={classes.footer}>
       <div className={classes.inner}>
-
-        <Group className={classes.links}>
-          {items}</Group>
+        <Group className={classes.links} position="center" spacing="xs">
+          {items}
+          <Text color="dimmed" size="sm">
+            © {new Date().getFullYear()} DCAStack.com. All rights reserved.
+          </Text>
+        </Group>
         <Group spacing={0} position="right" noWrap>
           <ActionIcon size="lg">
             <BrandTwitter size={18} />
