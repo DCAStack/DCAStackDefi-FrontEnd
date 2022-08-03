@@ -27,7 +27,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
-import { ContractInfoProps } from "./../../models/PropTypes";
+import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 import { ActionIcon } from "@mantine/core";
@@ -48,6 +48,8 @@ function TradeDCA() {
     new Date(),
     dayjs(new Date()).add(1, "days").toDate(),
   ]);
+
+  const freqRange = Array.from(String(Array(30).keys()));
 
   return (
     <Container my="setup_schedule">
@@ -78,13 +80,14 @@ function TradeDCA() {
             description="I want to sell each DCA..."
             required
           />
-          <NativeSelect
-            data={["React", "Vue", "Angular", "Svelte"]}
+          <NumberInput
             label="Trade Frequency"
             description="I want to DCA every..."
             radius="xs"
             size="xl"
             required
+            min={1}
+            max={30}
           />
           <NativeSelect
             data={["Days"]}

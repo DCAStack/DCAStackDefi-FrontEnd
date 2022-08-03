@@ -8,15 +8,25 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const TokenBadge = ({ token, className }: TokenBadgeProps) => {
+const TokenBadge = ({
+  token,
+  displayTokenName,
+  className,
+}: TokenBadgeProps) => {
   const { classes } = useStyles();
+  let displayData;
+  if (displayTokenName) {
+    displayData = `${token.symbol}: ${token.name}`;
+  } else {
+    displayData = `${token.symbol}`;
+  }
 
   return (
     <span className={(className ? className + " " : "") + "flex items-center"}>
       {token.logoURI && (
         <img src={token.logoURI} alt={token.name} className={classes.imgDim} />
       )}
-      {token.symbol}
+      {displayData}
     </span>
   );
 };

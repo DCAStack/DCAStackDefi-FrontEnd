@@ -13,7 +13,7 @@ import { formatEther } from "ethers/lib/utils";
 
 import { ContractInfoProps } from "./../../models/PropTypes";
 
-import TradeDCA from "../Forms/TradeDCA";
+import TradeDCA from "../Trade/TradeDCA";
 
 const useStyles = createStyles((theme) => ({
   // could improve this

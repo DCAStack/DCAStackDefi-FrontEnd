@@ -8,6 +8,7 @@ interface BaseProps {
 
 export interface TokenBadgeProps extends BaseProps {
     token: IToken;
+    displayTokenName?: boolean;
 }
 
 export interface ContractInfoProps extends BaseProps {
