@@ -55,7 +55,7 @@ function TradeDCA() {
     <Container my="setup_schedule">
       <Container my="setup_swap">
         <Group align="end" position="center" spacing="xs" grow>
-          <SwapToken text={"I want to sell..."} />
+          <SwapToken text={"I want to sell"} />
           <ActionIcon
             size="xl"
             radius="xl"
@@ -64,7 +64,7 @@ function TradeDCA() {
           >
             <SwitchHorizontal size={45} strokeWidth={3} />
           </ActionIcon>
-          <SwapToken text={"To purchase..."} />
+          <SwapToken text={"To purchase"} />
         </Group>
       </Container>
 
