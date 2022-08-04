@@ -19,9 +19,7 @@ import swapTokens from "./../../data/swapTokens";
 import { Selector } from "tabler-icons-react";
 
 import { IToken } from "../../models/Interfaces";
-// import useSWR from "swr";
-
-// const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import use1inchRetrieveTokens from "../../apis/1inch/retrieveTokens";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -39,35 +37,31 @@ export default function SwapToken({ text }: ISwapText) {
   const [opened, setOpened] = useState(false);
   const currentChain: number = chain?.id as keyof typeof gasTokens;
 
+  const {
+    tokens: masterTokenList,
+    isLoading,
+    isError,
+  } = use1inchRetrieveTokens(1); //chain num
+
   const [token, setToken] = useState(swapTokens[0][0]);
-
-  // const { data: fetchSuccess, error: fetchError } = useSWR(
-  //   // `https://api.1inch.io/v4.0/${currentChain}/tokens`,
-  //   `https://api.1inch.io/v4.0/1/tokens`,
-  //   fetcher
-  // );
-
-  // if (fetchSuccess) {
-  //   console.log("fetch success", fetchSuccess);
-  //   if (fetchSuccess.tokens) {
-  //   }
-  // }
-
-  // if (fetchError) console.log("fetch error", fetchError);
-
   const tokensList: IToken[] = swapTokens[currentChain];
   const [filteredTokens, setFilteredTokens] = useState(tokensList);
   useEffect(() => setFilteredTokens(tokensList), [tokensList]);
 
   const searchTokens = (event: ChangeEvent<HTMLInputElement>): void => {
     const searchValue = event.target.value.toLowerCase();
-    const filtered = tokensList.filter(
-      (token: IToken) =>
-        token.symbol.toLowerCase().includes(searchValue) ||
-        token.name.toLowerCase().includes(searchValue) ||
-        token.address.toLowerCase().includes(searchValue)
-    );
-    setFilteredTokens(filtered);
+    if (searchValue.length >= 3) {
+      //improve search performance
+      const filtered = masterTokenList.filter(
+        (token: IToken) =>
+          token.symbol.toLowerCase().includes(searchValue) ||
+          token.name.toLowerCase().includes(searchValue) ||
+          token.address.toLowerCase() === searchValue //exact matches only
+      );
+      setFilteredTokens(filtered);
+    } else {
+      setFilteredTokens(swapTokens[currentChain]);
+    }
   };
 
   return (
@@ -117,6 +111,7 @@ export default function SwapToken({ text }: ISwapText) {
                   }}
                 >
                   <TokenBadge token={token} displayTokenName={true} />
+                  <Divider my="sm" variant="dashed" />
                 </div>
               ))
             ) : (

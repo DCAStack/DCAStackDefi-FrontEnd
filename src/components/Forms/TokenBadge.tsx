@@ -1,5 +1,5 @@
 import { TokenBadgeProps } from "../../models/PropTypes";
-import { createStyles } from "@mantine/core";
+import { createStyles, Text } from "@mantine/core";
 
 const useStyles = createStyles((theme) => ({
   imgDim: {
@@ -15,18 +15,14 @@ const TokenBadge = ({
 }: TokenBadgeProps) => {
   const { classes } = useStyles();
   let displayData;
-  if (displayTokenName) {
-    displayData = `${token.symbol}: ${token.name}`;
-  } else {
-    displayData = `${token.symbol}`;
-  }
 
   return (
     <span className={(className ? className + " " : "") + "flex items-center"}>
       {token.logoURI && (
         <img src={token.logoURI} alt={token.name} className={classes.imgDim} />
       )}
-      {displayData}
+      {token.symbol}
+      {displayTokenName === true && <Text size="md">{token.name}</Text>}
     </span>
   );
 };
