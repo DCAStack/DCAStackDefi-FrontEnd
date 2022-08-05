@@ -1,6 +1,14 @@
 import React from "react";
 
-import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
+import {
+  Container,
+  Title,
+  Paper,
+  Space,
+  createStyles,
+  Text,
+  Group,
+} from "@mantine/core";
 
 import { useNetwork } from "wagmi";
 
@@ -33,7 +41,15 @@ const Trade = () => {
         Setup New Schedule
       </Title>
       <Space h="xl" />
-
+      <Alert
+        icon={<AlertCircle size={16} />}
+        title="No Fee to DCA!"
+        radius="xs"
+        withCloseButton
+      >
+        All DCA schedules have no fees during the initial launch. Enjoy DCAStack
+        fam!
+      </Alert>
       <Space h="xl" />
       <Paper shadow="xl" radius="xl" p="xl" withBorder>
         <TradeDCA />

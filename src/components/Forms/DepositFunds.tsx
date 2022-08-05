@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
-import GasToken from "./GasToken";
+import ViewToken from "./ViewToken";
 
 import {
   usePrepareContractWrite,
@@ -27,6 +27,7 @@ import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 import swapTokens from "./../../data/swapTokens";
+import { TokenBadgeProps } from "../../models/PropTypes";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -34,7 +35,11 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function DepositFunds() {
+interface ISetupToken {
+  token: TokenBadgeProps;
+}
+
+export default function DepositFunds({ token }: TokenBadgeProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const [depositAmount, setDeposit] = useState(0);
@@ -137,7 +142,7 @@ export default function DepositFunds() {
           size="xl"
           hideControls
           onChange={(val) => (val ? setDeposit(val) : setDeposit(0))}
-          icon={<GasToken />}
+          icon={<ViewToken token={token} />}
           iconWidth={115}
         />
         <Button

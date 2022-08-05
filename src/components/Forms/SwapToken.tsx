@@ -19,7 +19,7 @@ import swapTokens from "./../../data/swapTokens";
 import { Selector } from "tabler-icons-react";
 
 import { IToken } from "../../models/Interfaces";
-import use1inchRetrieveTokens from "../../apis/1inch/retrieveTokens";
+import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -29,9 +29,10 @@ const useStyles = createStyles((theme) => ({
 
 interface ISwapText {
   text: string;
+  updateToken: React.Dispatch<React.SetStateAction<IToken>>;
 }
 
-export default function SwapToken({ text }: ISwapText) {
+export default function SwapToken({ text, updateToken }: ISwapText) {
   const { classes } = useStyles();
   const { chain, chains } = useNetwork();
   const [opened, setOpened] = useState(false);
@@ -44,6 +45,7 @@ export default function SwapToken({ text }: ISwapText) {
   } = use1inchRetrieveTokens(1); //chain num
 
   const [token, setToken] = useState(swapTokens[0][0]);
+  updateToken(token);
   const tokensList: IToken[] = swapTokens[currentChain];
   const [filteredTokens, setFilteredTokens] = useState(tokensList);
   useEffect(() => setFilteredTokens(tokensList), [tokensList]);
