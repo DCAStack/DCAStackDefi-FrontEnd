@@ -4,6 +4,11 @@ import React, { useState } from "react";
 export default function use1inchRetrieveTokens(currentChain: number) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+  if (currentChain === 31337) {
+    //help with local testing
+    currentChain = 1;
+  }
+
   const { data, error } = useSWR(
     `https://api.1inch.io/v4.0/${currentChain}/tokens`,
     fetcher
