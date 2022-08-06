@@ -2,7 +2,7 @@ import React from "react";
 
 import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
 
-import WithdrawFunds from "../Forms/WithdrawFunds";
+import WithdrawFunds from "../Banking/WithdrawFunds";
 import { Tabs } from "@mantine/core";
 import { BuildingBank, Clock, Cash, History } from "tabler-icons-react";
 
@@ -40,7 +40,16 @@ const Dashboard = () => {
       <Space h="xl" />
 
       <Space h="xl" />
-      <Paper shadow="xl" radius="xl" p="xl" withBorder>
+      <Paper
+        shadow="xl"
+        radius="xl"
+        p="xl"
+        withBorder
+        sx={(theme) => ({
+          borderColor: theme.white,
+          borderBlockColor: theme.white,
+        })}
+      >
         <WithdrawFunds />
       </Paper>
       <Space h="xl" />
@@ -53,14 +62,14 @@ const Dashboard = () => {
         <Tabs.Tab label="Schedules" icon={<Clock size={30} />}>
           <UserSchedulesPopulated />
         </Tabs.Tab>
-
+        {/* 
         <Tabs.Tab label="Trades" icon={<Cash size={30} />}>
           <UserTradesPopulated />
         </Tabs.Tab>
 
         <Tabs.Tab label="History" icon={<History size={30} />}>
           <UserHistoryPopulated />
-        </Tabs.Tab>
+        </Tabs.Tab> */}
       </Tabs>
     </Container>
   );

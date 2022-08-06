@@ -3,8 +3,8 @@ import { useEffect, useState, useContext } from "react";
 
 import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
 
-import WithdrawGas from "../Forms/WithdrawGas";
-import DepositGas from "../Forms/DepositGas";
+import WithdrawGas from "../Banking/WithdrawGas";
+import DepositGas from "../Banking/DepositGas";
 
 import { useNetwork } from "wagmi";
 
@@ -78,7 +78,16 @@ const Gas = () => {
       </Alert>
 
       <Space h="xl" />
-      <Paper shadow="xl" radius="xl" p="xl" withBorder>
+      <Paper
+        shadow="xl"
+        radius="xl"
+        p="xl"
+        withBorder
+        sx={(theme) => ({
+          borderColor: theme.white,
+          borderBlockColor: theme.white,
+        })}
+      >
         <WithdrawGas />
         <Space h="xl" />
         <Space h="xl" />

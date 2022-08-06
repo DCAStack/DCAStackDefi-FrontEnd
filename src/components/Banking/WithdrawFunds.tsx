@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
-import GasToken from "./GasToken";
+import GasToken from "../TokenDisplay/GasToken";
 
 import {
   usePrepareContractWrite,
@@ -26,6 +26,7 @@ import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
+import swapTokens from "./../../data/swapTokens";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -33,7 +34,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function DepositGas() {
+export default function WithdrawFunds() {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const [depositAmount, setDeposit] = useState(0);
@@ -126,11 +127,12 @@ export default function DepositGas() {
   });
 
   return (
-    <Container my="deposit_gas">
+    <Container my="withdraw_funds">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
+          disabled
           value={depositAmount}
-          label="Deposit Gas Amount"
+          label="Withdraw Funds"
           radius="xs"
           size="xl"
           hideControls
@@ -142,13 +144,8 @@ export default function DepositGas() {
               variant="subtle"
               className={classes.input}
               compact
-              radius="xl"
+              radius="xs"
               size="md"
-              onClick={() =>
-                maxDeposit
-                  ? setDeposit(Number(maxDeposit?.formatted.split(".")[0]))
-                  : setDeposit(0)
-              }
             >
               MAX
             </Button>
@@ -162,7 +159,7 @@ export default function DepositGas() {
           size="xl"
           onClick={() => depositGas?.()}
         >
-          &nbsp;Deposit&nbsp;
+          &nbsp;Withdraw&nbsp;
         </Button>{" "}
       </Group>
     </Container>

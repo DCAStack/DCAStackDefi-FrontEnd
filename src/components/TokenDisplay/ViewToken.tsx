@@ -2,8 +2,8 @@ import { createStyles } from "@mantine/core";
 import { useNetwork } from "wagmi";
 import { Button } from "@mantine/core";
 import TokenBadge from "./TokenBadge";
-import gasTokens from "./../../data/gasTokens";
-import swapTokens from "./../../data/swapTokens";
+import gasTokens from "../../data/gasTokens";
+import swapTokens from "../../data/swapTokens";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
 const useStyles = createStyles((theme) => ({

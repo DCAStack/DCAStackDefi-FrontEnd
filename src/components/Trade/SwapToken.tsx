@@ -12,10 +12,10 @@ import {
   ScrollArea,
   Text,
 } from "@mantine/core";
-import TokenBadge from "./TokenBadge";
-import ViewToken from "./ViewToken";
-import gasTokens from "./../../data/gasTokens";
-import swapTokens from "./../../data/swapTokens";
+import TokenBadge from "../TokenDisplay/TokenBadge";
+import ViewToken from "../TokenDisplay/ViewToken";
+import gasTokens from "../../data/gasTokens";
+import swapTokens from "../../data/swapTokens";
 import { Selector } from "tabler-icons-react";
 
 import { IToken } from "../../models/Interfaces";

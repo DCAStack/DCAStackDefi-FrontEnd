@@ -8,11 +8,10 @@ import {
   Button,
   createStyles,
   Avatar,
-  Space,
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
-import ViewToken from "./ViewToken";
+import GasToken from "../TokenDisplay/GasToken";
 
 import {
   usePrepareContractWrite,
@@ -23,11 +22,9 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
-import { ContractInfoProps } from "../../models/PropTypes";
+import { ContractInfoProps } from "./../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import swapTokens from "./../../data/swapTokens";
-import { TokenBadgeProps } from "../../models/PropTypes";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -35,54 +32,50 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-interface ISetupToken {
-  token: TokenBadgeProps;
-}
-
-export default function DepositFunds({ token }: TokenBadgeProps) {
+export default function WithdrawGas() {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [depositAmount, setDeposit] = useState(0);
+  const [withdrawAmount, setWithdraw] = useState(0);
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   const {
-    config: depositGasSetup,
-    error: depositGasError,
-    isError: prepareDepositGasError,
+    config: withdrawGasSetup,
+    error: withdrawGasError,
+    isError: prepareWithdrawGasError,
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    functionName: "depositGas",
+    functionName: "withdrawGas",
+    args: parseEther(String(withdrawAmount)),
     overrides: {
       from: address,
-      value: parseEther(String(depositAmount)),
     },
     onError(error) {
-      console.log("Deposit Funds Error", error);
+      console.log("Withdraw Funds Error", error);
     },
     onSuccess(data) {
-      console.log("Deposit Funds Prepared", data);
+      console.log("Withdraw Funds Prepared", data);
     },
   });
 
   const {
     data,
     error,
-    isError: depositError,
-    write: depositGas,
-  } = useContractWrite(depositGasSetup);
+    isError: withdrawError,
+    write: withdrawGas,
+  } = useContractWrite(withdrawGasSetup);
 
   const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
     hash: data?.hash,
   });
 
-  if (depositError || prepareDepositGasError) {
+  if (withdrawError || prepareWithdrawGasError) {
     showNotification({
-      id: "deposit-gas-error",
+      id: "withdraw-gas-error",
       color: "red",
-      title: "Error Gas Deposit",
+      title: "Error Gas Withdrawal",
       message: "If this was unexpected, please raise an issue on github!",
       autoClose: true,
       disallowClose: false,
@@ -92,9 +85,9 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
 
   if (txPending) {
     showNotification({
-      id: "deposit-gas-pending",
+      id: "withdraw-gas-pending",
       loading: true,
-      title: "Pending Gas Deposit",
+      title: "Pending Gas Withdrawal",
       message: "Waiting for your tx. Check status on your account tab.",
       autoClose: true,
       disallowClose: false,
@@ -104,55 +97,77 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
   if (txDone && data?.hash) {
     addRecentTransaction({
       hash: data?.hash,
-      description: "Deposit Gas",
+      description: "Withdraw Gas",
     });
 
     updateNotification({
-      id: "deposit-gas-pending",
+      id: "withdraw-gas-pending",
       color: "teal",
-      title: "Gas Deposit Received",
-      message: "Happy DCAing :)",
+      title: "Gas Withdrawal Complete",
+      message: "Safe travels :)",
       icon: <CircleCheck />,
     });
   }
 
   const {
-    data: maxDeposit,
+    data: maxWithdraw,
     isError,
     isLoading,
-  } = useBalance({
-    addressOrName: address,
+  } = useContractRead({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "userGasBalances",
+    args: address,
+    cacheOnBlock: true,
     watch: true,
     onSuccess(data) {
-      console.log("Get User Wallet Balance Success", data);
+      console.log("Get User Gas for withdraw Success", data);
     },
     onError(error) {
-      console.log("Get User Wallet Balance Error", error);
+      console.log("Get User Gas for withdraw Error", error);
     },
   });
 
+  console.log("Max withdraw is", maxWithdraw);
+
   return (
-    <Container my="deposit_funds">
+    <Container my="withdraw_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
-          disabled
-          value={depositAmount}
-          label="Deposit DCA Amount"
+          value={withdrawAmount}
+          label="Withdraw Amount"
           radius="xs"
           size="xl"
           hideControls
-          onChange={(val) => (val ? setDeposit(val) : setDeposit(0))}
-          icon={<ViewToken token={token} />}
+          onChange={(val) => (val ? setWithdraw(val) : setWithdraw(0))}
+          icon={<GasToken />}
           iconWidth={115}
+          rightSection={
+            <Button
+              variant="subtle"
+              className={classes.input}
+              compact
+              radius="xs"
+              size="md"
+              onClick={() =>
+                maxWithdraw
+                  ? setWithdraw(Number(formatEther(maxWithdraw?.toString())))
+                  : setWithdraw(0)
+              }
+            >
+              MAX
+            </Button>
+          }
+          rightSectionWidth={65}
         />
         <Button
           compact
           className={classes.input}
           radius="xs"
           size="xl"
-          onClick={() => depositGas?.()}
+          onClick={() => withdrawGas?.()}
         >
-          &nbsp;Deposit&nbsp;
+          Withdraw
         </Button>{" "}
       </Group>
     </Container>

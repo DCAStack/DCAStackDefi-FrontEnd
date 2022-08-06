@@ -8,10 +8,11 @@ import {
   Button,
   createStyles,
   Avatar,
+  Space,
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
-import GasToken from "../Forms/GasToken";
+import GasToken from "../TokenDisplay/GasToken";
 
 import {
   usePrepareContractWrite,
@@ -22,7 +23,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
-import { ContractInfoProps } from "./../../models/PropTypes";
+import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
@@ -32,50 +33,50 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function WithdrawGas() {
+export default function DepositGas() {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [withdrawAmount, setWithdraw] = useState(0);
+  const [depositAmount, setDeposit] = useState(0);
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   const {
-    config: withdrawGasSetup,
-    error: withdrawGasError,
-    isError: prepareWithdrawGasError,
+    config: depositGasSetup,
+    error: depositGasError,
+    isError: prepareDepositGasError,
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    functionName: "withdrawGas",
-    args: parseEther(String(withdrawAmount)),
+    functionName: "depositGas",
     overrides: {
       from: address,
+      value: parseEther(String(depositAmount)),
     },
     onError(error) {
-      console.log("Withdraw Funds Error", error);
+      console.log("Deposit Funds Error", error);
     },
     onSuccess(data) {
-      console.log("Withdraw Funds Prepared", data);
+      console.log("Deposit Funds Prepared", data);
     },
   });
 
   const {
     data,
     error,
-    isError: withdrawError,
-    write: withdrawGas,
-  } = useContractWrite(withdrawGasSetup);
+    isError: depositError,
+    write: depositGas,
+  } = useContractWrite(depositGasSetup);
 
   const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
     hash: data?.hash,
   });
 
-  if (withdrawError || prepareWithdrawGasError) {
+  if (depositError || prepareDepositGasError) {
     showNotification({
-      id: "withdraw-gas-error",
+      id: "deposit-gas-error",
       color: "red",
-      title: "Error Gas Withdrawal",
+      title: "Error Gas Deposit",
       message: "If this was unexpected, please raise an issue on github!",
       autoClose: true,
       disallowClose: false,
@@ -85,9 +86,9 @@ export default function WithdrawGas() {
 
   if (txPending) {
     showNotification({
-      id: "withdraw-gas-pending",
+      id: "deposit-gas-pending",
       loading: true,
-      title: "Pending Gas Withdrawal",
+      title: "Pending Gas Deposit",
       message: "Waiting for your tx. Check status on your account tab.",
       autoClose: true,
       disallowClose: false,
@@ -97,49 +98,43 @@ export default function WithdrawGas() {
   if (txDone && data?.hash) {
     addRecentTransaction({
       hash: data?.hash,
-      description: "Withdraw Gas",
+      description: "Deposit Gas",
     });
 
     updateNotification({
-      id: "withdraw-gas-pending",
+      id: "deposit-gas-pending",
       color: "teal",
-      title: "Gas Withdrawal Complete",
-      message: "Safe travels :)",
+      title: "Gas Deposit Received",
+      message: "Happy DCAing :)",
       icon: <CircleCheck />,
     });
   }
 
   const {
-    data: maxWithdraw,
+    data: maxDeposit,
     isError,
     isLoading,
-  } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "userGasBalances",
-    args: address,
-    cacheOnBlock: true,
+  } = useBalance({
+    addressOrName: address,
     watch: true,
     onSuccess(data) {
-      console.log("Get User Gas for withdraw Success", data);
+      console.log("Get User Wallet Balance Success", data);
     },
     onError(error) {
-      console.log("Get User Gas for withdraw Error", error);
+      console.log("Get User Wallet Balance Error", error);
     },
   });
 
-  console.log("Max withdraw is", maxWithdraw);
-
   return (
-    <Container my="withdraw_gas">
+    <Container my="deposit_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
-          value={withdrawAmount}
-          label="Withdraw Amount"
+          value={depositAmount}
+          label="Deposit Gas Amount"
           radius="xs"
           size="xl"
           hideControls
-          onChange={(val) => (val ? setWithdraw(val) : setWithdraw(0))}
+          onChange={(val) => (val ? setDeposit(val) : setDeposit(0))}
           icon={<GasToken />}
           iconWidth={115}
           rightSection={
@@ -147,12 +142,12 @@ export default function WithdrawGas() {
               variant="subtle"
               className={classes.input}
               compact
-              radius="xs"
+              radius="xl"
               size="md"
               onClick={() =>
-                maxWithdraw
-                  ? setWithdraw(Number(formatEther(maxWithdraw?.toString())))
-                  : setWithdraw(0)
+                maxDeposit
+                  ? setDeposit(Number(maxDeposit?.formatted.split(".")[0]))
+                  : setDeposit(0)
               }
             >
               MAX
@@ -165,9 +160,9 @@ export default function WithdrawGas() {
           className={classes.input}
           radius="xs"
           size="xl"
-          onClick={() => withdrawGas?.()}
+          onClick={() => depositGas?.()}
         >
-          Withdraw
+          &nbsp;Deposit&nbsp;
         </Button>{" "}
       </Group>
     </Container>

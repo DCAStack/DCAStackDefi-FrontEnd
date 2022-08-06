@@ -1,23 +1,13 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-  ChangeEvent,
-  MouseEventHandler,
-  MouseEvent,
-} from "react";
+import { useEffect, useState, useContext } from "react";
 
 import {
   Group,
   NumberInput,
-  Grid,
   Container,
   Button,
   createStyles,
-  Avatar,
   Space,
   NativeSelect,
-  Paper,
   Text,
   Title,
   Stack,
@@ -25,8 +15,7 @@ import {
 import { DateRangePicker, TimeInput } from "@mantine/dates";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
-import SwapToken from "../Forms/SwapToken";
+import SwapToken from "./SwapToken";
 import dayjs from "dayjs";
 
 import {
@@ -45,8 +34,8 @@ import { ContractContext } from "../../App";
 import { ActionIcon } from "@mantine/core";
 import { SwitchHorizontal, PlayerPlay } from "tabler-icons-react";
 
-import DepositGas from "../Forms/DepositGas";
-import DepositFunds from "../Forms/DepositFunds";
+import DepositGas from "../Banking/DepositGas";
+import DepositFunds from "../Banking/DepositFunds";
 
 import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 
@@ -221,7 +210,6 @@ function TradeDCA() {
             radius="xs"
             size="xl"
             allowLevelChange
-            amountOfMonths={2}
           />
           <TimeInput
             value={new Date()}
