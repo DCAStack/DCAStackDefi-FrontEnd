@@ -112,8 +112,8 @@ function TradeDCA() {
       {
         addressOrName: contractAddr,
         contractInterface: contractABI,
-        functionName: "userTokenBalances",
-        args: [address, sellToken?.address],
+        functionName: "getFreeTokenBalance",
+        args: [sellToken?.address],
       },
     ],
     cacheOnBlock: true,
@@ -144,7 +144,7 @@ function TradeDCA() {
   return (
     <Container my="setup_schedule">
       <Container my="setup_swap">
-        <Group align="end" position="center" spacing="xs" grow>
+        <Group align="center" position="center" spacing="xs" grow>
           <SwapToken text={"I want to sell"} updateToken={setSellToken} />
           <ActionIcon
             size="xl"
@@ -172,13 +172,13 @@ function TradeDCA() {
             radius="xs"
             size="xl"
             hideControls
-            description="I want to sell each DCA..."
+            placeholder="Sell each DCA..."
             required
             onChange={(val) => (val ? setSellAmount(val) : setSellAmount(0))}
           />
           <NumberInput
             label="Trade Frequency"
-            description="I want to DCA every..."
+            placeholder="DCA every..."
             radius="xs"
             size="xl"
             required
@@ -207,18 +207,17 @@ function TradeDCA() {
             firstDayOfWeek="sunday"
             dropdownType="modal"
             label="Select DCA Schedule"
-            description="Duration of DCA"
             placeholder="Pick dates range"
             onChange={setDate}
             required
             radius="xs"
             size="xl"
             allowLevelChange
+            minDate={dayjs(new Date()).toDate()}
           />
           <TimeInput
             value={new Date()}
             label="Start Time"
-            description="When to execute your DCA"
             format="12"
             radius="xs"
             size="xl"
@@ -263,7 +262,14 @@ function TradeDCA() {
             )}
           </Stack>
 
-          <DepositGas />
+          <DepositGas
+            defaultValue={
+              Number(quote1inch?.estimatedGasFormatted) > Number(curUserGasBal)
+                ? Number(quote1inch?.estimatedGasFormatted) -
+                  Number(curUserGasBal)
+                : 0
+            }
+          />
         </Group>
 
         <Space h="md" />
@@ -282,18 +288,25 @@ function TradeDCA() {
               </Text>
             )}
 
-            {Number(curUserBal) < Number(depositAmount) && (
+            {Number(curUserBal) < depositAmount && (
               <Text size="lg" color="red">
                 Need: {depositAmount - Number(curUserBal)} {sellToken.symbol}
               </Text>
             )}
-            {Number(curUserBal) >= Number(depositAmount) && (
+            {Number(curUserBal) >= depositAmount && (
               <Text size="lg" color="green">
                 Need: 0 {sellToken.symbol}
               </Text>
             )}
           </Stack>
-          <DepositFunds token={sellToken} />
+          <DepositFunds
+            token={sellToken}
+            defaultValue={
+              Number(curUserBal) < depositAmount
+                ? depositAmount - Number(curUserBal)
+                : 0
+            }
+          />
         </Group>
       </Container>
 

@@ -33,13 +33,21 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function DepositGas() {
+interface ISetup {
+  defaultValue?: number;
+}
+
+export default function DepositGas({ defaultValue = 0 }: ISetup) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [depositAmount, setDeposit] = useState(0);
+  const [depositAmount, setDeposit] = useState(defaultValue);
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
+
+  useEffect(() => {
+    setDeposit(defaultValue);
+  }, [defaultValue]);
 
   const {
     config: depositGasSetup,
@@ -72,7 +80,7 @@ export default function DepositGas() {
     hash: data?.hash,
   });
 
-  if (depositError || prepareDepositGasError) {
+  if (depositError) {
     showNotification({
       id: "deposit-gas-error",
       color: "red",

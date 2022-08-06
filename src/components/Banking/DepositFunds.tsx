@@ -29,17 +29,18 @@ import { ContractContext } from "../../App";
 import swapTokens from "../../data/swapTokens";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
+import { parseUnits } from "ethers/lib/utils";
+
 const useStyles = createStyles((theme) => ({
   input: {
     height: 60,
   },
 }));
 
-interface ISetupToken {
-  token: TokenBadgeProps;
-}
-
-export default function DepositFunds({ token }: TokenBadgeProps) {
+export default function DepositFunds({
+  token,
+  defaultValue = 0,
+}: TokenBadgeProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const [depositAmount, setDeposit] = useState(0);
@@ -47,18 +48,19 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
+  useEffect(() => {
+    setDeposit(defaultValue);
+  }, [defaultValue]);
+
   const {
-    config: depositGasSetup,
-    error: depositGasError,
-    isError: prepareDepositGasError,
+    config: depositFundsSetup,
+    error: depositFundsError,
+    isError: prepareDepositFundsError,
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    functionName: "depositGas",
-    overrides: {
-      from: address,
-      value: parseEther(String(depositAmount)),
-    },
+    functionName: "depositFunds",
+    args: [token.address, parseUnits(String(depositAmount), token.decimals)],
     onError(error) {
       console.log("Deposit Funds Error", error);
     },
@@ -71,18 +73,18 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
     data,
     error,
     isError: depositError,
-    write: depositGas,
-  } = useContractWrite(depositGasSetup);
+    write: depositFunds,
+  } = useContractWrite(depositFundsSetup);
 
   const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
     hash: data?.hash,
   });
 
-  if (depositError || prepareDepositGasError) {
+  if (depositError) {
     showNotification({
-      id: "deposit-gas-error",
+      id: "deposit-funds-error",
       color: "red",
-      title: "Error Gas Deposit",
+      title: "Error Fund Deposit",
       message: "If this was unexpected, please raise an issue on github!",
       autoClose: true,
       disallowClose: false,
@@ -92,9 +94,9 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
 
   if (txPending) {
     showNotification({
-      id: "deposit-gas-pending",
+      id: "deposit-fund-pending",
       loading: true,
-      title: "Pending Gas Deposit",
+      title: "Pending Fund Deposit",
       message: "Waiting for your tx. Check status on your account tab.",
       autoClose: true,
       disallowClose: false,
@@ -104,13 +106,13 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
   if (txDone && data?.hash) {
     addRecentTransaction({
       hash: data?.hash,
-      description: "Deposit Gas",
+      description: "Deposit Fund",
     });
 
     updateNotification({
-      id: "deposit-gas-pending",
+      id: "deposit-fund-pending",
       color: "teal",
-      title: "Gas Deposit Received",
+      title: "Fund Deposit Received",
       message: "Happy DCAing :)",
       icon: <CircleCheck />,
     });
@@ -166,7 +168,7 @@ export default function DepositFunds({ token }: TokenBadgeProps) {
           className={classes.input}
           radius="xs"
           size="xl"
-          onClick={() => depositGas?.()}
+          onClick={() => depositFunds?.()}
         >
           &nbsp;Deposit&nbsp;
         </Button>{" "}
