@@ -1,4 +1,11 @@
-import { useEffect, useState, useContext } from "react";
+import {
+  useEffect,
+  useState,
+  useContext,
+  ChangeEvent,
+  MouseEventHandler,
+  MouseEvent,
+} from "react";
 
 import {
   Group,
@@ -15,7 +22,7 @@ import {
   Title,
   Stack,
 } from "@mantine/core";
-import { DatePicker, TimeInput } from "@mantine/dates";
+import { DateRangePicker, TimeInput } from "@mantine/dates";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
@@ -41,6 +48,10 @@ import { SwitchHorizontal, PlayerPlay } from "tabler-icons-react";
 import DepositGas from "../Forms/DepositGas";
 import DepositFunds from "../Forms/DepositFunds";
 
+import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
+
+import { nullToken } from "../../data/gasTokens";
+
 const useStyles = createStyles((theme) => ({
   input: {
     height: 60,
@@ -48,32 +59,54 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function TradeDCA() {
+  const [date, setDate] = useState<[Date | null, Date | null]>([
+    new Date(),
+    dayjs(new Date()).add(1, "days").toDate(),
+  ]);
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
+  const currentChain: number = chain ? chain?.id : 0;
 
   const { classes } = useStyles();
-  const [date, setDate] = useState<Date | null>(new Date());
   const [curUserGasBal, setUserGasBal] = useState("0");
   const [curUserBal, setUserBal] = useState("0");
   const [sellAmount, setSellAmount] = useState(0);
   const [tradeFreq, setTradeFreq] = useState(0);
 
-  const [sellToken, setSellToken] = useState({
-    address: "",
-    decimals: 0,
-    logoURI: "",
-    name: "",
-    symbol: "",
-  });
-  const [buyToken, setBuyToken] = useState({
-    address: "",
-    decimals: 0,
-    logoURI: "",
-    name: "",
-    symbol: "",
-  });
+  const [sellToken, setSellToken] = useState(nullToken);
+  const [buyToken, setBuyToken] = useState(nullToken);
+  const [depositAmount, setDepositAmount] = useState(0);
+
+  const [quote1inch, setQuote1inch] = useState({ estimatedGasFormatted: "0" });
+
+  const {
+    quote: quoteDetails,
+    isLoading: quoteLoading,
+    isError: quoteError,
+  } = use1inchRetrieveQuote(
+    currentChain,
+    sellToken,
+    buyToken,
+    String(sellAmount),
+    tradeFreq
+  );
+
+  useEffect(() => {
+    if (date[1] && date[0] && quoteDetails && sellAmount !== 0) {
+      const numExec =
+        (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000); //round off issue
+
+      setDepositAmount(numExec * sellAmount);
+
+      if (quoteDetails.estimatedGasFormatted) {
+        quoteDetails.estimatedGasFormatted =
+          quoteDetails.estimatedGasFormatted * numExec * 1.5;
+        setQuote1inch(quoteDetails);
+      }
+    }
+  }, [quoteDetails, date, tradeFreq, sellAmount]);
 
   const { data, isError, isLoading } = useContractReads({
     contracts: [
@@ -125,6 +158,11 @@ function TradeDCA() {
             radius="xl"
             variant="filled"
             className={classes.input}
+            onClick={() => {
+              if (buyToken !== nullToken && sellToken !== nullToken) {
+                console.log("SWAPPED pre", sellToken, buyToken);
+              }
+            }}
           >
             <SwitchHorizontal size={45} strokeWidth={3} />
           </ActionIcon>
@@ -169,16 +207,21 @@ function TradeDCA() {
 
       <Container my="setup_date">
         <Group align="end" position="center" spacing="xl" grow>
-          <DatePicker
+          <DateRangePicker
+            excludeDate={(date) =>
+              tradeFreq !== 0 ? date.getDate() % tradeFreq !== 0 : false
+            }
+            firstDayOfWeek="sunday"
             dropdownType="modal"
-            label="DCA Start Date"
-            description="When to start"
-            placeholder="Pick start date"
-            value={date}
+            label="Select DCA Schedule"
+            description="Duration of DCA"
+            placeholder="Pick dates range"
             onChange={setDate}
             required
             radius="xs"
             size="xl"
+            allowLevelChange
+            amountOfMonths={2}
           />
           <TimeInput
             value={new Date()}
@@ -197,24 +240,61 @@ function TradeDCA() {
       <Space h="xl" />
 
       <Container my="setup_deposits">
-        <Group align="center" position="apart" spacing="xs" grow>
+        <Group align="center" position="center" grow>
           <Stack>
             <Title order={4}>Contract Gas Balance</Title>
-            <Text size="xl" color="green">
-              {curUserGasBal} {networkCurrency}
-            </Text>
+            {curUserGasBal !== "0" && (
+              <Text size="lg" color="green">
+                Have: {curUserGasBal} {networkCurrency}
+              </Text>
+            )}
+            {curUserGasBal === "0" && (
+              <Text size="lg" color="red">
+                Have: {curUserGasBal} {networkCurrency}
+              </Text>
+            )}
+
+            {quote1inch?.estimatedGasFormatted <= curUserGasBal && (
+              <Text size="lg" color="green">
+                Need: {quote1inch?.estimatedGasFormatted} {networkCurrency}
+              </Text>
+            )}
+            {quote1inch?.estimatedGasFormatted > curUserGasBal && (
+              <Text size="lg" color="red">
+                Need: {quote1inch?.estimatedGasFormatted} {networkCurrency}
+              </Text>
+            )}
           </Stack>
+
           <DepositGas />
         </Group>
 
         <Space h="md" />
 
-        <Group align="center" position="apart" spacing="xs" grow>
+        <Group align="center" position="center" grow>
           <Stack>
-            <Title order={4}>Free Deposit Balance</Title>
-            <Text size="xl" color="green">
-              {curUserBal} {sellToken.symbol}
-            </Text>
+            <Title order={4}>Contract Deposit Balance</Title>
+            {curUserBal !== "0.0" && (
+              <Text size="lg" color="green">
+                Have: {curUserBal} {sellToken.symbol}
+              </Text>
+            )}
+            {curUserBal === "0.0" && (
+              <Text size="lg" color="red">
+                Have: {curUserBal} {sellToken.symbol}
+              </Text>
+            )}
+
+            {depositAmount !== 0 && (
+              <Text size="lg" color="red">
+                Need: {depositAmount} {sellToken.symbol}
+              </Text>
+            )}
+            {depositAmount === 0 && (
+              <Text size="lg" color="green">
+                Need: {depositAmount} {sellToken.symbol}
+              </Text>
+            )}
           </Stack>
           <DepositFunds token={sellToken} />
         </Group>
@@ -248,8 +328,6 @@ function TradeDCA() {
           </Button>
         </Group>
       </Container>
-
-      <Container my="user_stats"></Container>
     </Container>
   );
 }

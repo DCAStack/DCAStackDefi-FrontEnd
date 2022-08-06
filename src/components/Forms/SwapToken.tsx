@@ -42,10 +42,9 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
     tokens: masterTokenList,
     isLoading,
     isError,
-  } = use1inchRetrieveTokens(1); //chain num
+  } = use1inchRetrieveTokens(currentChain);
 
   const [token, setToken] = useState(swapTokens[0][0]);
-  updateToken(token);
   const tokensList: IToken[] = swapTokens[currentChain];
   const [filteredTokens, setFilteredTokens] = useState(tokensList);
   useEffect(() => setFilteredTokens(tokensList), [tokensList]);
@@ -90,6 +89,7 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
               onClick={() => {
                 setOpened(false);
                 setToken(token);
+                updateToken(token);
               }}
             >
               <ViewToken key={index} token={token} />
@@ -110,6 +110,7 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
                   onClick={() => {
                     setOpened(false);
                     setToken(token);
+                    updateToken(token);
                   }}
                 >
                   <TokenBadge token={token} displayTokenName={true} />

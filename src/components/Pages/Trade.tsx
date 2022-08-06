@@ -51,7 +51,16 @@ const Trade = () => {
         fam!
       </Alert>
       <Space h="xl" />
-      <Paper shadow="xl" radius="xl" p="xl" withBorder>
+      <Paper
+        shadow="xl"
+        radius="xl"
+        p="xl"
+        withBorder
+        sx={(theme) => ({ 
+          borderColor: theme.white,
+          borderBlockColor: theme.white 
+        })}
+      >
         <TradeDCA />
       </Paper>
     </Container>
