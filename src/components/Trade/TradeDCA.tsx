@@ -67,6 +67,7 @@ function TradeDCA() {
   const [sellToken, setSellToken] = useState(nullToken);
   const [buyToken, setBuyToken] = useState(nullToken);
   const [depositAmount, setDepositAmount] = useState(0);
+  const [numExec, setNumExec] = useState(0);
 
   const [quote1inch, setQuote1inch] = useState({ estimatedGasFormatted: "0" });
 
@@ -84,8 +85,11 @@ function TradeDCA() {
 
   useEffect(() => {
     if (date[1] && date[0] && quoteDetails && sellAmount !== 0) {
-      const numExec =
-        (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000); //round off issue
+      setNumExec(
+        Math.floor(
+          (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000)
+        )
+      );
 
       setDepositAmount(numExec * sellAmount);
 
@@ -95,7 +99,7 @@ function TradeDCA() {
         setQuote1inch(quoteDetails);
       }
     }
-  }, [quoteDetails, date, tradeFreq, sellAmount]);
+  }, [quoteDetails, date, tradeFreq, sellAmount, numExec]);
 
   const { data, isError, isLoading } = useContractReads({
     contracts: [
@@ -242,14 +246,19 @@ function TradeDCA() {
               </Text>
             )}
 
-            {quote1inch?.estimatedGasFormatted <= curUserGasBal && (
+            {Number(quote1inch?.estimatedGasFormatted) <=
+              Number(curUserGasBal) && (
               <Text size="lg" color="green">
-                Need: {quote1inch?.estimatedGasFormatted} {networkCurrency}
+                Need: 0 {networkCurrency}
               </Text>
             )}
-            {quote1inch?.estimatedGasFormatted > curUserGasBal && (
+            {Number(quote1inch?.estimatedGasFormatted) >
+              Number(curUserGasBal) && (
               <Text size="lg" color="red">
-                Need: {quote1inch?.estimatedGasFormatted} {networkCurrency}
+                Need:{" "}
+                {Number(quote1inch?.estimatedGasFormatted) -
+                  Number(curUserGasBal)}{" "}
+                {networkCurrency}
               </Text>
             )}
           </Stack>
@@ -273,14 +282,14 @@ function TradeDCA() {
               </Text>
             )}
 
-            {depositAmount !== 0 && (
+            {Number(curUserBal) < Number(depositAmount) && (
               <Text size="lg" color="red">
-                Need: {depositAmount} {sellToken.symbol}
+                Need: {depositAmount - Number(curUserBal)} {sellToken.symbol}
               </Text>
             )}
-            {depositAmount === 0 && (
+            {Number(curUserBal) >= Number(depositAmount) && (
               <Text size="lg" color="green">
-                Need: {depositAmount} {sellToken.symbol}
+                Need: 0 {sellToken.symbol}
               </Text>
             )}
           </Stack>
@@ -310,7 +319,7 @@ function TradeDCA() {
               buyToken.symbol !== "" && (
                 <Text size="xl">
                   Trade {sellAmount} {sellToken.symbol} for {buyToken.symbol}{" "}
-                  Every {tradeFreq} Days
+                  Every {tradeFreq} Days for {numExec} Days
                 </Text>
               )}
           </Button>
