@@ -14,7 +14,10 @@ export default function use1inchRetrieveQuote(
   sellCrypto: IToken,
   buyCrypto: IToken,
   tradeAmount: string,
-  tradeFreq: number
+  tradeFreq: number,
+  startDate: Date | null,
+  endDate: Date | null,
+  numExec: number
 ) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -31,7 +34,10 @@ export default function use1inchRetrieveQuote(
     sellCrypto !== nullToken &&
       buyCrypto !== nullToken &&
       tradeAmount !== "0" &&
-      tradeFreq > 0
+      tradeFreq > 0 &&
+      startDate !== null &&
+      endDate !== null &&
+      numExec !== 0
       ? readyUrl
       : null,
     fetcher
@@ -44,6 +50,7 @@ export default function use1inchRetrieveQuote(
         String(data.estimatedGas),
         "gwei"
       );
+      data.estimatedGasDca = Number(data.estimatedGasFormatted) * numExec;
     }
   }
 

@@ -48,10 +48,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 function TradeDCA() {
-  const [date, setDate] = useState<[Date | null, Date | null]>([
-    new Date(),
-    dayjs(new Date()).add(1, "days").toDate(),
-  ]);
+  const [date, setDate] = useState<[Date | null, Date | null]>([null, null]);
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const { chain, chains } = useNetwork();
@@ -69,7 +66,10 @@ function TradeDCA() {
   const [depositAmount, setDepositAmount] = useState(0);
   const [numExec, setNumExec] = useState(0);
 
-  const [quote1inch, setQuote1inch] = useState({ estimatedGasFormatted: "0" });
+  const [quote1inch, setQuote1inch] = useState({
+    // estimatedGasFormatted: "0",
+    estimatedGasDca: 0,
+  });
 
   const {
     quote: quoteDetails,
@@ -80,11 +80,20 @@ function TradeDCA() {
     sellToken,
     buyToken,
     String(sellAmount),
-    tradeFreq
+    tradeFreq,
+    date[0],
+    date[1],
+    numExec
   );
 
   useEffect(() => {
-    if (date[1] && date[0] && quoteDetails && sellAmount !== 0) {
+    if (
+      date[1] &&
+      date[0] &&
+      // quoteDetails.estimatedGasFormatted !== "0" &&
+      sellAmount !== 0 &&
+      tradeFreq !== 0
+    ) {
       setNumExec(
         Math.floor(
           (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000)
@@ -93,11 +102,23 @@ function TradeDCA() {
 
       setDepositAmount(numExec * sellAmount);
 
-      if (quoteDetails.estimatedGasFormatted) {
-        quoteDetails.estimatedGasFormatted =
-          quoteDetails.estimatedGasFormatted * numExec * 1.5;
-        setQuote1inch(quoteDetails);
-      }
+      // if (quoteDetails.estimatedGasFormatted) {
+      //   console.log(
+      //     "preparing quote",
+      //     quoteDetails.estimatedGasFormatted,
+      //     numExec
+      //   );
+      //   quoteDetails.estimatedGasDca =
+      //     Number(quoteDetails.estimatedGasFormatted) * numExec * 1.5;
+      //   console.log(
+      //     "prepared quote",
+      //     quoteDetails,
+      //     quoteDetails.estimatedGasFormatted,
+      //     numExec
+      //   );
+
+      setQuote1inch(quoteDetails);
+      // }
     }
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec]);
 
@@ -234,29 +255,25 @@ function TradeDCA() {
         <Group align="center" position="center" grow>
           <Stack>
             <Title order={4}>Contract Gas Balance</Title>
-            {curUserGasBal !== "0" && (
+            {curUserGasBal !== "0.0" && (
               <Text size="lg" color="green">
                 Have: {curUserGasBal} {networkCurrency}
               </Text>
             )}
-            {curUserGasBal === "0" && (
+            {curUserGasBal === "0.0" && (
               <Text size="lg" color="red">
                 Have: {curUserGasBal} {networkCurrency}
               </Text>
             )}
 
-            {Number(quote1inch?.estimatedGasFormatted) <=
-              Number(curUserGasBal) && (
+            {quote1inch?.estimatedGasDca <= Number(curUserGasBal) && (
               <Text size="lg" color="green">
                 Need: 0 {networkCurrency}
               </Text>
             )}
-            {Number(quote1inch?.estimatedGasFormatted) >
-              Number(curUserGasBal) && (
+            {quote1inch?.estimatedGasDca > Number(curUserGasBal) && (
               <Text size="lg" color="red">
-                Need:{" "}
-                {Number(quote1inch?.estimatedGasFormatted) -
-                  Number(curUserGasBal)}{" "}
+                Need: {quote1inch?.estimatedGasDca - Number(curUserGasBal)}{" "}
                 {networkCurrency}
               </Text>
             )}
@@ -264,9 +281,8 @@ function TradeDCA() {
 
           <DepositGas
             defaultValue={
-              Number(quote1inch?.estimatedGasFormatted) > Number(curUserGasBal)
-                ? Number(quote1inch?.estimatedGasFormatted) -
-                  Number(curUserGasBal)
+              Number(quote1inch?.estimatedGasDca) > Number(curUserGasBal)
+                ? Number(quote1inch?.estimatedGasDca) - Number(curUserGasBal)
                 : 0
             }
           />
