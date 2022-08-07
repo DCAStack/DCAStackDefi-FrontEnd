@@ -11,6 +11,7 @@ import {
   Center,
   Anchor,
   Image,
+  Text,
 } from "@mantine/core";
 import { useBooleanToggle } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -20,6 +21,11 @@ import { ChevronDown } from "tabler-icons-react";
 const HEADER_HEIGHT = 60;
 
 const useStyles = createStyles((theme) => ({
+  logo: {
+    height: 160,
+    width: 100,
+  },
+
   root: {
     position: "relative",
     zIndex: 1,
@@ -180,13 +186,32 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
       <Container className={classes.header} fluid>
-        <Image
+        {/* <Image
           radius={10}
           src={process.env.PUBLIC_URL + "/logo.png"}
           alt={"Logo"}
-          height={350}
-          width={350}
-        />
+          height={150}
+          width={150}
+        /> */}
+        {/* <img
+          src={process.env.PUBLIC_URL + "/logo.png"}
+          alt={"Logo"}
+          className={classes.logo}
+        /> */}
+
+        <Anchor component={Link} to={`/`}>
+          <Text
+            component="span"
+            align="center"
+            variant="gradient"
+            gradient={{ from: "indigo", to: "cyan", deg: 45 }}
+            size="xl"
+            weight={700}
+            style={{ fontFamily: "Greycliff CF, sans-serif" }}
+          >
+            DCA Stack
+          </Text>
+        </Anchor>
 
         <Group>
           <Group ml={50} spacing={5} className={classes.links}>
