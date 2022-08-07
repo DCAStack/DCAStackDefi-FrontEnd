@@ -50,7 +50,7 @@ export default function use1inchRetrieveQuote(
         String(data.estimatedGas),
         "gwei"
       );
-      data.estimatedGasDca = Number(data.estimatedGasFormatted) * numExec;
+      data.estimatedGasDca = Number(data.estimatedGasFormatted) * numExec * 2;
     }
   }
 
