@@ -36,7 +36,7 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
   const { classes } = useStyles();
   const { chain, chains } = useNetwork();
   const [opened, setOpened] = useState(false);
-  const currentChain: number = chain?.id as keyof typeof gasTokens;
+  const currentChain: number = chain ? chain?.id : 0;
 
   const {
     tokens: masterTokenList,
@@ -53,7 +53,7 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
     const searchValue = event.target.value.toLowerCase();
     if (searchValue.length >= 3) {
       //improve search performance
-      const filtered = masterTokenList.filter(
+      const filtered = masterTokenList?.flattenData.filter(
         (token: IToken) =>
           token.symbol.toLowerCase().includes(searchValue) ||
           token.name.toLowerCase().includes(searchValue) ||

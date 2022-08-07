@@ -16,15 +16,14 @@ export default function use1inchRetrieveTokens(currentChain: number) {
 
   if (data) {
     if (data.tokens) {
-      data.strippedTokens = Object.values(data.tokens);
-      //   console.log("1inch fetch tokens success", data);
+      data.flattenData = Object.values(data.tokens);
     }
   }
 
   if (error) console.log("1inch fetch tokens error", error);
 
   return {
-    tokens: data?.strippedTokens,
+    tokens: data,
     isLoading: !error && !data,
     isError: error,
   };
