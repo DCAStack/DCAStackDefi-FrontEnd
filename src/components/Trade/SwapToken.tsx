@@ -27,12 +27,13 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-interface ISwapText {
+interface ISwapInfo {
   text: string;
   updateToken: React.Dispatch<React.SetStateAction<IToken>>;
+  currToken: IToken;
 }
 
-export default function SwapToken({ text, updateToken }: ISwapText) {
+export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
   const { classes } = useStyles();
   const { chain, chains } = useNetwork();
   const [opened, setOpened] = useState(false);
@@ -44,10 +45,13 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
     isError,
   } = use1inchRetrieveTokens(currentChain);
 
-  const [token, setToken] = useState(swapTokens[0][0]);
+  const [token, setToken] = useState(currToken);
   const tokensList: IToken[] = swapTokens[currentChain];
   const [filteredTokens, setFilteredTokens] = useState(tokensList);
-  useEffect(() => setFilteredTokens(tokensList), [tokensList]);
+  useEffect(() => {
+    setFilteredTokens(tokensList);
+    setToken(currToken);
+  }, [tokensList, currToken]);
 
   const searchTokens = (event: ChangeEvent<HTMLInputElement>): void => {
     const searchValue = event.target.value.toLowerCase();
@@ -73,6 +77,7 @@ export default function SwapToken({ text, updateToken }: ISwapText) {
         onClose={() => setOpened(false)}
         title="Select Token to Trade"
         padding="xl"
+        size="65%"
       >
         <TextInput
           placeholder="Search name or paste address"

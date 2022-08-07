@@ -95,6 +95,7 @@ function TradeDCA() {
         )
       );
 
+      console.log("1inch", quoteDetails, quoteError);
       setDepositAmount(sellAmount.mul(numExec));
       setQuote1inch(quoteDetails);
     }
@@ -104,7 +105,11 @@ function TradeDCA() {
     <Container my="setup_schedule">
       <Container my="setup_swap">
         <Group align="center" position="center" spacing="xs" grow>
-          <SwapToken text={"I want to sell"} updateToken={setSellToken} />
+          <SwapToken
+            text={"I want to sell"}
+            updateToken={setSellToken}
+            currToken={sellToken}
+          />
           <ActionIcon
             size="xl"
             radius="xl"
@@ -112,13 +117,20 @@ function TradeDCA() {
             className={classes.input}
             onClick={() => {
               if (buyToken !== nullToken && sellToken !== nullToken) {
-                console.log("SWAPPED pre", sellToken, buyToken);
+                const tempBuyToken = { ...buyToken };
+                const tempSellToken = { ...sellToken };
+                setSellToken(tempBuyToken);
+                setBuyToken(tempSellToken);
               }
             }}
           >
             <SwitchHorizontal size={45} strokeWidth={3} />
           </ActionIcon>
-          <SwapToken text={"To purchase"} updateToken={setBuyToken} />
+          <SwapToken
+            text={"To purchase"}
+            updateToken={setBuyToken}
+            currToken={buyToken}
+          />
         </Group>
       </Container>
 
