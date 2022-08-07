@@ -40,6 +40,7 @@ import DepositFunds from "../Banking/DepositFunds";
 import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 
 import { nullToken } from "../../data/gasTokens";
+import NewSchedule from "./NewSchedule";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -67,7 +68,6 @@ function TradeDCA() {
   const [numExec, setNumExec] = useState(0);
 
   const [quote1inch, setQuote1inch] = useState({
-    // estimatedGasFormatted: "0",
     estimatedGasDca: 0,
   });
 
@@ -87,13 +87,7 @@ function TradeDCA() {
   );
 
   useEffect(() => {
-    if (
-      date[1] &&
-      date[0] &&
-      // quoteDetails.estimatedGasFormatted !== "0" &&
-      sellAmount !== 0 &&
-      tradeFreq !== 0
-    ) {
+    if (date[1] && date[0] && sellAmount !== 0 && tradeFreq !== 0) {
       setNumExec(
         Math.floor(
           (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000)
@@ -101,24 +95,7 @@ function TradeDCA() {
       );
 
       setDepositAmount(numExec * sellAmount);
-
-      // if (quoteDetails.estimatedGasFormatted) {
-      //   console.log(
-      //     "preparing quote",
-      //     quoteDetails.estimatedGasFormatted,
-      //     numExec
-      //   );
-      //   quoteDetails.estimatedGasDca =
-      //     Number(quoteDetails.estimatedGasFormatted) * numExec * 1.5;
-      //   console.log(
-      //     "prepared quote",
-      //     quoteDetails,
-      //     quoteDetails.estimatedGasFormatted,
-      //     numExec
-      //   );
-
       setQuote1inch(quoteDetails);
-      // }
     }
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec]);
 
@@ -329,30 +306,15 @@ function TradeDCA() {
       <Space h="xl" />
 
       <Container my="start_dca">
-        <Group align="end" position="center" spacing="xs" grow>
-          <Button
-            fullWidth
-            radius="xl"
-            size="xl"
-            variant="gradient"
-            gradient={{ from: "#ed6ea0", to: "#ec8c69", deg: 35 }}
-          >
-            {(sellAmount === 0 ||
-              tradeFreq === 0 ||
-              sellToken.symbol === "" ||
-              buyToken.symbol === "") &&
-              "Start DCA"}
-            {sellAmount > 0 &&
-              tradeFreq > 0 &&
-              sellToken.symbol !== "" &&
-              buyToken.symbol !== "" && (
-                <Text size="xl">
-                  Trade {sellAmount} {sellToken.symbol} for {buyToken.symbol}{" "}
-                  Every {tradeFreq} Days for {numExec} Days
-                </Text>
-              )}
-          </Button>
-        </Group>
+        <NewSchedule
+          sellToken={sellToken}
+          buyToken={buyToken}
+          sellAmount={sellAmount}
+          tradeFreq={tradeFreq}
+          numExec={numExec}
+          startDate={date[0]}
+          endDate={date[1]}
+        />
       </Container>
     </Container>
   );
