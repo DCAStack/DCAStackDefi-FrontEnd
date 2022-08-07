@@ -40,7 +40,7 @@ interface ISetup {
 export default function DepositGas({ defaultValue = 0 }: ISetup) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [depositAmount, setDeposit] = useState(defaultValue);
+  const [depositAmount, setDeposit] = useState(0);
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
@@ -62,10 +62,10 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
       value: parseEther(String(depositAmount)),
     },
     onError(error) {
-      console.log("Deposit Funds Error", error);
+      console.log("Deposit Gas Prepared Error", error);
     },
     onSuccess(data) {
-      console.log("Deposit Funds Prepared", data);
+      console.log("Deposit Gas Prepared Success", data);
     },
   });
 
@@ -74,49 +74,68 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
     error,
     isError: depositError,
     write: depositGas,
-  } = useContractWrite(depositGasSetup);
+  } = useContractWrite({
+    ...depositGasSetup,
+    onSuccess(data) {
+      console.log("Deposit Gas Write Success", data);
+
+      showNotification({
+        id: "deposit-gas-pending",
+        loading: true,
+        title: "Pending Gas Deposit",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+
+    onError(error) {
+      console.log("Deposit Gas Write Error", error);
+
+      showNotification({
+        id: "deposit-gas-error",
+        color: "red",
+        title: "Error Gas Deposit",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
 
   const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
     hash: data?.hash,
+    onSuccess(data) {
+      console.log("Deposit Gas Success", data);
+
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Deposit Gas",
+      });
+
+      updateNotification({
+        id: "deposit-gas-pending",
+        color: "teal",
+        title: "Gas Deposit Received",
+        message: "Happy DCAing :)",
+        icon: <CircleCheck />,
+      });
+    },
+    onError(error) {
+      console.log("Deposit Gas Error", error);
+
+      updateNotification({
+        id: "deposit-gas-pending",
+        color: "red",
+        title: "Error Gas Deposit",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
   });
-
-  if (depositError) {
-    showNotification({
-      id: "deposit-gas-error",
-      color: "red",
-      title: "Error Gas Deposit",
-      message: "If this was unexpected, please raise an issue on github!",
-      autoClose: true,
-      disallowClose: false,
-      icon: <AlertOctagon />,
-    });
-  }
-
-  if (txPending) {
-    showNotification({
-      id: "deposit-gas-pending",
-      loading: true,
-      title: "Pending Gas Deposit",
-      message: "Waiting for your tx. Check status on your account tab.",
-      autoClose: true,
-      disallowClose: false,
-    });
-  }
-
-  if (txDone && data?.hash) {
-    addRecentTransaction({
-      hash: data?.hash,
-      description: "Deposit Gas",
-    });
-
-    updateNotification({
-      id: "deposit-gas-pending",
-      color: "teal",
-      title: "Gas Deposit Received",
-      message: "Happy DCAing :)",
-      icon: <CircleCheck />,
-    });
-  }
 
   const {
     data: maxDeposit,
@@ -126,10 +145,10 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
     addressOrName: address,
     watch: true,
     onSuccess(data) {
-      console.log("Get User Wallet Balance Success", data);
+      console.log("Get User Wallet Gas Balance Success", data);
     },
     onError(error) {
-      console.log("Get User Wallet Balance Error", error);
+      console.log("Get User Wallet Gas Balance Error", error);
     },
   });
 
@@ -137,6 +156,7 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
     <Container my="deposit_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
+          // precision={depositAmount > 0 ? depositAmount.toString().length : 1}
           value={depositAmount}
           label="Deposit Gas Amount"
           radius="xs"

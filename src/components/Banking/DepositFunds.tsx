@@ -21,8 +21,10 @@ import {
   useBalance,
   useContractRead,
   useWaitForTransaction,
+  erc20ABI,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
+import { MaxUint256 } from "ethers/constants";
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -53,6 +55,26 @@ export default function DepositFunds({
   }, [defaultValue]);
 
   const {
+    data: depositApproveSetup,
+    isError: depositApproveError,
+    isLoading: depositApproveLoading,
+  } = useContractRead({
+    addressOrName: token.address,
+    contractInterface: erc20ABI,
+    functionName: "allowance",
+    args: [address, contractAddr],
+    cacheOnBlock: true,
+    watch: true,
+    onSuccess(data) {
+      console.log("Get User Fund Allowance Success", data);
+      // console.log(formatEther(data), typeof formatEther(data));
+    },
+    onError(error) {
+      console.log("Get User Fund Allowance Error", error);
+    },
+  });
+
+  const {
     config: depositFundsSetup,
     error: depositFundsError,
     isError: prepareDepositFundsError,
@@ -62,61 +84,164 @@ export default function DepositFunds({
     functionName: "depositFunds",
     args: [token.address, parseUnits(String(depositAmount), token.decimals)],
     onError(error) {
-      console.log("Deposit Funds Error", error);
+      console.log("Deposit Prepare Funds Error", error);
     },
     onSuccess(data) {
-      console.log("Deposit Funds Prepared", data);
+      console.log("Deposit Prepare Funds Success", data);
     },
   });
 
   const {
-    data,
-    error,
-    isError: depositError,
+    data: depositFundsWriteData,
+    error: depositFundsWriteError,
+    isError: depositFundsWriteIsError,
     write: depositFunds,
-  } = useContractWrite(depositFundsSetup);
-
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
-    hash: data?.hash,
+  } = useContractWrite({
+    ...depositFundsSetup,
+    onSuccess(data) {
+      console.log("Deposit Funds Write Success", data);
+      showNotification({
+        id: "deposit-token-pending",
+        loading: true,
+        title: "Pending Token Deposit",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+    onError(error) {
+      console.log("Deposit Funds Write Error", error);
+      showNotification({
+        id: "deposit-token-error",
+        color: "red",
+        title: "Error Token Deposit",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
   });
 
-  if (depositError) {
-    showNotification({
-      id: "deposit-funds-error",
-      color: "red",
-      title: "Error Fund Deposit",
-      message: "If this was unexpected, please raise an issue on github!",
-      autoClose: true,
-      disallowClose: false,
-      icon: <AlertOctagon />,
-    });
-  }
+  const { isLoading: depositTxPending, isSuccess: depositTxDone } =
+    useWaitForTransaction({
+      hash: depositFundsWriteData?.hash,
+      onSuccess(data) {
+        console.log("Deposit Funds Success", data);
 
-  if (txPending) {
-    showNotification({
-      id: "deposit-fund-pending",
-      loading: true,
-      title: "Pending Fund Deposit",
-      message: "Waiting for your tx. Check status on your account tab.",
-      autoClose: true,
-      disallowClose: false,
-    });
-  }
+        addRecentTransaction({
+          hash: data.transactionHash,
+          description: "Deposit Token",
+        });
 
-  if (txDone && data?.hash) {
-    addRecentTransaction({
-      hash: data?.hash,
-      description: "Deposit Fund",
+        updateNotification({
+          id: "deposit-token-pending",
+          color: "teal",
+          title: "Token Deposit Received",
+          message: "You're ready to create a schedule!",
+          icon: <CircleCheck />,
+        });
+      },
+
+      onError(error) {
+        console.log("Deposit Funds Error", error);
+
+        updateNotification({
+          id: "deposit-token-pending",
+          color: "red",
+          title: "Error Token Deposit",
+          message: "If this was unexpected, please raise an issue on github!",
+          autoClose: true,
+          disallowClose: false,
+          icon: <AlertOctagon />,
+        });
+      },
     });
 
-    updateNotification({
-      id: "deposit-fund-pending",
-      color: "teal",
-      title: "Fund Deposit Received",
-      message: "Happy DCAing :)",
-      icon: <CircleCheck />,
+  const {
+    config: prepareDepositApprove,
+    error: prepareDepositApproveError,
+    isError: prepareDepositApproveIsError,
+  } = usePrepareContractWrite({
+    addressOrName: token.address,
+    contractInterface: erc20ABI,
+    functionName: "approve",
+    args: [contractAddr, MaxUint256],
+    onError(error) {
+      console.log("Deposit Prepare Approve Error", error);
+    },
+    onSuccess(data) {
+      console.log("Deposit Prepare Approve Success", data);
+    },
+  });
+
+  const {
+    data: depositApproveWriteData,
+    error: depositApproveWriteError,
+    isError: depositApproveWriteIsError,
+    write: approveFunds,
+  } = useContractWrite({
+    ...prepareDepositApprove,
+    onSuccess(data) {
+      console.log("Deposit Approve Success", data);
+      showNotification({
+        id: "deposit-approve-pending",
+        loading: true,
+        title: "Pending Deposit Spend Approval",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+    onError(error) {
+      console.log("Deposit Approve Error", error);
+      showNotification({
+        id: "deposit-approve-error",
+        color: "red",
+        title: "Error Deposit Spend Approval",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
+
+  const { isLoading: approveTxPending, isSuccess: approveTxDone } =
+    useWaitForTransaction({
+      hash: depositApproveWriteData?.hash,
+      onSuccess(data) {
+        console.log("Approval Transaction Success", data);
+
+        addRecentTransaction({
+          hash: data.transactionHash,
+          description: "Approve Token Spend",
+        });
+
+        updateNotification({
+          id: "deposit-approve-pending",
+          color: "teal",
+          title: "Deposit Spend Approved",
+          message: "Now you can deposit funds!",
+          icon: <CircleCheck />,
+        });
+
+        depositFunds?.();
+      },
+      onError(error) {
+        console.log("Approval Transaction Error", error);
+
+        updateNotification({
+          id: "deposit-approve-pending",
+          color: "red",
+          title: "Error Deposit Spend Approval",
+          message: "If this was unexpected, please raise an issue on github!",
+          autoClose: true,
+          disallowClose: false,
+          icon: <AlertOctagon />,
+        });
+      },
     });
-  }
 
   const {
     data: maxDeposit,
@@ -124,12 +249,13 @@ export default function DepositFunds({
     isLoading,
   } = useBalance({
     addressOrName: address,
+    token: token.address,
     watch: true,
     onSuccess(data) {
-      console.log("Get User Wallet Balance Success", data);
+      console.log("Get User Wallet Token Balance Success", data);
     },
     onError(error) {
-      console.log("Get User Wallet Balance Error", error);
+      console.log("Get User Wallet Token Balance Error", error);
     },
   });
 
@@ -137,6 +263,7 @@ export default function DepositFunds({
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
+          // precision={depositAmount > 0 ? depositAmount.toString().length : 1}
           value={depositAmount}
           label="Deposit DCA Amount"
           radius="xs"
@@ -154,7 +281,7 @@ export default function DepositFunds({
               size="md"
               onClick={() =>
                 maxDeposit
-                  ? setDeposit(Number(maxDeposit?.formatted.split(".")[0]))
+                  ? setDeposit(Number(maxDeposit?.formatted))
                   : setDeposit(0)
               }
             >
@@ -168,7 +295,13 @@ export default function DepositFunds({
           className={classes.input}
           radius="xs"
           size="xl"
-          onClick={() => depositFunds?.()}
+          onClick={() => {
+            if (depositApproveSetup) {
+              formatEther(depositApproveSetup) === "0.0"
+                ? approveFunds?.()
+                : depositFunds?.();
+            }
+          }}
         >
           &nbsp;Deposit&nbsp;
         </Button>{" "}

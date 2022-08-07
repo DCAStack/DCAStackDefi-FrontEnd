@@ -53,10 +53,10 @@ export default function WithdrawGas() {
       from: address,
     },
     onError(error) {
-      console.log("Withdraw Funds Error", error);
+      console.log("Withdraw Gas Prepared Error", error);
     },
     onSuccess(data) {
-      console.log("Withdraw Funds Prepared", data);
+      console.log("Withdraw Gas Prepared Success", data);
     },
   });
 
@@ -65,49 +65,68 @@ export default function WithdrawGas() {
     error,
     isError: withdrawError,
     write: withdrawGas,
-  } = useContractWrite(withdrawGasSetup);
+  } = useContractWrite({
+    ...withdrawGasSetup,
+    onSuccess(data) {
+      console.log("Withdraw Gas Write Success", data);
+
+      showNotification({
+        id: "withdraw-gas-pending",
+        loading: true,
+        title: "Pending Gas Withdrawal",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+
+    onError(error) {
+      console.log("Withdraw Gas Write Error", error);
+
+      showNotification({
+        id: "withdraw-gas-error",
+        color: "red",
+        title: "Error Gas Withdrawal",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
 
   const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
     hash: data?.hash,
+    onSuccess(data) {
+      console.log("Withdraw Gas Success", data);
+
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Withdraw Gas",
+      });
+
+      updateNotification({
+        id: "withdraw-gas-pending",
+        color: "teal",
+        title: "Gas Withdrawal Complete",
+        message: "Safe travels :)",
+        icon: <CircleCheck />,
+      });
+    },
+    onError(error) {
+      console.log("Withdraw Gas Error", error);
+
+      updateNotification({
+        id: "withdraw-gas-pending",
+        color: "red",
+        title: "Error Gas Withdrawal",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
   });
-
-  if (withdrawError || prepareWithdrawGasError) {
-    showNotification({
-      id: "withdraw-gas-error",
-      color: "red",
-      title: "Error Gas Withdrawal",
-      message: "If this was unexpected, please raise an issue on github!",
-      autoClose: true,
-      disallowClose: false,
-      icon: <AlertOctagon />,
-    });
-  }
-
-  if (txPending) {
-    showNotification({
-      id: "withdraw-gas-pending",
-      loading: true,
-      title: "Pending Gas Withdrawal",
-      message: "Waiting for your tx. Check status on your account tab.",
-      autoClose: true,
-      disallowClose: false,
-    });
-  }
-
-  if (txDone && data?.hash) {
-    addRecentTransaction({
-      hash: data?.hash,
-      description: "Withdraw Gas",
-    });
-
-    updateNotification({
-      id: "withdraw-gas-pending",
-      color: "teal",
-      title: "Gas Withdrawal Complete",
-      message: "Safe travels :)",
-      icon: <CircleCheck />,
-    });
-  }
 
   const {
     data: maxWithdraw,
@@ -134,8 +153,9 @@ export default function WithdrawGas() {
     <Container my="withdraw_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
+                    // precision={withdrawAmount > 0 ? withdrawAmount.toString().length : 1}
+
           value={withdrawAmount}
-          label="Withdraw Amount"
           radius="xs"
           size="xl"
           hideControls
