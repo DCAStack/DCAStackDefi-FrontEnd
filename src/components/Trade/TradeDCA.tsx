@@ -116,12 +116,10 @@ function TradeDCA() {
             variant="filled"
             className={classes.input}
             onClick={() => {
-              if (buyToken !== nullToken && sellToken !== nullToken) {
-                const tempBuyToken = { ...buyToken };
-                const tempSellToken = { ...sellToken };
-                setSellToken(tempBuyToken);
-                setBuyToken(tempSellToken);
-              }
+              const tempBuyToken = { ...buyToken };
+              const tempSellToken = { ...sellToken };
+              setSellToken(tempBuyToken);
+              setBuyToken(tempSellToken);
             }}
           >
             <SwitchHorizontal size={45} strokeWidth={3} />
