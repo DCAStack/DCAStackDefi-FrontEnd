@@ -32,6 +32,7 @@ import swapTokens from "../../data/swapTokens";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
 import { parseUnits } from "ethers/lib/utils";
+import { nullToken } from "../../data/gasTokens";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -50,9 +51,8 @@ export default function DepositFunds({
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  useEffect(() => {
-    setDeposit(defaultValue);
-  }, [defaultValue]);
+  const [enableApprovePrep, setApprovePrep] = useState(false);
+  const [enableDepositPrep, setDepositPrep] = useState(false);
 
   const {
     data: depositApproveSetup,
@@ -62,12 +62,16 @@ export default function DepositFunds({
     addressOrName: token.address,
     contractInterface: erc20ABI,
     functionName: "allowance",
+    enabled:
+      token.address.toLowerCase() !==
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
     args: [address, contractAddr],
     cacheOnBlock: true,
     watch: true,
     onSuccess(data) {
       console.log("Get User Fund Allowance Success", data);
-      // console.log(formatEther(data), typeof formatEther(data));
     },
     onError(error) {
       console.log("Get User Fund Allowance Error", error);
@@ -82,6 +86,11 @@ export default function DepositFunds({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
+    enabled:
+      token.address.toLowerCase() ===
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : enableDepositPrep,
     args: [token.address, parseUnits(String(depositAmount), token.decimals)],
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
@@ -166,6 +175,11 @@ export default function DepositFunds({
     addressOrName: token.address,
     contractInterface: erc20ABI,
     functionName: "approve",
+    enabled:
+      token.address.toLowerCase() ===
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? false
+        : enableApprovePrep,
     args: [contractAddr, MaxUint256],
     onError(error) {
       console.log("Deposit Prepare Approve Error", error);
@@ -226,7 +240,7 @@ export default function DepositFunds({
           icon: <CircleCheck />,
         });
 
-        depositFunds?.();
+        setDepositPrep(true);
       },
       onError(error) {
         console.log("Approval Transaction Error", error);
@@ -240,17 +254,24 @@ export default function DepositFunds({
           disallowClose: false,
           icon: <AlertOctagon />,
         });
+
+        setDepositPrep(false);
       },
     });
 
   const {
-    data: maxDeposit,
-    isError,
-    isLoading,
+    data: maxTokenDeposit,
+    isError: maxTokenDepositIsError,
+    isLoading: maxTokenDepositIsLoading,
   } = useBalance({
     addressOrName: address,
     token: token.address,
     watch: true,
+    enabled:
+      token.address.toLowerCase() !==
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
     onSuccess(data) {
       console.log("Get User Wallet Token Balance Success", data);
     },
@@ -259,12 +280,55 @@ export default function DepositFunds({
     },
   });
 
+  const {
+    data: maxDeposit,
+    isError: maxDepositIsError,
+    isLoading: maxDepositIsLoading,
+  } = useBalance({
+    addressOrName: address,
+    watch: true,
+    enabled:
+      token.address.toLowerCase() ===
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
+    onSuccess(data) {
+      console.log("Get User Wallet ETH Balance Success", data);
+    },
+    onError(error) {
+      console.log("Get User Wallet ETH Balance Error", error);
+    },
+  });
+
+  useEffect(() => {
+    setDeposit(defaultValue);
+
+    if (
+      token !== nullToken &&
+      depositAmount !== 0 &&
+      token.address.toLowerCase() !==
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    ) {
+      setApprovePrep(true);
+    } else {
+      setApprovePrep(false);
+    }
+
+    if (
+      enableDepositPrep === true &&
+      token.address.toLowerCase() !==
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    ) {
+      //to trigger after allowance
+      depositFunds?.();
+    }
+  }, [defaultValue, token, depositAmount, enableDepositPrep, depositFunds]);
+
   return (
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
           // precision={depositAmount > 0 ? depositAmount.toString().length : 1}
-          value={depositAmount}
           label="Deposit DCA Amount"
           radius="xs"
           size="xl"
@@ -279,11 +343,20 @@ export default function DepositFunds({
               compact
               radius="xl"
               size="md"
-              onClick={() =>
-                maxDeposit
-                  ? setDeposit(Number(maxDeposit?.formatted))
-                  : setDeposit(0)
-              }
+              onClick={() => {
+                if (
+                  token.address.toLowerCase() !==
+                  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+                ) {
+                  maxTokenDeposit
+                    ? setDeposit(Number(maxTokenDeposit?.formatted))
+                    : setDeposit(0);
+                } else {
+                  maxDeposit
+                    ? setDeposit(Number(maxDeposit?.formatted))
+                    : setDeposit(0);
+                }
+              }}
             >
               MAX
             </Button>
@@ -296,10 +369,17 @@ export default function DepositFunds({
           radius="xs"
           size="xl"
           onClick={() => {
-            if (depositApproveSetup) {
-              formatEther(depositApproveSetup) === "0.0"
-                ? approveFunds?.()
-                : depositFunds?.();
+            if (
+              token.address.toLowerCase() !==
+              "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+            ) {
+              if (depositApproveSetup) {
+                formatEther(depositApproveSetup) === "0.0"
+                  ? approveFunds?.()
+                  : depositFunds?.();
+              }
+            } else {
+              depositFunds?.();
             }
           }}
         >
