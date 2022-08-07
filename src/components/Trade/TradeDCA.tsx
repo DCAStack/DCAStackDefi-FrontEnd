@@ -126,6 +126,7 @@ function TradeDCA() {
       <Container my="setup_dca">
         <Group align="end" position="center" spacing="xl" grow>
           <NumberInput
+            // precision={sellToken.decimals}
             label="Sell Amount"
             radius="xs"
             size="xl"
@@ -191,7 +192,7 @@ function TradeDCA() {
       <Container my="setup_deposits">
         <SetupDeposits
           sellToken={sellToken}
-          estimatedGas={quote1inch.estimatedGasDca}
+          estimatedGas={quote1inch?.estimatedGasDca}
           depositAmount={depositAmount}
         />
       </Container>
