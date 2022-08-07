@@ -374,12 +374,40 @@ export default function DepositFunds({
               "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
             ) {
               if (depositApproveSetup) {
-                formatEther(depositApproveSetup) === "0.0"
-                  ? approveFunds?.()
-                  : depositFunds?.();
+                //regular token
+                if (maxTokenDeposit?.formatted === "0.0") {
+                  showNotification({
+                    id: "deposit-balance-error",
+                    color: "red",
+                    title: "Insufficient Balance",
+                    message:
+                      "If this was unexpected, please raise an issue on github!",
+                    autoClose: true,
+                    disallowClose: false,
+                    icon: <AlertOctagon />,
+                  });
+                } else {
+                  formatEther(depositApproveSetup) === "0.0"
+                    ? approveFunds?.()
+                    : depositFunds?.();
+                }
               }
             } else {
-              depositFunds?.();
+              //eth token
+              if (maxDeposit?.formatted === "0.0") {
+                showNotification({
+                  id: "deposit-balance-error",
+                  color: "red",
+                  title: "Insufficient Balance",
+                  message:
+                    "If this was unexpected, please raise an issue on github!",
+                  autoClose: true,
+                  disallowClose: false,
+                  icon: <AlertOctagon />,
+                });
+              } else {
+                depositFunds?.();
+              }
             }
           }}
         >

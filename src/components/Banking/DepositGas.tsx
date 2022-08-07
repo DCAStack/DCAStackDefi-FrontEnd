@@ -188,7 +188,22 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
           className={classes.input}
           radius="xs"
           size="xl"
-          onClick={() => depositGas?.()}
+          onClick={() => {
+            if (maxDeposit?.formatted === "0.0") {
+              showNotification({
+                id: "deposit-balance-error",
+                color: "red",
+                title: "Insufficient Balance",
+                message:
+                  "If this was unexpected, please raise an issue on github!",
+                autoClose: true,
+                disallowClose: false,
+                icon: <AlertOctagon />,
+              });
+            } else {
+              depositGas?.();
+            }
+          }}
         >
           &nbsp;Deposit&nbsp;
         </Button>{" "}
