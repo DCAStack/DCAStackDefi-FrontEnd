@@ -8,6 +8,7 @@ import {
 } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
+import { BigNumber } from "ethers";
 
 export default function use1inchRetrieveQuote(
   currentChain: number,
@@ -46,11 +47,15 @@ export default function use1inchRetrieveQuote(
   if (data) {
     console.log("1inch fetch quote success", data);
     if (data?.estimatedGas) {
-      data.estimatedGasFormatted = formatUnits(
-        String(data.estimatedGas),
+      let calcGas = data.estimatedGas * numExec * 2; //big number
+      data.estimatedGasDcaGwei = BigNumber.from(calcGas);
+      data.estimatedGasDcaFormatted = formatUnits(
+        data.estimatedGasDcaGwei.toString(),
         "gwei"
       );
-      data.estimatedGasDca = Number(data.estimatedGasFormatted) * numExec * 2;
+      data.estimatedGasDca = BigNumber.from(
+        parseEther(data.estimatedGasDcaFormatted)
+      );
     }
   }
 

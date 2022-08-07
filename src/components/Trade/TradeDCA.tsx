@@ -19,7 +19,6 @@ import SwapToken from "./SwapToken";
 import dayjs from "dayjs";
 
 import {
-  usePrepareContractWrite,
   useContractWrite,
   useAccount,
   useBalance,
@@ -28,6 +27,8 @@ import {
   useNetwork,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
+import { BigNumber } from "ethers";
+
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -59,16 +60,16 @@ function TradeDCA() {
 
   const { classes } = useStyles();
 
-  const [sellAmount, setSellAmount] = useState(0);
+  const [sellAmount, setSellAmount] = useState(BigNumber.from(0));
   const [tradeFreq, setTradeFreq] = useState(0);
 
   const [sellToken, setSellToken] = useState(nullToken);
   const [buyToken, setBuyToken] = useState(nullToken);
-  const [depositAmount, setDepositAmount] = useState(0);
+  const [depositAmount, setDepositAmount] = useState(BigNumber.from(0));
   const [numExec, setNumExec] = useState(0);
 
   const [quote1inch, setQuote1inch] = useState({
-    estimatedGasDca: 0,
+    estimatedGasDca: BigNumber.from(0),
   });
 
   const {
@@ -79,7 +80,7 @@ function TradeDCA() {
     currentChain,
     sellToken,
     buyToken,
-    String(sellAmount),
+    sellAmount.toString(),
     tradeFreq,
     date[0],
     date[1],
@@ -87,17 +88,17 @@ function TradeDCA() {
   );
 
   useEffect(() => {
-    if (date[1] && date[0] && sellAmount !== 0 && tradeFreq !== 0) {
+    if (date[1] && date[0] && !sellAmount.isZero() && tradeFreq !== 0) {
       setNumExec(
         Math.floor(
           (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000)
         )
       );
 
-      setDepositAmount(numExec * sellAmount);
+      setDepositAmount(sellAmount.mul(numExec));
       setQuote1inch(quoteDetails);
     }
-  }, [quoteDetails, date, tradeFreq, sellAmount, numExec]);
+  }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
 
   return (
     <Container my="setup_schedule">
@@ -133,7 +134,11 @@ function TradeDCA() {
             hideControls
             placeholder="Sell each DCA..."
             required
-            onChange={(val) => (val ? setSellAmount(val) : setSellAmount(0))}
+            onChange={(val) =>
+              val
+                ? setSellAmount(BigNumber.from(val))
+                : setSellAmount(BigNumber.from(0))
+            }
           />
           <NumberInput
             label="Trade Frequency"
