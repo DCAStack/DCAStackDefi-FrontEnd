@@ -176,7 +176,7 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
           toggleOpened(false);
         }}
       >
-        <Anchor component={Link} to={`${link.link}`}>
+        <Anchor component={Link} to={`${link.link}`} inherit>
           {link.label}
         </Anchor>
       </a>
@@ -186,19 +186,6 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
       <Container className={classes.header} fluid>
-        {/* <Image
-          radius={10}
-          src={process.env.PUBLIC_URL + "/logo.png"}
-          alt={"Logo"}
-          height={150}
-          width={150}
-        /> */}
-        {/* <img
-          src={process.env.PUBLIC_URL + "/logo.png"}
-          alt={"Logo"}
-          className={classes.logo}
-        /> */}
-
         <Anchor component={Link} to={`/`}>
           <Text
             component="span"
@@ -206,8 +193,7 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
             variant="gradient"
             gradient={{ from: "indigo", to: "cyan", deg: 45 }}
             size="xl"
-            weight={700}
-            style={{ fontFamily: "Greycliff CF, sans-serif" }}
+            weight={800}
           >
             DCA Stack
           </Text>

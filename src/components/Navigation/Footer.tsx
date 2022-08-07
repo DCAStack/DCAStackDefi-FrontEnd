@@ -66,10 +66,22 @@ function FooterCentered({ links }: FooterCenteredProps) {
           </Text>
         </Group>
         <Group spacing={0} position="right" noWrap>
-          <ActionIcon size="lg">
+          <ActionIcon
+            size="lg"
+            component="a"
+            href={"https://twitter.com/"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <BrandTwitter size={18} />
           </ActionIcon>
-          <ActionIcon size="lg">
+          <ActionIcon
+            size="lg"
+            component="a"
+            href={"https://github.com/"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <BrandGithub size={18} />
           </ActionIcon>
         </Group>

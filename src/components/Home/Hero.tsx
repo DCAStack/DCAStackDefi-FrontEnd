@@ -8,6 +8,8 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { Dots } from "./Dots";
+import { Link } from "react-router-dom";
+import { BrandGithub, Speedboat } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -122,14 +124,26 @@ export function HeroText() {
         </Container>
 
         <div className={classes.controls}>
-          <Button className={classes.control} size="lg">
+          <Button
+            className={classes.control}
+            size="lg"
+            component={Link}
+            to="/trade"
+            leftIcon={<Speedboat size={20} />}
+          >
             Enter App
           </Button>
+
           <Button
             className={classes.control}
             size="lg"
             variant="default"
             color="gray"
+            component="a"
+            href={"https://github.com/"}
+            target="_blank"
+            rel="noopener noreferrer"
+            leftIcon={<BrandGithub size={20} />}
           >
             View Github
           </Button>
