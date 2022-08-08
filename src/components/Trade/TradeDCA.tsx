@@ -11,6 +11,8 @@ import {
   Text,
   Title,
   Stack,
+  Stepper,
+  ActionIcon,
 } from "@mantine/core";
 import { DateRangePicker, TimeInput } from "@mantine/dates";
 
@@ -18,25 +20,11 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import SwapToken from "./SwapToken";
 import dayjs from "dayjs";
 
-import {
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractReads,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
-import { parseEther, formatEther } from "ethers/lib/utils";
+import { useAccount, useNetwork } from "wagmi";
 import { BigNumber } from "ethers";
 
-import { ContractInfoProps } from "../../models/PropTypes";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import { ActionIcon } from "@mantine/core";
-import { SwitchHorizontal, PlayerPlay } from "tabler-icons-react";
-
-import DepositGas from "../Banking/DepositGas";
-import DepositFunds from "../Banking/DepositFunds";
+import { SwitchHorizontal } from "tabler-icons-react";
 
 import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 
@@ -52,6 +40,11 @@ const useStyles = createStyles((theme) => ({
 
 function TradeDCA() {
   const [date, setDate] = useState<[Date | null, Date | null]>([null, null]);
+  const [active, setActive] = useState(1);
+  const nextStep = () =>
+    setActive((current) => (current < 2 ? current + 1 : current));
+  const prevStep = () =>
+    setActive((current) => (current > 0 ? current - 1 : current));
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const { chain, chains } = useNetwork();
@@ -102,130 +95,155 @@ function TradeDCA() {
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
 
   return (
-    <Container my="setup_schedule">
-      <Container my="setup_swap">
-        <Group align="center" position="center" spacing="xs" grow>
-          <SwapToken
-            text={"I want to sell"}
-            updateToken={setSellToken}
-            currToken={sellToken}
-          />
-          <ActionIcon
-            size="xl"
-            radius="xl"
-            variant="filled"
-            className={classes.input}
-            onClick={() => {
-              const tempBuyToken = { ...buyToken };
-              const tempSellToken = { ...sellToken };
-              setSellToken(tempBuyToken);
-              setBuyToken(tempSellToken);
-            }}
-          >
-            <SwitchHorizontal size={45} strokeWidth={3} />
-          </ActionIcon>
-          <SwapToken
-            text={"To purchase"}
-            updateToken={setBuyToken}
-            currToken={buyToken}
-          />
-        </Group>
-      </Container>
+    <>
+      <Stepper
+        active={active}
+        onStepClick={setActive}
+        breakpoint="sm"
+        size="xl"
+      >
+        <Stepper.Step label="First step" description="Setup DCA Schedule">
+          <Container my="setup_schedule">
+            <Container my="setup_swap">
+              <Group align="center" position="center" spacing="xs" grow>
+                <SwapToken
+                  text={"I want to sell"}
+                  updateToken={setSellToken}
+                  currToken={sellToken}
+                />
+                <ActionIcon
+                  size="xl"
+                  radius="xl"
+                  variant="filled"
+                  className={classes.input}
+                  onClick={() => {
+                    const tempBuyToken = { ...buyToken };
+                    const tempSellToken = { ...sellToken };
+                    setSellToken(tempBuyToken);
+                    setBuyToken(tempSellToken);
+                  }}
+                >
+                  <SwitchHorizontal size={45} strokeWidth={3} />
+                </ActionIcon>
+                <SwapToken
+                  text={"To purchase"}
+                  updateToken={setBuyToken}
+                  currToken={buyToken}
+                />
+              </Group>
+            </Container>
 
-      <Space h="xl" />
+            <Space h="xl" />
 
-      <Container my="setup_dca">
-        <Group align="end" position="center" spacing="xl" grow>
-          <NumberInput
-            // precision={sellToken.decimals}
-            label="Sell Amount"
-            radius="xs"
-            size="xl"
-            hideControls
-            placeholder="Sell each DCA..."
-            required
-            onChange={(val) =>
-              val
-                ? setSellAmount(BigNumber.from(val))
-                : setSellAmount(BigNumber.from(0))
-            }
-          />
-          <NumberInput
-            label="Trade Frequency"
-            placeholder="DCA every..."
-            radius="xs"
-            size="xl"
-            required
-            min={1}
-            max={30}
-            onChange={(val) => (val ? setTradeFreq(val) : setTradeFreq(0))}
-          />
-          <NativeSelect
-            data={["Days"]}
-            label="Trade On"
-            radius="xs"
-            size="xl"
-            required
-          />
-        </Group>
-      </Container>
+            <Container my="setup_dca">
+              <Group align="end" position="center" spacing="xl" grow>
+                <NumberInput
+                  // precision={sellToken.decimals}
+                  label="Sell Amount"
+                  radius="xs"
+                  size="xl"
+                  hideControls
+                  placeholder="Sell each DCA..."
+                  required
+                  onChange={(val) =>
+                    val
+                      ? setSellAmount(BigNumber.from(val))
+                      : setSellAmount(BigNumber.from(0))
+                  }
+                />
+                <NumberInput
+                  label="Trade Frequency"
+                  placeholder="DCA every..."
+                  radius="xs"
+                  size="xl"
+                  required
+                  min={1}
+                  max={30}
+                  onChange={(val) =>
+                    val ? setTradeFreq(val) : setTradeFreq(0)
+                  }
+                />
+                <NativeSelect
+                  data={["Days"]}
+                  label="Trade On"
+                  radius="xs"
+                  size="xl"
+                  required
+                />
+              </Group>
+            </Container>
 
-      <Space h="xl" />
+            <Space h="xl" />
 
-      <Container my="setup_date">
-        <Group align="end" position="center" spacing="xl" grow>
-          <DateRangePicker
-            excludeDate={(date) =>
-              tradeFreq !== 0 ? date.getDate() % tradeFreq !== 0 : false
-            }
-            firstDayOfWeek="sunday"
-            dropdownType="modal"
-            label="Select DCA Schedule"
-            placeholder="Pick dates range"
-            onChange={setDate}
-            required
-            radius="xs"
-            size="xl"
-            allowLevelChange
-            minDate={dayjs(new Date()).toDate()}
-          />
-          <TimeInput
-            value={new Date()}
-            label="Start Time"
-            format="12"
-            radius="xs"
-            size="xl"
-            amLabel="am"
-            pmLabel="pm"
-            required
-          />
-        </Group>
-      </Container>
+            <Container my="setup_date">
+              <Group align="end" position="center" spacing="xl" grow>
+                <DateRangePicker
+                  excludeDate={(date) =>
+                    tradeFreq !== 0 ? date.getDate() % tradeFreq !== 0 : false
+                  }
+                  firstDayOfWeek="sunday"
+                  dropdownType="modal"
+                  label="Select DCA Schedule"
+                  placeholder="Pick dates range"
+                  onChange={setDate}
+                  required
+                  radius="xs"
+                  size="xl"
+                  allowLevelChange
+                  minDate={dayjs(new Date()).toDate()}
+                />
+                <TimeInput
+                  value={new Date()}
+                  label="Start Time"
+                  format="12"
+                  radius="xs"
+                  size="xl"
+                  amLabel="am"
+                  pmLabel="pm"
+                  required
+                />
+              </Group>
+            </Container>
 
-      <Space h="xl" />
+            <Space h="xl" />
 
-      <Container my="setup_deposits">
-        <SetupDeposits
-          sellToken={sellToken}
-          estimatedGas={quote1inch?.estimatedGasDca}
-          depositAmount={depositAmount}
-        />
-      </Container>
+            <Container my="setup_deposits">
+              <SetupDeposits
+                sellToken={sellToken}
+                estimatedGas={quote1inch?.estimatedGasDca}
+                depositAmount={depositAmount}
+              />
+            </Container>
+          </Container>
+        </Stepper.Step>
+        <Stepper.Step label="Second step" description="Verify Details">
+          <Container my="start_dca">
+            <NewSchedule
+              sellToken={sellToken}
+              buyToken={buyToken}
+              sellAmount={sellAmount}
+              tradeFreq={tradeFreq}
+              numExec={numExec}
+              startDate={date[0]}
+              endDate={date[1]}
+            />
+          </Container>
+        </Stepper.Step>
+      </Stepper>
 
-      <Space h="xl" />
-
-      <Container my="start_dca">
-        <NewSchedule
-          sellToken={sellToken}
-          buyToken={buyToken}
-          sellAmount={sellAmount}
-          tradeFreq={tradeFreq}
-          numExec={numExec}
-          startDate={date[0]}
-          endDate={date[1]}
-        />
-      </Container>
-    </Container>
+      <Group position="center" mt="xl" grow>
+        {active !== 0 && (
+          <Button variant="default" onClick={prevStep} size="xl">
+            Back
+          </Button>
+        )}
+        {active === 0 && (
+          <Button onClick={nextStep} size="xl">
+            Review
+          </Button>
+        )}
+      </Group>
+    </>
   );
 }
 
