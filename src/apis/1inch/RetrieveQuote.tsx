@@ -57,6 +57,16 @@ export default function use1inchRetrieveQuote(
         parseEther(data.estimatedGasDcaFormatted)
       );
     }
+
+    if (data?.toTokenAmount && data?.fromTokenAmount) {
+      const bnToAmount = BigNumber.from(data.toTokenAmount);
+      const bnFromAount = BigNumber.from(data.fromTokenAmount);
+
+      data.swapQuote = formatUnits(
+        bnToAmount.div(bnFromAount).add(bnToAmount.mod(bnFromAount)).toString(),
+        buyCrypto.decimals
+      );
+    }
   }
 
   if (error) console.log("1inch fetch quote error", error);

@@ -40,7 +40,7 @@ const useStyles = createStyles((theme) => ({
 
 function TradeDCA() {
   const [date, setDate] = useState<[Date | null, Date | null]>([null, null]);
-  const [active, setActive] = useState(1);
+  const [active, setActive] = useState(0);
   const nextStep = () =>
     setActive((current) => (current < 2 ? current + 1 : current));
   const prevStep = () =>
@@ -88,7 +88,7 @@ function TradeDCA() {
         )
       );
 
-      console.log("1inch", quoteDetails, quoteError);
+      console.log("1inch", quoteDetails, quoteError, typeof quoteDetails);
       setDepositAmount(sellAmount.mul(numExec));
       setQuote1inch(quoteDetails);
     }
@@ -226,6 +226,7 @@ function TradeDCA() {
               numExec={numExec}
               startDate={date[0]}
               endDate={date[1]}
+              quoteDetails={quote1inch}
             />
           </Container>
         </Stepper.Step>
