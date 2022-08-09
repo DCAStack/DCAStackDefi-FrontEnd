@@ -30,7 +30,12 @@ import {
   useWaitForTransaction,
   useNetwork,
 } from "wagmi";
-import { parseEther, formatEther } from "ethers/lib/utils";
+import {
+  parseEther,
+  formatEther,
+  parseUnits,
+  formatUnits,
+} from "ethers/lib/utils";
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -45,7 +50,6 @@ import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 import { nullToken } from "../../data/gasTokens";
 import { IToken } from "../../models/Interfaces";
 
-
 interface IScheduleParams {
   sellToken: IToken;
   buyToken: IToken;
@@ -55,6 +59,8 @@ interface IScheduleParams {
   startDate: Date | null;
   endDate: Date | null;
   quoteDetails: Record<string, any>;
+  freeTokenBal: BigNumber;
+  freeGasBal: BigNumber;
 }
 
 export default function NewSchedule({
@@ -66,6 +72,8 @@ export default function NewSchedule({
   startDate,
   endDate,
   quoteDetails,
+  freeTokenBal,
+  freeGasBal,
 }: IScheduleParams) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -77,6 +85,11 @@ export default function NewSchedule({
   const unixEndDate = endDate ? endDate?.getTime() / 1000 : 0;
 
   const [enablePrep, setPrep] = useState(false);
+
+  const weiDepositAmount = parseUnits(
+    sellAmount.toString(),
+    sellToken.decimals
+  );
 
   // useEffect(() => {
   //   if (
@@ -245,7 +258,7 @@ export default function NewSchedule({
           </Group>
 
           <Group align="end" position="left" spacing="xs">
-            <Text size="lg">Your total deposit is</Text>
+            <Text size="lg">Total deposit required is</Text>
             <Text weight={700} color="green">
               ${sellAmount.mul(numExec).toString()} {sellToken.symbol}
             </Text>
@@ -258,6 +271,38 @@ export default function NewSchedule({
               {numExec} times
             </Text>
           </Group>
+
+          {!freeTokenBal.eq(0) && //run if additional deposit needed
+            weiDepositAmount.mul(numExec).gte(freeTokenBal) && (
+              <Group align="end" position="left" spacing="xs">
+                <Text size="lg">But you have</Text>
+                <Text weight={700} color="green">
+                  ${formatUnits(freeTokenBal, sellToken.decimals)}{" "}
+                  {sellToken.symbol}
+                </Text>
+                <Text size="lg">not in use so your deposit is just</Text>
+                <Text weight={700} color="green">
+                  $
+                  {formatUnits(
+                    weiDepositAmount.mul(numExec).sub(freeTokenBal),
+                    sellToken.decimals
+                  )}{" "}
+                  {sellToken.symbol}
+                </Text>
+              </Group>
+            )}
+
+          {!freeTokenBal.eq(0) && //run if zero needed
+            weiDepositAmount.mul(numExec).lt(freeTokenBal) && (
+              <Group align="end" position="left" spacing="xs">
+                <Text size="lg">But you have</Text>
+                <Text weight={700} color="green">
+                  ${formatUnits(freeTokenBal, sellToken.decimals)}{" "}
+                  {sellToken.symbol}
+                </Text>
+                <Text size="lg">not in use, so a deposit is not needed!</Text>
+              </Group>
+            )}
 
           <Space h="md" />
 
@@ -290,6 +335,22 @@ export default function NewSchedule({
             </Text>
             <Text size="xs">(x 2 for a buffer)</Text>
           </Group>
+
+          {/* <Group align="end" position="left" spacing="xs">
+            <Text size="lg">But you have</Text>
+            <Text weight={700} color="green">
+              ${sellAmount.mul(numExec).toString()} {sellToken.symbol}
+            </Text>
+            <Text size="lg">available</Text>
+            <Text weight={700} color="green">
+              ${sellAmount.toString()} {sellToken.symbol}
+            </Text>
+            <Text size="lg">so your deposit is just</Text>
+            <Text weight={700} color="green">
+              {numExec} times
+            </Text>
+          </Group> */}
+
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Default slippage is:</Text>
             <Text weight={700} color="green">

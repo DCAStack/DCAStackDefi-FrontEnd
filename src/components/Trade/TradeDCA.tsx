@@ -20,7 +20,7 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import SwapToken from "./SwapToken";
 import dayjs from "dayjs";
 
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useNetwork, useContractReads } from "wagmi";
 import { BigNumber } from "ethers";
 
 import { ContractContext } from "../../App";
@@ -94,6 +94,46 @@ function TradeDCA() {
     }
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
 
+  const bnZero = BigNumber.from(0);
+  const [freeGasBal, setUserGasBal] = useState<BigNumber>(bnZero);
+  const [freeTokenBal, setUserBal] = useState<BigNumber>(bnZero);
+
+  const { data, isError, isLoading } = useContractReads({
+    contracts: [
+      {
+        addressOrName: contractAddr,
+        contractInterface: contractABI,
+        functionName: "userGasBalances",
+        args: address,
+      },
+      {
+        addressOrName: contractAddr,
+        contractInterface: contractABI,
+        functionName: "getFreeTokenBalance",
+        args: [sellToken?.address],
+      },
+    ],
+    cacheOnBlock: true,
+    watch: true,
+    onSuccess(data) {
+      console.log("Get User Funds Success", data);
+      let userGasBalance = data[0];
+      userGasBalance
+        ? setUserGasBal(BigNumber.from(userGasBalance._hex))
+        : setUserGasBal(bnZero);
+
+      let userFundBalance = data[1];
+      userFundBalance
+        ? setUserBal(BigNumber.from(userFundBalance._hex))
+        : setUserBal(bnZero);
+    },
+    onError(error) {
+      console.log("Get User Funds Error", error);
+      setUserGasBal(bnZero);
+      setUserBal(bnZero);
+    },
+  });
+
   return (
     <>
       <Stepper
@@ -139,6 +179,7 @@ function TradeDCA() {
               <Group align="end" position="center" spacing="xl" grow>
                 <NumberInput
                   label="Sell Amount"
+                  precision={sellToken?.decimals}
                   value={sellAmount.toNumber()}
                   radius="xs"
                   size="xl"
@@ -214,6 +255,8 @@ function TradeDCA() {
                 sellToken={sellToken}
                 estimatedGas={quote1inch?.estimatedGasDca}
                 depositAmount={depositAmount}
+                freeGasBal={freeGasBal}
+                freeTokenBal={freeTokenBal}
               />
             </Container>
           </Container>
@@ -229,6 +272,8 @@ function TradeDCA() {
               startDate={date[0]}
               endDate={date[1]}
               quoteDetails={quote1inch}
+              freeGasBal={freeGasBal}
+              freeTokenBal={freeTokenBal}
             />
           </Container>
         </Stepper.Step>
