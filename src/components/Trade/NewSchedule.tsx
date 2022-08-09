@@ -45,6 +45,7 @@ import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 import { nullToken } from "../../data/gasTokens";
 import { IToken } from "../../models/Interfaces";
 
+
 interface IScheduleParams {
   sellToken: IToken;
   buyToken: IToken;
@@ -265,7 +266,7 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Current swap quote is:</Text>
             <Text weight={700} color="green">
-              $1 {sellToken.symbol} for {quoteDetails?.swapQuote}{" "}
+              $1 {sellToken.symbol} for ~{quoteDetails?.swapQuote}{" "}
               {buyToken.symbol}
             </Text>
           </Group>

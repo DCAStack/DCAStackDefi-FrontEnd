@@ -9,6 +9,7 @@ import {
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
 import { BigNumber } from "ethers";
+import Big from "big.js";
 
 export default function use1inchRetrieveQuote(
   currentChain: number,
@@ -59,13 +60,14 @@ export default function use1inchRetrieveQuote(
     }
 
     if (data?.toTokenAmount && data?.fromTokenAmount) {
-      const bnToAmount = BigNumber.from(data.toTokenAmount);
-      const bnFromAount = BigNumber.from(data.fromTokenAmount);
-
-      data.swapQuote = formatUnits(
-        bnToAmount.div(bnFromAount).add(bnToAmount.mod(bnFromAount)).toString(),
-        buyCrypto.decimals
+      const bnToAmount = Big(
+        formatUnits(data.toTokenAmount, buyCrypto.decimals)
       );
+      const bnFromAmount = Big(
+        formatUnits(data.fromTokenAmount, sellCrypto.decimals)
+      );
+
+      data.swapQuote = bnToAmount.div(bnFromAmount).toString();
     }
   }
 

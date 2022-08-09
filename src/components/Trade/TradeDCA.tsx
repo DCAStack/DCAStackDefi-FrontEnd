@@ -138,8 +138,8 @@ function TradeDCA() {
             <Container my="setup_dca">
               <Group align="end" position="center" spacing="xl" grow>
                 <NumberInput
-                  // precision={sellToken.decimals}
                   label="Sell Amount"
+                  value={sellAmount.toNumber()}
                   radius="xs"
                   size="xl"
                   hideControls
@@ -159,6 +159,7 @@ function TradeDCA() {
                   required
                   min={1}
                   max={30}
+                  value={tradeFreq}
                   onChange={(val) =>
                     val ? setTradeFreq(val) : setTradeFreq(0)
                   }
@@ -181,6 +182,7 @@ function TradeDCA() {
                   excludeDate={(date) =>
                     tradeFreq !== 0 ? date.getDate() % tradeFreq !== 0 : false
                   }
+                  value={date}
                   firstDayOfWeek="sunday"
                   dropdownType="modal"
                   label="Select DCA Schedule"
