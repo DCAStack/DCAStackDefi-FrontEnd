@@ -60,6 +60,7 @@ function TradeDCA() {
   const [buyToken, setBuyToken] = useState(nullToken);
   const [depositAmount, setDepositAmount] = useState(BigNumber.from(0));
   const [numExec, setNumExec] = useState(0);
+  const [enableRead, setEnableRead] = useState(false);
 
   const [quote1inch, setQuote1inch] = useState({
     estimatedGasDca: BigNumber.from(0),
@@ -91,6 +92,7 @@ function TradeDCA() {
       console.log("1inch", quoteDetails, quoteError, typeof quoteDetails);
       setDepositAmount(sellAmount.mul(numExec));
       setQuote1inch(quoteDetails);
+      setEnableRead(true);
     }
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
 
@@ -103,8 +105,8 @@ function TradeDCA() {
       {
         addressOrName: contractAddr,
         contractInterface: contractABI,
-        functionName: "userGasBalances",
-        args: address,
+        functionName: "getFreeGasBalance",
+        args: [quote1inch?.estimatedGasDca],
       },
       {
         addressOrName: contractAddr,
@@ -113,6 +115,7 @@ function TradeDCA() {
         args: [sellToken?.address],
       },
     ],
+    enabled: enableRead,
     cacheOnBlock: true,
     watch: true,
     onSuccess(data) {
@@ -122,10 +125,14 @@ function TradeDCA() {
         ? setUserGasBal(BigNumber.from(userGasBalance._hex))
         : setUserGasBal(bnZero);
 
+      console.log("Free gas balance is", userGasBalance?.toString());
+
       let userFundBalance = data[1];
       userFundBalance
         ? setUserBal(BigNumber.from(userFundBalance._hex))
         : setUserBal(bnZero);
+
+      console.log("Free token balance is", userFundBalance?.toString());
     },
     onError(error) {
       console.log("Get User Funds Error", error);
@@ -274,6 +281,7 @@ function TradeDCA() {
               quoteDetails={quote1inch}
               freeGasBal={freeGasBal}
               freeTokenBal={freeTokenBal}
+              depositAmount={depositAmount}
             />
           </Container>
         </Stepper.Step>

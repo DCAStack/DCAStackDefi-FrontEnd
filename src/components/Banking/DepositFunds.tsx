@@ -23,7 +23,7 @@ import {
   useWaitForTransaction,
   erc20ABI,
 } from "wagmi";
-import { parseEther, formatEther } from "ethers/lib/utils";
+import { parseEther, formatEther, formatUnits } from "ethers/lib/utils";
 import { MaxUint256 } from "ethers/constants";
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -34,6 +34,8 @@ import { TokenBadgeProps } from "../../models/PropTypes";
 import { parseUnits } from "ethers/lib/utils";
 import { nullToken } from "../../data/gasTokens";
 
+import { BigNumber } from "ethers";
+
 const useStyles = createStyles((theme) => ({
   input: {
     height: 60,
@@ -42,11 +44,11 @@ const useStyles = createStyles((theme) => ({
 
 export default function DepositFunds({
   token,
-  defaultValue = 0,
+  weiDefaultValue = BigNumber.from(0),
 }: TokenBadgeProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [depositAmount, setDeposit] = useState(0);
+  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
@@ -91,7 +93,7 @@ export default function DepositFunds({
       "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
         ? true
         : enableDepositPrep,
-    args: [token.address, parseUnits(String(depositAmount), token.decimals)],
+    args: [token.address, weiDepositAmount],
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
     },
@@ -117,6 +119,7 @@ export default function DepositFunds({
         autoClose: true,
         disallowClose: false,
       });
+      setDepositPrep(false);
     },
     onError(error) {
       console.log("Deposit Funds Write Error", error);
@@ -301,11 +304,11 @@ export default function DepositFunds({
   });
 
   useEffect(() => {
-    setDeposit(defaultValue);
+    setDeposit(weiDefaultValue);
 
     if (
       token !== nullToken &&
-      depositAmount !== 0 &&
+      weiDepositAmount !== BigNumber.from(0) &&
       token.address.toLowerCase() !==
         "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
     ) {
@@ -322,19 +325,32 @@ export default function DepositFunds({
       //to trigger after allowance
       depositFunds?.();
     }
-  }, [defaultValue, token, depositAmount, enableDepositPrep, depositFunds]);
+  }, [
+    weiDefaultValue,
+    token,
+    weiDepositAmount,
+    enableDepositPrep,
+    depositFunds,
+    depositApproveSetup,
+  ]);
 
   return (
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
           precision={token?.decimals}
-          value={defaultValue}
+          value={Number(
+            formatUnits(weiDefaultValue.toString(), token.decimals)
+          )}
           label="Deposit DCA Amount"
           radius="xs"
           size="xl"
           hideControls
-          onChange={(val) => (val ? setDeposit(val) : setDeposit(0))}
+          onChange={(val) =>
+            val
+              ? setDeposit(BigNumber.from(val))
+              : setDeposit(BigNumber.from(0))
+          }
           icon={<ViewToken token={token} />}
           iconWidth={115}
           rightSection={
@@ -350,12 +366,12 @@ export default function DepositFunds({
                   "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
                 ) {
                   maxTokenDeposit
-                    ? setDeposit(Number(maxTokenDeposit?.formatted))
-                    : setDeposit(0);
+                    ? setDeposit(maxTokenDeposit?.value)
+                    : setDeposit(BigNumber.from(0));
                 } else {
                   maxDeposit
-                    ? setDeposit(Number(maxDeposit?.formatted))
-                    : setDeposit(0);
+                    ? setDeposit(maxDeposit?.value)
+                    : setDeposit(BigNumber.from(0));
                 }
               }}
             >
@@ -370,6 +386,7 @@ export default function DepositFunds({
           radius="xs"
           size="xl"
           onClick={() => {
+            console.log(depositApproveSetup, depositApproveSetup?.toString());
             if (
               token.address.toLowerCase() !==
               "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"

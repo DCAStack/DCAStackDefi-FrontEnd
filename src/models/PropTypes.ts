@@ -1,4 +1,5 @@
 import { IToken, IContract } from "./Interfaces";
+import { BigNumber } from "ethers";
 
 interface BaseProps {
     children?: React.ReactNode;
@@ -9,7 +10,7 @@ interface BaseProps {
 export interface TokenBadgeProps extends BaseProps {
     token: IToken;
     displayTokenName?: boolean;
-    defaultValue?: number;
+    weiDefaultValue?: BigNumber;
 }
 
 export interface ContractInfoProps extends BaseProps {

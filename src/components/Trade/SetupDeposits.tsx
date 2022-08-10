@@ -54,7 +54,6 @@ interface ISetupDeposits {
   depositAmount: BigNumber;
   freeTokenBal: BigNumber;
   freeGasBal: BigNumber;
-
 }
 
 export default function SetupDeposits({
@@ -76,7 +75,6 @@ export default function SetupDeposits({
   );
 
   const bnZero = BigNumber.from(0);
-  
 
   const networkCurrency: string = chain?.nativeCurrency
     ? chain.nativeCurrency.symbol
@@ -111,10 +109,10 @@ export default function SetupDeposits({
         </Stack>
 
         <DepositGas
-          defaultValue={
+          weiDefaultValue={
             estimatedGas?.gt(freeGasBal)
-              ? Number(formatEther(estimatedGas?.sub(freeGasBal).toString()))
-              : 0
+              ? estimatedGas?.sub(freeGasBal)
+              : BigNumber.from(0)
           }
         />
       </Group>
@@ -154,15 +152,10 @@ export default function SetupDeposits({
         </Stack>
         <DepositFunds
           token={sellToken}
-          defaultValue={
+          weiDefaultValue={
             freeTokenBal.lt(weiDepositAmount)
-              ? Number(
-                  formatUnits(
-                    weiDepositAmount?.sub(freeTokenBal),
-                    sellToken.decimals
-                  )
-                )
-              : 0
+              ? weiDepositAmount
+              : BigNumber.from(0)
           }
         />
       </Group>

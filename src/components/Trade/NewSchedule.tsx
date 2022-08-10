@@ -61,6 +61,7 @@ interface IScheduleParams {
   quoteDetails: Record<string, any>;
   freeTokenBal: BigNumber;
   freeGasBal: BigNumber;
+  depositAmount: BigNumber;
 }
 
 export default function NewSchedule({
@@ -74,6 +75,7 @@ export default function NewSchedule({
   quoteDetails,
   freeTokenBal,
   freeGasBal,
+  depositAmount,
 }: IScheduleParams) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -87,31 +89,27 @@ export default function NewSchedule({
   const [enablePrep, setPrep] = useState(false);
 
   const weiDepositAmount = parseUnits(
-    sellAmount.toString(),
+    depositAmount.toString(),
     sellToken.decimals
   );
 
-  // useEffect(() => {
-  //   if (
-  //     sellToken !== nullToken &&
-  //     buyToken !== nullToken &&
-  //     !sellAmount.isZero() &&
-  //     tradeFreq !== 0 &&
-  //     numExec !== 0 &&
-  //     unixStartDate &&
-  //     unixEndDate
-  //   ) {
-  //     setPrep(true);
-  //   }
-  // }, [
-  //   sellToken,
-  //   buyToken,
-  //   tradeFreq,
-  //   sellAmount,
-  //   numExec,
-  //   unixStartDate,
-  //   unixEndDate,
-  // ]);
+  useEffect(() => {
+    if (
+      sellToken !== nullToken &&
+      buyToken !== nullToken &&
+      !sellAmount.isZero() &&
+      tradeFreq !== 0 &&
+      numExec !== 0 &&
+      unixStartDate &&
+      unixEndDate &&
+      !freeTokenBal.isZero() &&
+      !freeGasBal.isZero()
+    ) {
+      setPrep(true);
+    } else {
+      setPrep(false);
+    }
+  }, [sellToken, buyToken, tradeFreq, sellAmount, numExec, unixStartDate, unixEndDate, freeTokenBal, freeGasBal]);
 
   const {
     config: prepareNewScheduleSetup,
@@ -219,20 +217,9 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">You're selling</Text>
             <Text weight={700} color="green">
-              {sellToken.symbol}
+              {sellAmount.toString()} {sellToken.symbol}
             </Text>
             <Text size="lg">to buy</Text>
-            <Text weight={700} color="green">
-              {buyToken.symbol}
-            </Text>
-          </Group>
-
-          <Group align="end" position="left" spacing="xs">
-            <Text size="lg">You're selling</Text>
-            <Text weight={700} color="green">
-              ${sellAmount.toString()} {sellToken.symbol}
-            </Text>
-            <Text size="lg">into</Text>
             <Text weight={700} color="green">
               {buyToken.symbol}
             </Text>
@@ -260,11 +247,11 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Total deposit required is</Text>
             <Text weight={700} color="green">
-              ${sellAmount.mul(numExec).toString()} {sellToken.symbol}
+              {depositAmount.toString()} {sellToken.symbol}
             </Text>
             <Text size="lg">because you're swapping</Text>
             <Text weight={700} color="green">
-              ${sellAmount.toString()} {sellToken.symbol}
+              {sellAmount.toString()} {sellToken.symbol}
             </Text>
             <Text size="lg">x</Text>
             <Text weight={700} color="green">
@@ -273,18 +260,17 @@ export default function NewSchedule({
           </Group>
 
           {!freeTokenBal.eq(0) && //run if additional deposit needed
-            weiDepositAmount.mul(numExec).gte(freeTokenBal) && (
+            weiDepositAmount.gt(freeTokenBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you have</Text>
                 <Text weight={700} color="green">
-                  ${formatUnits(freeTokenBal, sellToken.decimals)}{" "}
+                  {formatUnits(freeTokenBal, sellToken.decimals)}{" "}
                   {sellToken.symbol}
                 </Text>
                 <Text size="lg">not in use so your deposit is just</Text>
                 <Text weight={700} color="green">
-                  $
                   {formatUnits(
-                    weiDepositAmount.mul(numExec).sub(freeTokenBal),
+                    weiDepositAmount.sub(freeTokenBal),
                     sellToken.decimals
                   )}{" "}
                   {sellToken.symbol}
@@ -293,11 +279,11 @@ export default function NewSchedule({
             )}
 
           {!freeTokenBal.eq(0) && //run if zero needed
-            weiDepositAmount.mul(numExec).lt(freeTokenBal) && (
+            weiDepositAmount.lte(freeTokenBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you have</Text>
                 <Text weight={700} color="green">
-                  ${formatUnits(freeTokenBal, sellToken.decimals)}{" "}
+                  {formatUnits(freeTokenBal, sellToken.decimals)}{" "}
                   {sellToken.symbol}
                 </Text>
                 <Text size="lg">not in use, so a deposit is not needed!</Text>
@@ -311,7 +297,7 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Current swap quote is:</Text>
             <Text weight={700} color="green">
-              $1 {sellToken.symbol} for ~{quoteDetails?.swapQuote}{" "}
+              1 {sellToken.symbol} for ~{quoteDetails?.swapQuote}{" "}
               {buyToken.symbol}
             </Text>
           </Group>
@@ -319,15 +305,14 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Estimated gas per swap is:</Text>
             <Text weight={700} color="green">
-              {quoteDetails?.estimatedGasDcaFormatted} {networkCurrency}
+              {quoteDetails?.estimatedGasFormatted} {networkCurrency}
             </Text>
           </Group>
 
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Your total gas deposit is</Text>
             <Text weight={700} color="green">
-              {quoteDetails?.estimatedGasDcaFormatted * 2 * numExec}{" "}
-              {networkCurrency}
+              {quoteDetails?.estimatedGasDcaFormatted} {networkCurrency}
             </Text>
             <Text size="lg">because you're swapping</Text>
             <Text weight={700} color="green">
@@ -336,20 +321,33 @@ export default function NewSchedule({
             <Text size="xs">(x 2 for a buffer)</Text>
           </Group>
 
-          {/* <Group align="end" position="left" spacing="xs">
-            <Text size="lg">But you have</Text>
-            <Text weight={700} color="green">
-              ${sellAmount.mul(numExec).toString()} {sellToken.symbol}
-            </Text>
-            <Text size="lg">available</Text>
-            <Text weight={700} color="green">
-              ${sellAmount.toString()} {sellToken.symbol}
-            </Text>
-            <Text size="lg">so your deposit is just</Text>
-            <Text weight={700} color="green">
-              {numExec} times
-            </Text>
-          </Group> */}
+          {!freeGasBal.eq(0) && //run if additional deposit needed
+            quoteDetails?.estimatedGasDca.gt(freeGasBal) && (
+              <Group align="end" position="left" spacing="xs">
+                <Text size="lg">But you have</Text>
+                <Text weight={700} color="green">
+                  {formatEther(freeGasBal)} {networkCurrency}
+                </Text>
+                <Text size="lg">not in use so your deposit is just</Text>
+                <Text weight={700} color="green">
+                  {formatEther(quoteDetails?.estimatedGasDca.sub(freeGasBal))}{" "}
+                  {networkCurrency}
+                </Text>
+              </Group>
+            )}
+
+          {!freeGasBal.eq(0) && //run if zero needed
+            quoteDetails?.estimatedGasDca.lte(freeGasBal) && (
+              <Group align="end" position="left" spacing="xs">
+                <Text size="lg">But you have</Text>
+                <Text weight={700} color="green">
+                  {formatEther(freeGasBal)} {networkCurrency}
+                </Text>
+                <Text size="lg">
+                  not in use, so a gas deposit is not needed!
+                </Text>
+              </Group>
+            )}
 
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Default slippage is:</Text>

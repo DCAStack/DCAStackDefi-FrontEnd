@@ -27,6 +27,7 @@ import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
+import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -35,22 +36,24 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface ISetup {
-  defaultValue?: number;
+  weiDefaultValue?: BigNumber;
 }
 
-export default function DepositGas({ defaultValue = 0 }: ISetup) {
+export default function DepositGas({
+  weiDefaultValue = BigNumber.from(0),
+}: ISetup) {
   const { chain, chains } = useNetwork();
 
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [depositAmount, setDeposit] = useState(0);
+  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   useEffect(() => {
-    setDeposit(defaultValue);
-  }, [defaultValue]);
+    setDeposit(weiDefaultValue);
+  }, [weiDefaultValue]);
 
   const {
     config: depositGasSetup,
@@ -62,7 +65,7 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
     functionName: "depositGas",
     overrides: {
       from: address,
-      value: parseEther(String(depositAmount)),
+      value: weiDepositAmount,
     },
     onError(error) {
       console.log("Deposit Gas Prepared Error", error);
@@ -160,12 +163,16 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
       <Group align="end" position="center" spacing="xs">
         <NumberInput
           precision={chain?.nativeCurrency?.decimals}
-          value={depositAmount}
+          value={Number(parseEther(weiDepositAmount.toString()))}
           label="Deposit Gas Amount"
           radius="xs"
           size="xl"
           hideControls
-          onChange={(val) => (val ? setDeposit(val) : setDeposit(0))}
+          onChange={(val) =>
+            val
+              ? setDeposit(BigNumber.from(val))
+              : setDeposit(BigNumber.from(0))
+          }
           icon={<GasToken />}
           iconWidth={115}
           rightSection={
@@ -177,8 +184,8 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
               size="md"
               onClick={() =>
                 maxDeposit
-                  ? setDeposit(Number(maxDeposit?.formatted.split(".")[0]))
-                  : setDeposit(0)
+                  ? setDeposit(maxDeposit?.value)
+                  : setDeposit(BigNumber.from(0))
               }
             >
               MAX
