@@ -48,6 +48,10 @@ export default function use1inchRetrieveQuote(
   if (data) {
     console.log("1inch fetch quote success", data);
     if (data?.estimatedGas) {
+      data.estimatedGasFormatted = formatUnits(
+        data.estimatedGas.toString(),
+        "gwei"
+      );
       let calcGas = data.estimatedGas * numExec * 2; //big number
       data.estimatedGasDcaGwei = BigNumber.from(calcGas);
       data.estimatedGasDcaFormatted = formatUnits(
