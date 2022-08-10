@@ -87,6 +87,7 @@ export default function NewSchedule({
   const unixEndDate = endDate ? endDate?.getTime() / 1000 : 0;
 
   const [enablePrep, setPrep] = useState(false);
+  const [buttonTxt, setButtonTxt] = useState("Waiting...");
 
   const weiDepositAmount = parseUnits(
     depositAmount.toString(),
@@ -106,10 +107,22 @@ export default function NewSchedule({
       !freeGasBal.isZero()
     ) {
       setPrep(true);
+      setButtonTxt("Start DCA");
     } else {
       setPrep(false);
+      setButtonTxt("Not Ready!");
     }
-  }, [sellToken, buyToken, tradeFreq, sellAmount, numExec, unixStartDate, unixEndDate, freeTokenBal, freeGasBal]);
+  }, [
+    sellToken,
+    buyToken,
+    tradeFreq,
+    sellAmount,
+    numExec,
+    unixStartDate,
+    unixEndDate,
+    freeTokenBal,
+    freeGasBal,
+  ]);
 
   const {
     config: prepareNewScheduleSetup,
@@ -367,7 +380,7 @@ export default function NewSchedule({
           gradient={{ from: "#ed6ea0", to: "#ec8c69", deg: 35 }}
           onClick={() => newSchedule?.()}
         >
-          Start DCA
+          {buttonTxt}
         </Button>
       </Group>
     </div>
