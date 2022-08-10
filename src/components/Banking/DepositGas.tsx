@@ -21,6 +21,7 @@ import {
   useBalance,
   useContractRead,
   useWaitForTransaction,
+  useNetwork,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "../../models/PropTypes";
@@ -38,6 +39,8 @@ interface ISetup {
 }
 
 export default function DepositGas({ defaultValue = 0 }: ISetup) {
+  const { chain, chains } = useNetwork();
+
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const [depositAmount, setDeposit] = useState(0);
@@ -156,7 +159,7 @@ export default function DepositGas({ defaultValue = 0 }: ISetup) {
     <Container my="deposit_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
-          // precision={depositAmount > 0 ? depositAmount.toString().length : 1}
+          precision={chain?.nativeCurrency?.decimals}
           value={depositAmount}
           label="Deposit Gas Amount"
           radius="xs"

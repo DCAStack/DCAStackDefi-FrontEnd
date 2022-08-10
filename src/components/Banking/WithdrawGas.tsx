@@ -20,6 +20,7 @@ import {
   useBalance,
   useContractRead,
   useWaitForTransaction,
+  useNetwork,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "./../../models/PropTypes";
@@ -33,6 +34,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function WithdrawGas() {
+  const { chain, chains } = useNetwork();
+
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const [withdrawAmount, setWithdraw] = useState(0);
@@ -147,13 +150,11 @@ export default function WithdrawGas() {
     },
   });
 
-  console.log("Max withdraw is", maxWithdraw);
-
   return (
     <Container my="withdraw_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
-                    // precision={withdrawAmount > 0 ? withdrawAmount.toString().length : 1}
+                    precision={chain?.nativeCurrency?.decimals}
 
           value={withdrawAmount}
           radius="xs"

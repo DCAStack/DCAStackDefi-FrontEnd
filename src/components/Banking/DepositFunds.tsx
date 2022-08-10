@@ -328,7 +328,8 @@ export default function DepositFunds({
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
-          // precision={depositAmount > 0 ? depositAmount.toString().length : 1}
+          precision={token?.decimals}
+          value={defaultValue}
           label="Deposit DCA Amount"
           radius="xs"
           size="xl"
