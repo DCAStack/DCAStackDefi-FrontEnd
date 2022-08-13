@@ -55,6 +55,7 @@ export default function DepositFunds({
 
   const [enableApprovePrep, setApprovePrep] = useState(false);
   const [enableDepositPrep, setDepositPrep] = useState(false);
+  const [depositAfterApprove, setDepositAfterApprove] = useState(false);
 
   const {
     data: depositApproveSetup,
@@ -64,11 +65,6 @@ export default function DepositFunds({
     addressOrName: token.address,
     contractInterface: erc20ABI,
     functionName: "allowance",
-    enabled:
-      token.address.toLowerCase() !==
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-        ? true
-        : false,
     args: [address, contractAddr],
     cacheOnBlock: true,
     watch: true,
@@ -88,11 +84,7 @@ export default function DepositFunds({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
-    enabled:
-      token.address.toLowerCase() ===
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-        ? true
-        : enableDepositPrep,
+    enabled: enableDepositPrep,
     args: [token.address, weiDepositAmount],
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
@@ -120,6 +112,7 @@ export default function DepositFunds({
         disallowClose: false,
       });
       setDepositPrep(false);
+      setDepositAfterApprove(false);
     },
     onError(error) {
       console.log("Deposit Funds Write Error", error);
@@ -153,6 +146,8 @@ export default function DepositFunds({
           message: "You're ready to create a schedule!",
           icon: <CircleCheck />,
         });
+
+        setDepositPrep(false);
       },
 
       onError(error) {
@@ -178,11 +173,7 @@ export default function DepositFunds({
     addressOrName: token.address,
     contractInterface: erc20ABI,
     functionName: "approve",
-    enabled:
-      token.address.toLowerCase() ===
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-        ? false
-        : enableApprovePrep,
+    enabled: enableApprovePrep,
     args: [contractAddr, MaxUint256],
     onError(error) {
       console.log("Deposit Prepare Approve Error", error);
@@ -243,7 +234,7 @@ export default function DepositFunds({
           icon: <CircleCheck />,
         });
 
-        setDepositPrep(true);
+        setDepositAfterApprove(true);
       },
       onError(error) {
         console.log("Approval Transaction Error", error);
@@ -270,11 +261,6 @@ export default function DepositFunds({
     addressOrName: address,
     token: token.address,
     watch: true,
-    enabled:
-      token.address.toLowerCase() !==
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-        ? true
-        : false,
     onSuccess(data) {
       console.log("Get User Wallet Token Balance Success", data);
     },
@@ -283,55 +269,35 @@ export default function DepositFunds({
     },
   });
 
-  const {
-    data: maxDeposit,
-    isError: maxDepositIsError,
-    isLoading: maxDepositIsLoading,
-  } = useBalance({
-    addressOrName: address,
-    watch: true,
-    enabled:
-      token.address.toLowerCase() ===
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-        ? true
-        : false,
-    onSuccess(data) {
-      console.log("Get User Wallet ETH Balance Success", data);
-    },
-    onError(error) {
-      console.log("Get User Wallet ETH Balance Error", error);
-    },
-  });
-
   useEffect(() => {
-    setDeposit(weiDefaultValue);
-
-    if (
-      token !== nullToken &&
-      weiDepositAmount !== BigNumber.from(0) &&
-      token.address.toLowerCase() !==
-        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-    ) {
-      setApprovePrep(true);
-    } else {
-      setApprovePrep(false);
+    if (!weiDefaultValue.eq(0)) {
+      setDeposit(weiDefaultValue);
     }
 
-    if (
-      enableDepositPrep === true &&
-      token.address.toLowerCase() !==
-        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-    ) {
-      //to trigger after allowance
+    //flow 1: approve then deposit
+    if (depositApproveSetup) {
+      if (formatEther(depositApproveSetup) === "0.0") {
+        setApprovePrep(true);
+        setDepositPrep(false);
+      }
+      //flow 2: just deposit
+      else {
+        setApprovePrep(false);
+        setDepositPrep(true);
+      }
+    }
+
+    // to trigger after allowance
+    if (depositAfterApprove) {
       depositFunds?.();
+      // setDepositPrep(false);
     }
   }, [
     weiDefaultValue,
-    token,
-    weiDepositAmount,
-    enableDepositPrep,
     depositFunds,
+    enableDepositPrep,
     depositApproveSetup,
+    depositAfterApprove,
   ]);
 
   return (
@@ -339,16 +305,14 @@ export default function DepositFunds({
       <Group align="end" position="center" spacing="xs">
         <NumberInput
           precision={token?.decimals}
-          value={Number(
-            formatUnits(weiDefaultValue.toString(), token.decimals)
-          )}
+          value={Number(formatUnits(weiDepositAmount, token.decimals))}
           label="Deposit DCA Amount"
           radius="xs"
           size="xl"
           hideControls
           onChange={(val) =>
             val
-              ? setDeposit(BigNumber.from(val))
+              ? setDeposit(parseUnits(String(val), token.decimals))
               : setDeposit(BigNumber.from(0))
           }
           icon={<ViewToken token={token} />}
@@ -361,18 +325,9 @@ export default function DepositFunds({
               radius="xl"
               size="md"
               onClick={() => {
-                if (
-                  token.address.toLowerCase() !==
-                  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                ) {
-                  maxTokenDeposit
-                    ? setDeposit(maxTokenDeposit?.value)
-                    : setDeposit(BigNumber.from(0));
-                } else {
-                  maxDeposit
-                    ? setDeposit(maxDeposit?.value)
-                    : setDeposit(BigNumber.from(0));
-                }
+                maxTokenDeposit
+                  ? setDeposit(maxTokenDeposit?.value)
+                  : setDeposit(BigNumber.from(0));
               }}
             >
               MAX
@@ -387,32 +342,10 @@ export default function DepositFunds({
           size="xl"
           onClick={() => {
             console.log(depositApproveSetup, depositApproveSetup?.toString());
-            if (
-              token.address.toLowerCase() !==
-              "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-            ) {
-              if (depositApproveSetup) {
-                //regular token
-                if (maxTokenDeposit?.formatted === "0.0") {
-                  showNotification({
-                    id: "deposit-balance-error",
-                    color: "red",
-                    title: "Insufficient Balance",
-                    message:
-                      "If this was unexpected, please raise an issue on github!",
-                    autoClose: true,
-                    disallowClose: false,
-                    icon: <AlertOctagon />,
-                  });
-                } else {
-                  formatEther(depositApproveSetup) === "0.0"
-                    ? approveFunds?.()
-                    : depositFunds?.();
-                }
-              }
-            } else {
-              //eth token
-              if (maxDeposit?.formatted === "0.0") {
+
+            if (depositApproveSetup) {
+              //regular token
+              if (maxTokenDeposit?.formatted === "0.0") {
                 showNotification({
                   id: "deposit-balance-error",
                   color: "red",
@@ -424,7 +357,9 @@ export default function DepositFunds({
                   icon: <AlertOctagon />,
                 });
               } else {
-                depositFunds?.();
+                formatEther(depositApproveSetup) === "0.0"
+                  ? approveFunds?.()
+                  : depositFunds?.();
               }
             }
           }}
