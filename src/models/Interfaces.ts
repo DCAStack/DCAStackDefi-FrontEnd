@@ -20,4 +20,5 @@ export interface IUserFunds {
   name: string;
   decimals: number;
   balance: string;
+  freeBalance: string;
 }

@@ -13,7 +13,7 @@ import {
   useContractWrite,
   useAccount,
   useBalance,
-  useContractRead,
+  useContractReads,
   useWaitForTransaction,
   useNetwork,
 } from "wagmi";
@@ -26,6 +26,7 @@ import { UserTradesPopulated } from "../Dashboard/TradeTable";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
 import { IUserFunds } from "../../models/Interfaces";
+import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -53,46 +54,83 @@ const Dashboard = () => {
   } = use1inchRetrieveTokens(currentChain);
 
   const {
-    data: userTokenBalances,
+    data: userTokenInfo,
     isError,
     isLoading,
-  } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "getUserAllTokenBalances",
+  } = useContractReads({
+    contracts: [
+      {
+        addressOrName: contractAddr,
+        contractInterface: contractABI,
+        functionName: "getUserAllTokenBalances",
+      },
+      {
+        addressOrName: contractAddr,
+        contractInterface: contractABI,
+        functionName: "getUserSchedules",
+      },
+    ],
     cacheOnBlock: true,
     watch: true,
     onSuccess(data) {
-      console.log("Get All User Funds Success", data, typeof data);
+      console.log("Get All User Token Info Success", data);
     },
     onError(error) {
-      console.log("Get All User Funds Error", error);
+      console.log("Get All User Token Info Error", error);
     },
   });
 
   let parsedTokenBalances: IUserFunds[] = [];
   let mappedTokenBalances: Record<string, IUserFunds> = {};
+  let userTokenBalances = userTokenInfo ? userTokenInfo[0] : [[], [], []];
+  let userTokenPurchasing = userTokenInfo ? userTokenInfo[1] : [[]];
+  let joinNeededTokens: any = [[], [], []];
+
+  if (userTokenPurchasing) {
+    for (const key of Object.keys(userTokenPurchasing)) {
+      joinNeededTokens[0].push(userTokenPurchasing[key].buyToken);
+    }
+  }
 
   if (userTokenBalances) {
-    userTokenBalances[0].forEach(function (tokenAddr: string, index: number) {
-      // console.log(tokenAddr, index);
-      let tokenDetails = masterTokenList?.tokens[tokenAddr?.toLowerCase()];
-      // console.log(tokenDetails);
+    joinNeededTokens[1] = joinNeededTokens[1].concat(
+      Array(joinNeededTokens[0].length).fill(BigNumber.from(0))
+    );
+    joinNeededTokens[2] = joinNeededTokens[2].concat(
+      Array(joinNeededTokens[0].length).fill(BigNumber.from(0))
+    );
 
-      let addDetails = {
-        logoURI: tokenDetails.logoURI,
-        symbol: tokenDetails.symbol,
-        address: tokenAddr,
-        name: tokenDetails.name,
-        decimals: tokenDetails.decimals,
-        balance: formatUnits(
-          userTokenBalances[1][index],
-          tokenDetails.decimals
-        ),
-      };
-      if (!parsedTokenBalances.includes(addDetails)) {
-        parsedTokenBalances.push(addDetails);
-        mappedTokenBalances[`${tokenAddr}`] = addDetails;
+    joinNeededTokens[0] = joinNeededTokens[0].concat(userTokenBalances[0]);
+    joinNeededTokens[1] = joinNeededTokens[1].concat(userTokenBalances[1]);
+    joinNeededTokens[2] = joinNeededTokens[2].concat(userTokenBalances[2]);
+  }
+
+  if (joinNeededTokens) {
+    joinNeededTokens[0].forEach(function (tokenAddr: string, index: number) {
+      if (tokenAddr) {
+        let tokenDetails = masterTokenList?.tokens[tokenAddr?.toLowerCase()];
+
+        let addDetails = {
+          logoURI: tokenDetails.logoURI,
+          symbol: tokenDetails.symbol,
+          address: tokenAddr,
+          name: tokenDetails.name,
+          decimals: tokenDetails.decimals,
+          balance: formatUnits(
+            joinNeededTokens[1][index],
+            tokenDetails.decimals
+          ),
+          freeBalance: formatUnits(
+            joinNeededTokens[2][index],
+            tokenDetails.decimals
+          ),
+        };
+        if (!parsedTokenBalances.includes(addDetails)) {
+          if (addDetails.freeBalance !== "0.0") {
+            parsedTokenBalances.push(addDetails);
+          }
+          mappedTokenBalances[`${tokenAddr}`] = addDetails;
+        }
       }
     });
   }
@@ -119,7 +157,7 @@ const Dashboard = () => {
       </Paper>
       <Space h="xl" />
 
-      <Tabs tabPadding="xl" grow position="center">
+      <Tabs tabPadding="xl" position="center" grow>
         <Tabs.Tab label="Schedule Balances" icon={<BuildingBank size={30} />}>
           <UserBalancesPopulated userFunds={parsedTokenBalances} />
         </Tabs.Tab>

@@ -212,6 +212,7 @@ export default function WithdrawFunds({
     args: [address, selectedToken?.address],
     cacheOnBlock: true,
     watch: true,
+    enabled: selectedToken ? true : false,
     onSuccess(data) {
       console.log(
         "Get User Token for withdraw Success",

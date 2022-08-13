@@ -13,6 +13,7 @@ import {
   ScrollArea,
   Group,
   Button,
+  Badge,
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon, ChevronDown } from "tabler-icons-react";
@@ -88,26 +89,35 @@ function ScheduleTable({ data }: IUserScheduleInfo) {
 
   const rows = data.map((row) => (
     <tr key={row.scheduleID}>
-      <td>{row.scheduleID}</td>
       <td>
-        {row.isActive === true && "Running"}
-        {row.isActive === false && "Paused"}
+        {row.sellToken?.symbol} for {row.buyToken?.symbol}
       </td>
       <td>
-        {row.sellToken.symbol} for {row.buyToken.symbol}
+        {row.isActive === true && (
+          <Badge color="teal" size="md">
+            Running
+          </Badge>
+        )}
+        {row.isActive === false && (
+          <Badge color="orange" size="md">
+            Paused
+          </Badge>
+        )}
       </td>
+
       <td>
-        {formatUnits(row.tradeAmount, row.sellToken.decimals)}{" "}
-        {row.sellToken.symbol}
+        {formatUnits(row.tradeAmount, row.sellToken?.decimals)}{" "}
+        {row.sellToken?.symbol}
       </td>
-      <td>{row.startDate.toString()}</td>
-      <td>{row.endDate.toString()}</td>
-      <td>{row.nextRun.toString()}</td>
-      <td>{row.lastRun.toString()}</td>
+      <td>{row.startDate.toLocaleString()}</td>
+      <td>{row.endDate.toLocaleString()}</td>
+      <td>{row.nextRun.toLocaleString()}</td>
+      <td>{row.lastRun.toLocaleString()}</td>
       <td>
         {!row.boughtAmount.eq(0) &&
           !row.soldAmount.eq(0) &&
           row.boughtAmount.div(row.soldAmount).toString()}
+        {row.boughtAmount.eq(0) && row.soldAmount.eq(0) && 0}
       </td>
 
       <td>
@@ -128,12 +138,11 @@ function ScheduleTable({ data }: IUserScheduleInfo) {
       sx={{ height: 300 }}
       onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
     >
-      <Table sx={{ minWidth: 700 }} striped highlightOnHover>
+      <Table sx={{ minWidth: 700 }} striped highlightOnHover fontSize="md">
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
           <tr>
-            <th>Schedule ID</th>
-            <th>Status</th>
             <th>Trading Pair</th>
+            <th>Status</th>
             <th>DCA Amount</th>
             <th>Start Date</th>
             <th>Last Run</th>
@@ -176,8 +185,6 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
 
   if (userSchedules && mappedUserFunds) {
     for (const key of Object.keys(userSchedules)) {
-      console.log("fetching schedules ", key, userSchedules[key]);
-
       let addSchedule = {
         scheduleID: Number(key),
         isActive: userSchedules[key].isActive,
@@ -185,7 +192,6 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
         startDate: new Date(userSchedules[key].scheduleDates[0] * 1000),
         endDate: new Date(userSchedules[key].scheduleDates[1] * 1000),
         nextRun: new Date(userSchedules[key].scheduleDates[2] * 1000),
-
 
         lastRun: new Date(userSchedules[key].scheduleDates[3] * 1000),
 
