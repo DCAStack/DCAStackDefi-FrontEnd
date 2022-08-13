@@ -51,6 +51,7 @@ export default function WithdrawGas() {
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
+    enabled: !weiWithdrawAmount.eq(0) ? true : false,
     functionName: "withdrawGas",
     args: weiWithdrawAmount,
     overrides: {
@@ -145,7 +146,6 @@ export default function WithdrawGas() {
     watch: true,
     onSuccess(data) {
       console.log("Get User Gas for withdraw Success", data);
-      console.log(typeof data, data.toString());
     },
     onError(error) {
       console.log("Get User Gas for withdraw Error", error);

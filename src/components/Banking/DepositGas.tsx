@@ -64,6 +64,7 @@ export default function DepositGas({
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
+    enabled: !weiDepositAmount.eq(0) ? true : false,
     functionName: "depositGas",
     overrides: {
       from: address,
