@@ -26,6 +26,7 @@ import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractInfoProps } from "./../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
+import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -38,7 +39,7 @@ export default function WithdrawGas() {
 
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [withdrawAmount, setWithdraw] = useState(0);
+  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
@@ -51,7 +52,7 @@ export default function WithdrawGas() {
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "withdrawGas",
-    args: parseEther(String(withdrawAmount)),
+    args: weiWithdrawAmount,
     overrides: {
       from: address,
     },
@@ -144,6 +145,7 @@ export default function WithdrawGas() {
     watch: true,
     onSuccess(data) {
       console.log("Get User Gas for withdraw Success", data);
+      console.log(typeof data, data.toString());
     },
     onError(error) {
       console.log("Get User Gas for withdraw Error", error);
@@ -154,13 +156,17 @@ export default function WithdrawGas() {
     <Container my="withdraw_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
-                    precision={chain?.nativeCurrency?.decimals}
-
-          value={withdrawAmount}
+          precision={chain?.nativeCurrency?.decimals}
+          label="Withdraw Gas Amount"
+          value={Number(formatEther(weiWithdrawAmount.toString()))}
           radius="xs"
           size="xl"
           hideControls
-          onChange={(val) => (val ? setWithdraw(val) : setWithdraw(0))}
+          onChange={(val) =>
+            val
+              ? setWithdraw(parseEther(String(val)))
+              : setWithdraw(BigNumber.from(0))
+          }
           icon={<GasToken />}
           iconWidth={115}
           rightSection={
@@ -172,8 +178,8 @@ export default function WithdrawGas() {
               size="md"
               onClick={() =>
                 maxWithdraw
-                  ? setWithdraw(Number(formatEther(maxWithdraw?.toString())))
-                  : setWithdraw(0)
+                  ? setWithdraw(BigNumber.from(maxWithdraw))
+                  : setWithdraw(BigNumber.from(0))
               }
             >
               MAX

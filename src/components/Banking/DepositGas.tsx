@@ -52,7 +52,9 @@ export default function DepositGas({
   const addRecentTransaction = useAddRecentTransaction();
 
   useEffect(() => {
-    setDeposit(weiDefaultValue);
+    if (!weiDefaultValue.eq(0)) {
+      setDeposit(weiDefaultValue);
+    }
   }, [weiDefaultValue]);
 
   const {
@@ -162,15 +164,16 @@ export default function DepositGas({
     <Container my="deposit_gas">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
+          style={{ textAlign: "center" }}
           precision={chain?.nativeCurrency?.decimals}
-          value={Number(parseEther(weiDepositAmount.toString()))}
+          value={Number(formatEther(weiDepositAmount?.toString()))}
           label="Deposit Gas Amount"
           radius="xs"
           size="xl"
           hideControls
           onChange={(val) =>
             val
-              ? setDeposit(BigNumber.from(val))
+              ? setDeposit(parseEther(String(val)))
               : setDeposit(BigNumber.from(0))
           }
           icon={<GasToken />}
