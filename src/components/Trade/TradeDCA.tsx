@@ -31,6 +31,7 @@ import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 import { nullToken } from "../../data/gasTokens";
 import NewSchedule from "./NewSchedule";
 import SetupDeposits from "./SetupDeposits";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -132,7 +133,11 @@ function TradeDCA() {
         ? setUserBal(BigNumber.from(userFundBalance._hex))
         : setUserBal(bnZero);
 
-      console.log("Free token balance is", userFundBalance?.toString());
+      console.log(
+        "Free token balance is",
+        userFundBalance?.toString(),
+        sellToken?.address
+      );
     },
     onError(error) {
       console.log("Get User Funds Error", error);
@@ -195,7 +200,9 @@ function TradeDCA() {
                   required
                   onChange={(val) =>
                     val
-                      ? setSellAmount(BigNumber.from(val))
+                      ? setSellAmount(
+                          parseUnits(String(val), sellToken?.decimals)
+                        )
                       : setSellAmount(BigNumber.from(0))
                   }
                 />
