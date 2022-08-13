@@ -281,7 +281,7 @@ function TradeDCA() {
               sellToken={sellToken}
               buyToken={buyToken}
               sellAmount={sellAmount}
-              tradeFreq={tradeFreq}
+              tradeFreq={BigNumber.from(tradeFreq * 86400)}
               numExec={numExec}
               startDate={date[0]}
               endDate={date[1]}

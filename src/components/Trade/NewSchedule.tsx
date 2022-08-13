@@ -54,7 +54,7 @@ interface IScheduleParams {
   sellToken: IToken;
   buyToken: IToken;
   sellAmount: BigNumber;
-  tradeFreq: number;
+  tradeFreq: BigNumber;
   numExec: number;
   startDate: Date | null;
   endDate: Date | null;
@@ -99,7 +99,7 @@ export default function NewSchedule({
       sellToken !== nullToken &&
       buyToken !== nullToken &&
       !sellAmount.isZero() &&
-      tradeFreq !== 0 &&
+      !tradeFreq.isZero() &&
       numExec !== 0 &&
       unixStartDate &&
       unixEndDate &&
@@ -238,7 +238,7 @@ export default function NewSchedule({
             </Text>
             <Text size="lg">Every</Text>
             <Text weight={700} color="green">
-              {tradeFreq} Days
+              {tradeFreq.div(86400).toString()} Days
             </Text>
           </Group>
 
