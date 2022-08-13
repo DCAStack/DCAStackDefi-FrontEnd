@@ -60,7 +60,7 @@ interface ISetupDeposits {
 export default function SetupDeposits({
   sellToken,
   estimatedGas,
-  depositAmount,
+  depositAmount: weiDepositAmount,
   freeTokenBal,
   freeGasBal,
 }: ISetupDeposits) {
@@ -69,11 +69,6 @@ export default function SetupDeposits({
   const { chain, chains } = useNetwork();
   const { address, isConnecting, isDisconnected } = useAccount();
   const currentChain: number = chain ? chain?.id : 0;
-
-  const weiDepositAmount = parseUnits(
-    depositAmount.toString(),
-    sellToken.decimals
-  );
 
   const bnZero = BigNumber.from(0);
 

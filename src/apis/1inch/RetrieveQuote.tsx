@@ -23,14 +23,12 @@ export default function use1inchRetrieveQuote(
 ) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-  const formattedTradeAmount = parseUnits(tradeAmount, sellCrypto.decimals); //based off decimals of sell token
-
   if (currentChain === 31337) {
     //help with local testing
     currentChain = 1;
   }
 
-  const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${formattedTradeAmount}`;
+  const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${tradeAmount}`;
 
   const { data, error } = useSWR(
     sellCrypto !== nullToken &&

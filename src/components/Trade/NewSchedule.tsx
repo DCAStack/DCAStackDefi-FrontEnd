@@ -75,7 +75,7 @@ export default function NewSchedule({
   quoteDetails,
   freeTokenBal,
   freeGasBal,
-  depositAmount,
+  depositAmount: weiDepositAmount,
 }: IScheduleParams) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -89,8 +89,8 @@ export default function NewSchedule({
   const [enablePrep, setPrep] = useState(false);
   const [buttonTxt, setButtonTxt] = useState("Waiting...");
 
-  const weiDepositAmount = parseUnits(
-    depositAmount.toString(),
+  const formatSellAmount = formatUnits(
+    sellAmount.toString(),
     sellToken.decimals
   );
 
@@ -230,7 +230,7 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">You're selling</Text>
             <Text weight={700} color="green">
-              {sellAmount.toString()} {sellToken.symbol}
+              {formatSellAmount} {sellToken.symbol}
             </Text>
             <Text size="lg">to buy</Text>
             <Text weight={700} color="green">
@@ -260,11 +260,12 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Total deposit required is</Text>
             <Text weight={700} color="green">
-              {depositAmount.toString()} {sellToken.symbol}
+              {formatUnits(weiDepositAmount.toString(), sellToken.decimals)}{" "}
+              {sellToken.symbol}
             </Text>
             <Text size="lg">because you're swapping</Text>
             <Text weight={700} color="green">
-              {sellAmount.toString()} {sellToken.symbol}
+              {formatSellAmount} {sellToken.symbol}
             </Text>
             <Text size="lg">x</Text>
             <Text weight={700} color="green">

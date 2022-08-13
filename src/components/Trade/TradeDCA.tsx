@@ -192,7 +192,7 @@ function TradeDCA() {
                 <NumberInput
                   label="Sell Amount"
                   precision={sellToken?.decimals}
-                  value={sellAmount.toNumber()}
+                  value={Number(formatUnits(sellAmount, sellToken?.decimals))}
                   radius="xs"
                   size="xl"
                   hideControls
