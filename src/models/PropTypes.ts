@@ -1,4 +1,4 @@
-import { IToken, IContract } from "./Interfaces";
+import { IToken, IContract, IUserFunds } from "./Interfaces";
 import { BigNumber } from "ethers";
 
 interface BaseProps {
@@ -14,5 +14,9 @@ export interface TokenBadgeProps extends BaseProps {
 }
 
 export interface ContractInfoProps extends BaseProps {
-    contract: IContract;
+}
+
+export interface UserFundsProps extends BaseProps {
+    userFunds?: IUserFunds[];
+    mappedUserFunds?: Record<string, IUserFunds>;
 }

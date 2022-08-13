@@ -1,6 +1,5 @@
 import { ContractInterface } from 'ethers';
 
-
 export interface IToken {
   name: string;
   symbol: string;
@@ -12,4 +11,13 @@ export interface IToken {
 export interface IContract {
   address: string;
   abi: ContractInterface;
+}
+
+export interface IUserFunds {
+  logo: string;
+  symbol: string;
+  address: string;
+  name: string;
+  decimals: number;
+  balance: string;
 }
