@@ -42,6 +42,7 @@ import { SwitchHorizontal, PlayerPlay } from "tabler-icons-react";
 
 import DepositGas from "../Banking/DepositGas";
 import DepositFunds from "../Banking/DepositFunds";
+import DepositEthFunds from "../Banking/DepositEthFunds";
 
 import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 
@@ -150,14 +151,28 @@ export default function SetupDeposits({
             </Text>
           )}
         </Stack>
-        <DepositFunds
-          token={sellToken}
-          weiDefaultValue={
-            freeTokenBal.lt(weiDepositAmount)
-              ? weiDepositAmount
-              : BigNumber.from(0)
-          }
-        />
+        {sellToken.address.toLowerCase() !==
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
+          <DepositFunds
+            token={sellToken}
+            weiDefaultValue={
+              freeTokenBal.lt(weiDepositAmount)
+                ? weiDepositAmount
+                : BigNumber.from(0)
+            }
+          />
+        )}
+        {sellToken.address.toLowerCase() ===
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
+          <DepositEthFunds
+            token={sellToken}
+            weiDefaultValue={
+              freeTokenBal.lt(weiDepositAmount)
+                ? weiDepositAmount
+                : BigNumber.from(0)
+            }
+          />
+        )}
       </Group>
     </div>
   );
