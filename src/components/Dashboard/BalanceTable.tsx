@@ -10,10 +10,36 @@ import {
   useMantineTheme,
   Button,
 } from "@mantine/core";
-import { useState } from "react";
 
 import { Pencil, Trash } from "tabler-icons-react";
 import { createStyles } from "@mantine/core";
+
+import { useEffect, useState, useContext } from "react";
+
+import { showNotification, updateNotification } from "@mantine/notifications";
+import { CircleCheck, AlertOctagon, ChevronDown } from "tabler-icons-react";
+import GasToken from "../TokenDisplay/GasToken";
+
+import {
+  usePrepareContractWrite,
+  useContractWrite,
+  useAccount,
+  useBalance,
+  useContractRead,
+  useWaitForTransaction,
+  useNetwork,
+} from "wagmi";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
+import { ContractInfoProps } from "../../models/PropTypes";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { ContractContext } from "../../App";
+import swapTokens from "./../../data/swapTokens";
+import { forwardRef } from "react";
+import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
+import { BigNumber } from "ethers";
+import { IUserFunds } from "../../models/Interfaces";
+import ViewToken from "../TokenDisplay/ViewToken";
+import { UserFundsProps } from "../../models/PropTypes";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -51,45 +77,29 @@ interface UsersTableProps {
   }[];
 }
 
-const jobColors: Record<string, string> = {
-  engineer: "blue",
-  manager: "cyan",
-  designer: "pink",
-};
-
-export function UsersTable({ data }: UsersTableProps) {
+interface IUserBalanceInfo {
+  data: {
+    logoURI: string;
+    symbol: string;
+    address: string;
+    name: string;
+    decimals: number;
+    balance: string;
+  }[];
+}
+export function UsersTable({ data }: IUserBalanceInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
 
   const theme = useMantineTheme();
   const rows = data.map((item) => (
-    <tr key={item.name}>
+    <tr key={item.address}>
       <td>
-        <Group spacing="sm">
-          <Avatar size={30} src={item.avatar} radius={30} />
-          <Text size="sm" weight={500}>
-            {item.name}
-          </Text>
-        </Group>
+        <ViewToken token={item} />
       </td>
+      <td>{item.balance}</td>
+      <td>{item.balance}</td>
 
-      <td>
-        <Badge
-          color={jobColors[item.job.toLowerCase()]}
-          variant={theme.colorScheme === "dark" ? "light" : "outline"}
-        >
-          {item.job}
-        </Badge>
-      </td>
-      <td>
-        <Anchor<"a">
-          size="sm"
-          href="#"
-          onClick={(event) => event.preventDefault()}
-        >
-          {item.email}
-        </Anchor>
-      </td>
       <td>
         <Group spacing="xs" position="center">
           <Button radius="xl" size="md" compact>
@@ -117,8 +127,9 @@ export function UsersTable({ data }: UsersTableProps) {
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
           <tr>
             <th>Token</th>
-            <th>Balance</th>
+            <th>Total Balance</th>
             <th>Available Balance Not Used in Schedules</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
@@ -167,6 +178,12 @@ const randomData = {
   ],
 };
 
-export function UserBalancesPopulated() {
-  return <UsersTable data={randomData.data} />;
+export function UserBalancesPopulated({
+  userFunds: parsedTokenBalances,
+}: UserFundsProps) {
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
+  const { address, isConnecting, isDisconnected } = useAccount();
+
+  return <UsersTable data={parsedTokenBalances ? parsedTokenBalances : []} />;
 }

@@ -14,7 +14,7 @@ export interface IContract {
 }
 
 export interface IUserFunds {
-  logo: string;
+  logoURI: string;
   symbol: string;
   address: string;
   name: string;

@@ -80,7 +80,7 @@ const Dashboard = () => {
       console.log(tokenDetails);
 
       let addDetails = {
-        logo: tokenDetails.logoURI,
+        logoURI: tokenDetails.logoURI,
         symbol: tokenDetails.symbol,
         address: tokenAddr,
         name: tokenDetails.name,
@@ -121,7 +121,7 @@ const Dashboard = () => {
 
       <Tabs tabPadding="xl" grow position="center">
         <Tabs.Tab label="Schedule Balances" icon={<BuildingBank size={30} />}>
-          {/* <UserBalancesPopulated userFunds={parsedTokenBalances} /> */}
+          <UserBalancesPopulated userFunds={parsedTokenBalances} />
         </Tabs.Tab>
 
         <Tabs.Tab label="Schedules" icon={<Clock size={30} />}>
