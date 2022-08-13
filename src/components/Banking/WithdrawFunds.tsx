@@ -26,7 +26,7 @@ import {
   useWaitForTransaction,
   useNetwork,
 } from "wagmi";
-import { parseEther, formatEther, formatUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -34,6 +34,10 @@ import swapTokens from "./../../data/swapTokens";
 import { forwardRef } from "react";
 import { Text, Select } from "@mantine/core";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
+import { BigNumber } from "ethers";
+
+import { UserFundsProps } from "../../models/PropTypes";
+import { IUserFunds } from "../../models/Interfaces";
 
 const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
   control: {
@@ -77,102 +81,143 @@ const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
   },
 }));
 
-interface IUserFunds {
-  logo: string;
-  symbol: string;
-  address: string;
-  name: string;
-  decimals: number;
-  balance: string;
-}
-
-export default function WithdrawFunds() {
+export default function WithdrawFunds({
+  userFunds: parsedTokenBalances,
+}: UserFundsProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [depositAmount, setDeposit] = useState(0);
+  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
-  const { chain, chains } = useNetwork();
-
-  const currentChain: number = chain ? chain?.id : 0;
-
-  const {
-    tokens: masterTokenList,
-    isLoading: tokenFetchLoading,
-    isError: tokenFetchIsError,
-  } = use1inchRetrieveTokens(currentChain);
-
-  const {
-    data: userTokenBalances,
-    isError,
-    isLoading,
-  } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "getUserAllTokenBalances",
-    cacheOnBlock: true,
-    watch: true,
-    onSuccess(data) {
-      console.log("Get All User Funds Success", data);
-    },
-    onError(error) {
-      console.log("Get All User Funds Error", error);
-    },
-  });
-
-  let parsedTokenBalances: IUserFunds[] = [];
-
-  if (userTokenBalances) {
-    userTokenBalances[0].forEach(function (tokenAddr: string, index: number) {
-      console.log(tokenAddr, index);
-      let tokenDetails = masterTokenList?.tokens[tokenAddr?.toLowerCase()];
-      console.log(tokenDetails);
-      let addDetails = {
-        logo: tokenDetails.logoURI,
-        symbol: tokenDetails.symbol,
-        address: tokenAddr,
-        name: tokenDetails.name,
-        decimals: tokenDetails.decimals,
-        balance: formatUnits(
-          userTokenBalances[1][index],
-          tokenDetails.decimals
-        ),
-      };
-      if (!parsedTokenBalances.includes(addDetails)) {
-        parsedTokenBalances.push(addDetails);
-      }
-    });
-  }
 
   const [opened, setOpened] = useState(false);
   const { classes } = useStyles({ opened });
   const [selectedToken, setSelectedToken] = useState(
     parsedTokenBalances ? parsedTokenBalances[0] : null
   );
-  const items = parsedTokenBalances.map((item) => (
-    <Menu.Item
-      icon={<Image src={item.logo} width={30} height={30} />}
-      onClick={() => setSelectedToken(item)}
-      key={item.address}
-    >
-      {item.balance}&nbsp;
-      {item.symbol}
-    </Menu.Item>
-  ));
+
+  useEffect(() => {
+    //any time token changes, reset input back to 0
+    setWithdraw(BigNumber.from(0));
+  }, [selectedToken]);
+
+  let items;
+  if (parsedTokenBalances) {
+    items = parsedTokenBalances.map((item) => (
+      <Menu.Item
+        icon={<Image src={item.logoURI} width={30} height={30} />}
+        onClick={() => setSelectedToken(item)}
+        key={item.address}
+      >
+        {item.balance}&nbsp;
+        {item.symbol}
+      </Menu.Item>
+    ));
+  }
 
   const {
-    data: maxWithdrawRead,
-    isError: maxWithdrawReadIsError,
-    isLoading: maxWithdrawReadIsLoading,
+    config: withdrawFundsSetup,
+    error: prepareWithdrawFundsError,
+    isError: prepareWithdrawFundsIsError,
+  } = usePrepareContractWrite({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    enabled: !weiWithdrawAmount.eq(0) ? true : false,
+    functionName: "withdrawFunds",
+    args: [selectedToken?.address, weiWithdrawAmount],
+    onError(error) {
+      console.log("Withdraw Gas Prepared Error", error);
+    },
+    onSuccess(data) {
+      console.log("Withdraw Gas Prepared Success", data);
+    },
+  });
+
+  const {
+    data,
+    error,
+    isError: withdrawFundsError,
+    write: withdrawFunds,
+  } = useContractWrite({
+    ...withdrawFundsSetup,
+    onSuccess(data) {
+      console.log("Withdraw Funds Write Success", data);
+
+      showNotification({
+        id: "withdraw-token-pending",
+        loading: true,
+        title: "Pending Token Withdrawal",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+
+    onError(error) {
+      console.log("Withdraw Funds Write Error", error);
+
+      showNotification({
+        id: "withdraw-token-error",
+        color: "red",
+        title: "Error token Withdrawal",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
+
+  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+    hash: data?.hash,
+    onSuccess(data) {
+      console.log("Withdraw Funds Success", data);
+
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Withdraw token",
+      });
+
+      updateNotification({
+        id: "withdraw-token-pending",
+        color: "teal",
+        title: "Token Withdrawal Complete",
+        message: "Safe travels :)",
+        icon: <CircleCheck />,
+      });
+    },
+    onError(error) {
+      console.log("Withdraw Gas Error", error);
+
+      updateNotification({
+        id: "withdraw-token-pending",
+        color: "red",
+        title: "Error Token Withdrawal",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
+
+  const {
+    data: maxWithdraw,
+    isError: maxWithdrawIsError,
+    isLoading: maxWithdrawIsLoading,
   } = useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "userTokenBalances",
-    args: [selectedToken?.address, address],
+    args: [address, selectedToken?.address],
     cacheOnBlock: true,
     watch: true,
     onSuccess(data) {
-      console.log("Get User Token for withdraw Success", data);
+      console.log(
+        "Get User Token for withdraw Success",
+        data,
+        selectedToken?.address
+      );
     },
     onError(error) {
       console.log("Get User Token for withdraw Error", error);
@@ -191,7 +236,7 @@ export default function WithdrawFunds() {
           control={
             <UnstyledButton className={classes.control}>
               <Group spacing="xs">
-                <Image src={selectedToken?.logo} width={30} height={30} />
+                <Image src={selectedToken?.logoURI} width={30} height={30} />
                 <span className={classes.label}>
                   {selectedToken?.balance}&nbsp;{selectedToken?.symbol}
                 </span>
@@ -204,11 +249,17 @@ export default function WithdrawFunds() {
         </Menu>
         <NumberInput
           precision={selectedToken?.decimals}
-          value={depositAmount}
+          value={Number(
+            formatUnits(weiWithdrawAmount, selectedToken?.decimals)
+          )}
           radius="xs"
           size="xl"
           hideControls
-          onChange={(val) => (val ? setDeposit(val) : setDeposit(0))}
+          onChange={(val) =>
+            val
+              ? setWithdraw(parseUnits(String(val), selectedToken?.decimals))
+              : setWithdraw(BigNumber.from(0))
+          }
           rightSection={
             <Button
               variant="subtle"
@@ -216,6 +267,11 @@ export default function WithdrawFunds() {
               compact
               radius="xs"
               size="md"
+              onClick={() => {
+                maxWithdraw
+                  ? setWithdraw(BigNumber.from(maxWithdraw))
+                  : setWithdraw(BigNumber.from(0));
+              }}
             >
               MAX
             </Button>
@@ -227,9 +283,9 @@ export default function WithdrawFunds() {
           className={classes.input}
           radius="xs"
           size="xl"
-          // onClick={() => depositGas?.()}
+          onClick={() => withdrawFunds?.()}
         >
-          &nbsp;Withdraw&nbsp;
+          Withdraw
         </Button>{" "}
       </Group>
     </Container>

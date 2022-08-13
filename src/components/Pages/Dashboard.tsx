@@ -75,9 +75,9 @@ const Dashboard = () => {
 
   if (userTokenBalances) {
     userTokenBalances[0].forEach(function (tokenAddr: string, index: number) {
-      console.log(tokenAddr, index);
+      // console.log(tokenAddr, index);
       let tokenDetails = masterTokenList?.tokens[tokenAddr?.toLowerCase()];
-      console.log(tokenDetails);
+      // console.log(tokenDetails);
 
       let addDetails = {
         logoURI: tokenDetails.logoURI,
