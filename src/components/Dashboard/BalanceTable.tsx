@@ -1,45 +1,16 @@
-import {
-  Avatar,
-  Badge,
-  Table,
-  Group,
-  Text,
-  ActionIcon,
-  Anchor,
-  ScrollArea,
-  useMantineTheme,
-  Button,
-} from "@mantine/core";
+import { Table, Group, ScrollArea, Button } from "@mantine/core";
 
-import { Pencil, Trash } from "tabler-icons-react";
 import { createStyles } from "@mantine/core";
 
-import { useEffect, useState, useContext } from "react";
+import { useState } from "react";
 
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon, ChevronDown } from "tabler-icons-react";
-import GasToken from "../TokenDisplay/GasToken";
-
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractRead,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
-import { ContractInfoProps } from "../../models/PropTypes";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { ContractContext } from "../../App";
-import swapTokens from "./../../data/swapTokens";
-import { forwardRef } from "react";
-import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
+import { parseUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
-import { IUserFunds } from "../../models/Interfaces";
 import ViewToken from "../TokenDisplay/ViewToken";
 import { UserFundsProps } from "../../models/PropTypes";
+import WithdrawFundsFlow from "../Banking/WithdrawFundsFlow";
+import { nullToken } from "../../data/gasTokens";
+import { showNotification, updateNotification } from "@mantine/notifications";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -82,8 +53,11 @@ interface IUserBalanceInfo {
 export function UsersTable({ data }: IUserBalanceInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
+  const [selectedToken, setSelectedToken] = useState(nullToken);
 
-  const theme = useMantineTheme();
+  let withdrawActions = WithdrawFundsFlow(selectedToken, weiWithdrawAmount);
+
   const rows = data.map((item) => (
     <tr key={item.address}>
       <td>
@@ -94,10 +68,33 @@ export function UsersTable({ data }: IUserBalanceInfo) {
 
       <td>
         <Group spacing="xs" position="center">
-          <Button radius="xl" size="md" compact>
+          <Button
+            radius="xl"
+            size="md"
+            compact
+            onMouseOver={() => {
+              setSelectedToken(item);
+              setWithdraw(parseUnits(item.freeBalance, item.decimals));
+            }}
+            onClick={() => {
+              withdrawActions.action?.();
+            }}
+          >
             Withdraw Available
           </Button>
-          <Button color="red" radius="xl" size="md" compact>
+          <Button
+            color="red"
+            radius="xl"
+            size="md"
+            compact
+            onMouseOver={() => {
+              setSelectedToken(item);
+              setWithdraw(parseUnits(item.balance, item.decimals));
+            }}
+            onClick={() => {
+              withdrawActions.action?.();
+            }}
+          >
             Withdraw All
           </Button>
         </Group>
@@ -122,7 +119,6 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             <th>Token</th>
             <th>Total Balance</th>
             <th>Balance Not Used in Schedules</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
@@ -134,9 +130,5 @@ export function UsersTable({ data }: IUserBalanceInfo) {
 export function UserBalancesPopulated({
   userFunds: parsedTokenBalances,
 }: UserFundsProps) {
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
-
   return <UsersTable data={parsedTokenBalances ? parsedTokenBalances : []} />;
 }

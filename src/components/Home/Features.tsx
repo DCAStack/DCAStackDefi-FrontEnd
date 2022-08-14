@@ -92,7 +92,7 @@ const data = [
     icon: World,
     title: "All Defi",
     description:
-      "Use the wonders of decentralized finance to automate your dollar cost averaging. Trustless, Transparent, Transactions. ",
+      "Use the wonders of decentralized finance to automate your dollar cost averaging. Trustless, Transparent, Trading. ",
   },
 ];
 

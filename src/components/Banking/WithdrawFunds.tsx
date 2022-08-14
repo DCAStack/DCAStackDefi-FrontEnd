@@ -3,41 +3,24 @@ import { useEffect, useState, useContext } from "react";
 import {
   Group,
   NumberInput,
-  Grid,
   Container,
   Button,
   createStyles,
-  Avatar,
-  Space,
   UnstyledButton,
   Menu,
   Image,
 } from "@mantine/core";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon, ChevronDown } from "tabler-icons-react";
-import GasToken from "../TokenDisplay/GasToken";
+import { ChevronDown } from "tabler-icons-react";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractRead,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
+import { useAccount } from "wagmi";
 import { formatUnits, parseUnits } from "ethers/lib/utils";
-import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import swapTokens from "./../../data/swapTokens";
-import { forwardRef } from "react";
-import { Text, Select } from "@mantine/core";
-import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 import { BigNumber } from "ethers";
 
 import { UserFundsProps } from "../../models/PropTypes";
-import { IUserFunds } from "../../models/Interfaces";
+
+import WithdrawFundsFlow from "./WithdrawFundsFlow";
 
 const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
   control: {
@@ -96,6 +79,8 @@ export default function WithdrawFunds({
     parsedTokenBalances ? parsedTokenBalances[0] : null
   );
 
+  let withdrawActions = WithdrawFundsFlow(selectedToken, weiWithdrawAmount);
+
   useEffect(() => {
     //any time token changes, reset input back to 0
     setWithdraw(BigNumber.from(0));
@@ -114,116 +99,6 @@ export default function WithdrawFunds({
       </Menu.Item>
     ));
   }
-
-  const {
-    config: withdrawFundsSetup,
-    error: prepareWithdrawFundsError,
-    isError: prepareWithdrawFundsIsError,
-  } = usePrepareContractWrite({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    enabled: !weiWithdrawAmount.eq(0) ? true : false,
-    functionName: "withdrawFunds",
-    args: [selectedToken?.address, weiWithdrawAmount],
-    onError(error) {
-      console.log("Withdraw Gas Prepared Error", error);
-    },
-    onSuccess(data) {
-      console.log("Withdraw Gas Prepared Success", data);
-    },
-  });
-
-  const {
-    data,
-    error,
-    isError: withdrawFundsError,
-    write: withdrawFunds,
-  } = useContractWrite({
-    ...withdrawFundsSetup,
-    onSuccess(data) {
-      console.log("Withdraw Funds Write Success", data);
-
-      showNotification({
-        id: "withdraw-token-pending",
-        loading: true,
-        title: "Pending Token Withdrawal",
-        message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
-        disallowClose: false,
-      });
-    },
-
-    onError(error) {
-      console.log("Withdraw Funds Write Error", error);
-
-      showNotification({
-        id: "withdraw-token-error",
-        color: "red",
-        title: "Error token Withdrawal",
-        message: "If this was unexpected, please raise an issue on github!",
-        autoClose: true,
-        disallowClose: false,
-        icon: <AlertOctagon />,
-      });
-    },
-  });
-
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
-    hash: data?.hash,
-    onSuccess(data) {
-      console.log("Withdraw Funds Success", data);
-
-      addRecentTransaction({
-        hash: data.transactionHash,
-        description: "Withdraw token",
-      });
-
-      updateNotification({
-        id: "withdraw-token-pending",
-        color: "teal",
-        title: "Token Withdrawal Complete",
-        message: "Safe travels :)",
-        icon: <CircleCheck />,
-      });
-    },
-    onError(error) {
-      console.log("Withdraw Gas Error", error);
-
-      updateNotification({
-        id: "withdraw-token-pending",
-        color: "red",
-        title: "Error Token Withdrawal",
-        message: "If this was unexpected, please raise an issue on github!",
-        autoClose: true,
-        disallowClose: false,
-        icon: <AlertOctagon />,
-      });
-    },
-  });
-
-  const {
-    data: maxWithdraw,
-    isError: maxWithdrawIsError,
-    isLoading: maxWithdrawIsLoading,
-  } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "userTokenBalances",
-    args: [address, selectedToken?.address],
-    cacheOnBlock: true,
-    watch: true,
-    enabled: selectedToken ? true : false,
-    onSuccess(data) {
-      console.log(
-        "Get User Token for withdraw Success",
-        data,
-        selectedToken?.address
-      );
-    },
-    onError(error) {
-      console.log("Get User Token for withdraw Error", error);
-    },
-  });
 
   return (
     <Container my="withdraw_funds">
@@ -269,8 +144,8 @@ export default function WithdrawFunds({
               radius="xs"
               size="md"
               onClick={() => {
-                maxWithdraw
-                  ? setWithdraw(BigNumber.from(maxWithdraw))
+                withdrawActions?.max
+                  ? setWithdraw(BigNumber.from(withdrawActions?.max))
                   : setWithdraw(BigNumber.from(0));
               }}
             >
@@ -284,7 +159,9 @@ export default function WithdrawFunds({
           className={classes.input}
           radius="xs"
           size="xl"
-          onClick={() => withdrawFunds?.()}
+          onClick={() =>
+            withdrawActions?.action ? withdrawActions?.action?.() : null
+          }
         >
           Withdraw
         </Button>{" "}
