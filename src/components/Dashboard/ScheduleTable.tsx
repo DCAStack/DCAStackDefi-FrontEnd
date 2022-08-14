@@ -83,14 +83,229 @@ interface IUserScheduleInfo {
   }[];
 }
 
-function ScheduleTable({ data }: IUserScheduleInfo) {
+function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const [scheduleId, setScheduleId] = useState(0);
+  const [changeStatus, setChangeStatus] = useState(false);
+  const [enableFunc, setEnableFunc] = useState(false);
+  const [enableDeleteFunc, setEnableDeleteFunc] = useState(false);
 
-  const rows = data.map((row) => (
+  const addRecentTransaction = useAddRecentTransaction();
+
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
+  const { address, isConnecting, isDisconnected } = useAccount();
+
+  const {
+    config: modifyStatusConfig,
+    error: prepareModifyStatusError,
+    isError: prepareModifyStatusIsError,
+  } = usePrepareContractWrite({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    enabled: enableFunc,
+    functionName: "changeStatus",
+    args: [scheduleId, changeStatus],
+    onError(error) {
+      console.log("Change Status Prepared Error", error);
+    },
+    onSuccess(data) {
+      console.log("Change Status Prepared Success", data);
+    },
+  });
+
+  const {
+    data: modifyStatusData,
+    error,
+    isError: modifyStatusError,
+    write: modifyStatus,
+  } = useContractWrite({
+    ...modifyStatusConfig,
+    onSuccess(data) {
+      console.log("Change Status Write Success", data);
+
+      showNotification({
+        id: "change-status-pending",
+        loading: true,
+        title: "Pending Schedule Status Change",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+
+    onError(error) {
+      console.log("Change Status Write Error", error);
+
+      showNotification({
+        id: "change-status-error",
+        color: "red",
+        title: "Error Changing Status",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
+
+  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+    hash: modifyStatusData?.hash,
+    onSuccess(data) {
+      console.log("Withdraw Funds Success", data);
+
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Modify Schedule Status",
+      });
+
+      updateNotification({
+        id: "change-status-pending",
+        color: "teal",
+        title: "Schedule Status Change Complete",
+        message: "Safe travels :)",
+        icon: <CircleCheck />,
+      });
+
+      setEnableFunc(false);
+    },
+    onError(error) {
+      console.log("Withdraw Gas Error", error);
+
+      updateNotification({
+        id: "change-status-pending",
+        color: "red",
+        title: "Error Changing Status",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
+
+  const {
+    config: deleteScheduleConfig,
+    error: preparedeleteScheduleError,
+    isError: preparedeleteScheduleIsError,
+  } = usePrepareContractWrite({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    enabled: enableDeleteFunc,
+    functionName: "deleteSchedule",
+    args: [scheduleId],
+    onError(error) {
+      console.log("Delete Schedule Prepared Error", error);
+    },
+    onSuccess(data) {
+      console.log("Delete Schedule Prepared Success", data);
+    },
+  });
+
+  const {
+    data: deleteScheduleData,
+    error: deleteScheduleError,
+    isError: deleteScheduleIsError,
+    write: deleteSchedule,
+  } = useContractWrite({
+    ...deleteScheduleConfig,
+    onSuccess(data) {
+      console.log("Delete Schedule Write Success", data);
+
+      showNotification({
+        id: "delete-schedule-pending",
+        loading: true,
+        title: "Delete Schedule Pending",
+        message: "Waiting for your tx. Check status on your account tab.",
+        autoClose: true,
+        disallowClose: false,
+      });
+    },
+
+    onError(error) {
+      console.log("Delete Schedule Write Error", error);
+
+      showNotification({
+        id: "delete-schedule-error",
+        color: "red",
+        title: "Error Deleting Schedule",
+        message: "If this was unexpected, please raise an issue on github!",
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
+
+  const { isLoading: deleteTxPending, isSuccess: deleteTxDone } =
+    useWaitForTransaction({
+      hash: deleteScheduleData?.hash,
+      onSuccess(data) {
+        console.log("Delete Schedule Success", data);
+
+        addRecentTransaction({
+          hash: data.transactionHash,
+          description: "Delete Schedule",
+        });
+
+        updateNotification({
+          id: "delete-schedule-pending",
+          color: "teal",
+          title: "Delete Schedule Complete",
+          message: "Don't forget to withdraw your unused schedule balances.",
+          icon: <CircleCheck />,
+        });
+
+        setEnableFunc(false);
+      },
+      onError(error) {
+        console.log("Withdraw Gas Error", error);
+
+        updateNotification({
+          id: "delete-schedule-pending",
+          color: "red",
+          title: "Error Deleting Schedule",
+          message: "If this was unexpected, please raise an issue on github!",
+          autoClose: true,
+          disallowClose: false,
+          icon: <AlertOctagon />,
+        });
+      },
+    });
+
+  useEffect(() => {
+    if (enableFunc === true) {
+      modifyStatus?.();
+    }
+    if (enableDeleteFunc === true) {
+      deleteSchedule?.();
+    }
+  }, [enableFunc, modifyStatus, enableDeleteFunc, deleteSchedule]);
+
+  const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
       <td>
-        {row.sellToken?.symbol} for {row.buyToken?.symbol}
+        <Badge
+          sx={{ paddingLeft: 0, paddingRight: 0 }}
+          size="lg"
+          leftSection={
+            <Avatar
+              alt="Sell Token Avatar"
+              size={20}
+              src={row.sellToken?.logoURI}
+            />
+          }
+          rightSection={
+            <Avatar
+              alt="Buy Token Avatar"
+              size={20}
+              src={row.buyToken?.logoURI}
+            />
+          }
+        >
+          {row.sellToken?.symbol} / {row.buyToken?.symbol}
+        </Badge>
       </td>
       <td>
         {row.isActive === true && (
@@ -110,9 +325,14 @@ function ScheduleTable({ data }: IUserScheduleInfo) {
         {row.sellToken?.symbol}
       </td>
       <td>{row.startDate.toLocaleString()}</td>
-      <td>{row.endDate.toLocaleString()}</td>
+
+      <td>
+        {row.lastRun.toLocaleString() === "12/31/1969, 7:00:00 PM" && "Never"}
+        {row.lastRun.toLocaleString() !== "12/31/1969, 7:00:00 PM" &&
+          row.lastRun.toLocaleString()}
+      </td>
       <td>{row.nextRun.toLocaleString()}</td>
-      <td>{row.lastRun.toLocaleString()}</td>
+      <td>{row.endDate.toLocaleString()}</td>
       <td>
         {!row.boughtAmount.eq(0) &&
           !row.soldAmount.eq(0) &&
@@ -122,10 +342,47 @@ function ScheduleTable({ data }: IUserScheduleInfo) {
 
       <td>
         <Group spacing="xs" position="center">
-          <Button color="orange" radius="xl" size="md" compact>
-            Pause
-          </Button>
-          <Button color="red" radius="xl" size="md" compact>
+          {row.isActive === true && (
+            <Button
+              color="orange"
+              radius="xl"
+              size="md"
+              compact
+              onClick={() => {
+                setScheduleId(row.scheduleID);
+                setChangeStatus(false);
+                setEnableFunc(true);
+              }}
+            >
+              Pause
+            </Button>
+          )}
+          {row.isActive === false && (
+            <Button
+              color="teal"
+              radius="xl"
+              size="md"
+              compact
+              onClick={() => {
+                setScheduleId(row.scheduleID);
+                setChangeStatus(true);
+                setEnableFunc(true);
+              }}
+            >
+              Resume
+            </Button>
+          )}
+
+          <Button
+            color="red"
+            radius="xl"
+            size="md"
+            compact
+            onClick={() => {
+              setScheduleId(row.scheduleID);
+              setEnableDeleteFunc(true);
+            }}
+          >
             Delete
           </Button>
         </Group>
@@ -190,10 +447,9 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
         isActive: userSchedules[key].isActive,
         tradeAmount: userSchedules[key].tradeAmount,
         startDate: new Date(userSchedules[key].scheduleDates[0] * 1000),
-        endDate: new Date(userSchedules[key].scheduleDates[1] * 1000),
+        lastRun: new Date(userSchedules[key].scheduleDates[1] * 1000),
         nextRun: new Date(userSchedules[key].scheduleDates[2] * 1000),
-
-        lastRun: new Date(userSchedules[key].scheduleDates[3] * 1000),
+        endDate: new Date(userSchedules[key].scheduleDates[3] * 1000),
 
         boughtAmount: userSchedules[key].boughtAmount,
         soldAmount: userSchedules[key].soldAmount,
