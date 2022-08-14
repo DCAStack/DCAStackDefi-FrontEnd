@@ -58,6 +58,7 @@ interface IScheduleParams {
   numExec: number;
   startDate: Date | null;
   endDate: Date | null;
+  startTime: Date;
   quoteDetails: Record<string, any>;
   freeTokenBal: BigNumber;
   freeGasBal: BigNumber;
@@ -72,6 +73,7 @@ export default function NewSchedule({
   numExec,
   startDate,
   endDate,
+  startTime,
   quoteDetails,
   freeTokenBal,
   freeGasBal,
@@ -83,8 +85,20 @@ export default function NewSchedule({
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const unixStartDate = startDate ? startDate?.getTime() / 1000 : 0;
-  const unixEndDate = endDate ? endDate?.getTime() / 1000 : 0;
+  let startDateTime = null;
+  let endDateTime = null;
+  if (startDate && endDate) {
+    startDateTime = new Date(
+      startDate?.toDateString() + " " + startTime.toTimeString()
+    );
+
+    endDateTime = new Date(
+      endDate?.toDateString() + " " + startTime.toTimeString()
+    );
+  }
+
+  const unixStartDate = startDateTime ? startDateTime?.getTime() / 1000 : 0;
+  const unixEndDate = endDateTime ? endDateTime?.getTime() / 1000 : 0;
 
   const [enablePrep, setPrep] = useState(false);
   const [buttonTxt, setButtonTxt] = useState("Waiting...");
@@ -101,8 +115,8 @@ export default function NewSchedule({
       !sellAmount.isZero() &&
       !tradeFreq.isZero() &&
       numExec !== 0 &&
-      unixStartDate &&
-      unixEndDate &&
+      unixStartDate !== 0 &&
+      unixEndDate !== 0 &&
       !freeTokenBal.isZero() &&
       !freeGasBal.isZero()
     ) {

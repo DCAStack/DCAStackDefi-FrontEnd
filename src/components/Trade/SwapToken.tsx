@@ -20,6 +20,7 @@ import { Selector } from "tabler-icons-react";
 
 import { IToken } from "../../models/Interfaces";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
+import { showNotification, updateNotification } from "@mantine/notifications";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -41,8 +42,8 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
 
   const {
     tokens: masterTokenList,
-    isLoading,
-    isError,
+    isLoading: masterTokenListLoading,
+    isError: masterTokenListError,
   } = use1inchRetrieveTokens(currentChain);
 
   const [token, setToken] = useState(currToken);
@@ -54,18 +55,29 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
   }, [tokensList, currToken]);
 
   const searchTokens = (event: ChangeEvent<HTMLInputElement>): void => {
-    const searchValue = event.target.value.toLowerCase();
-    if (searchValue.length >= 3) {
-      //improve search performance
-      const filtered = masterTokenList?.flattenData.filter(
-        (token: IToken) =>
-          token.symbol.toLowerCase().includes(searchValue) ||
-          token.name.toLowerCase().includes(searchValue) ||
-          token.address.toLowerCase() === searchValue //exact matches only
-      );
-      setFilteredTokens(filtered);
-    } else {
-      setFilteredTokens(swapTokens[currentChain]);
+    if (masterTokenList) {
+      const searchValue = event.target.value.toLowerCase();
+      if (searchValue.length >= 3) {
+        //improve search performance
+        const filtered = masterTokenList?.flattenData.filter(
+          (token: IToken) =>
+            token.symbol.toLowerCase().includes(searchValue) ||
+            token.name.toLowerCase().includes(searchValue) ||
+            token.address.toLowerCase() === searchValue //exact matches only
+        );
+        setFilteredTokens(filtered);
+      } else {
+        setFilteredTokens(swapTokens[currentChain]);
+      }
+    } else if (masterTokenListError) {
+      showNotification({
+        id: "1inch-error",
+        loading: true,
+        title: "Error Fetching Token List",
+        message: "Could not get token list!",
+        autoClose: true,
+        disallowClose: false,
+      });
     }
   };
 

@@ -41,6 +41,8 @@ const useStyles = createStyles((theme) => ({
 
 function TradeDCA() {
   const [date, setDate] = useState<[Date | null, Date | null]>([null, null]);
+  const [time, setTime] = useState<Date>(new Date());
+
   const [active, setActive] = useState(0);
   const nextStep = () =>
     setActive((current) => (current < 2 ? current + 1 : current));
@@ -90,10 +92,21 @@ function TradeDCA() {
         )
       );
 
-      console.log("1inch", quoteDetails, quoteError, typeof quoteDetails);
+      if (quoteError) {
+        console.log("could not fetch 1inch: ", quoteError);
+        showNotification({
+          id: "1inch-error",
+          loading: true,
+          title: "Error Fetching Swap Details",
+          message: "Could not get swap details for this DCA!",
+          autoClose: true,
+          disallowClose: false,
+        });
+      } else {
+        setQuote1inch(quoteDetails);
+        setEnableRead(true);
+      }
       setDepositAmount(sellAmount.mul(numExec));
-      setQuote1inch(quoteDetails);
-      setEnableRead(true);
     }
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
 
@@ -250,7 +263,8 @@ function TradeDCA() {
                   minDate={dayjs(new Date()).toDate()}
                 />
                 <TimeInput
-                  value={new Date()}
+                  value={time}
+                  onChange={setTime}
                   label="Start Time"
                   format="12"
                   radius="xs"
@@ -285,6 +299,7 @@ function TradeDCA() {
               numExec={numExec}
               startDate={date[0]}
               endDate={date[1]}
+              startTime={time}
               quoteDetails={quote1inch}
               freeGasBal={freeGasBal}
               freeTokenBal={freeTokenBal}
