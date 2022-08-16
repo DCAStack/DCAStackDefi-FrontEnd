@@ -16,6 +16,7 @@ import { useAccount } from "wagmi";
 import { formatEther } from "ethers/lib/utils";
 
 import { ContractContext } from "../../App";
+import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -92,7 +93,7 @@ const Gas = () => {
         <Space h="xl" />
         <Space h="xl" />
 
-        <DepositGas />
+        <DepositGas weiDefaultValue={BigNumber.from(0)} />
       </Paper>
     </Container>
   );

@@ -35,9 +35,7 @@ export default function DepositFunds({
   let depositTokenActions = DepositFundsFlow(token, weiDepositAmount);
 
   useEffect(() => {
-    if (!weiDefaultValue.eq(0)) {
-      setDeposit(weiDefaultValue);
-    }
+    setDeposit(weiDefaultValue);
   }, [weiDefaultValue]);
 
   return (
