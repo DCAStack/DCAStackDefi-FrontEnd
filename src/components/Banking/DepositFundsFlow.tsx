@@ -13,7 +13,7 @@ import {
   useWaitForTransaction,
   erc20ABI,
 } from "wagmi";
-import { formatEther } from "ethers/lib/utils";
+import { formatUnits } from "ethers/lib/utils";
 import { MaxUint256 } from "ethers/constants";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -33,7 +33,6 @@ export default function DepositFundsFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
@@ -50,6 +49,11 @@ export default function DepositFundsFlow(
     addressOrName: token ? token.address : "",
     contractInterface: erc20ABI,
     functionName: "allowance",
+    enabled:
+      token?.address.toLowerCase() !==
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
     args: [address, contractAddr],
     cacheOnBlock: true,
     watch: true,
@@ -70,7 +74,7 @@ export default function DepositFundsFlow(
     contractInterface: contractABI,
     functionName: "depositFunds",
     enabled: enableDepositPrep,
-    args: [token?.address, weiDepositAmount],
+    args: [token?.address, weiDefaultValue],
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
     },
@@ -246,6 +250,11 @@ export default function DepositFundsFlow(
     addressOrName: address,
     token: token?.address,
     watch: true,
+    enabled:
+      token?.address.toLowerCase() !==
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
     onSuccess(data) {
       console.log("Get User Wallet Token Balance Success", data);
     },
@@ -255,13 +264,9 @@ export default function DepositFundsFlow(
   });
 
   useEffect(() => {
-    if (!weiDefaultValue.eq(0)) {
-      setDeposit(weiDefaultValue);
-    }
-
     //flow 1: approve then deposit
     if (depositApproveSetup) {
-      if (formatEther(depositApproveSetup) === "0.0") {
+      if (formatUnits(depositApproveSetup, token?.decimals) === "0.0") {
         setApprovePrep(true);
         setDepositPrep(false);
       }

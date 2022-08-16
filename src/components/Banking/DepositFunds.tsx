@@ -98,7 +98,10 @@ export default function DepositFunds({
                   icon: <AlertOctagon />,
                 });
               } else {
-                formatEther(depositTokenActions?.approveMax) === "0.0"
+                formatUnits(
+                  depositTokenActions?.approveMax,
+                  token?.decimals
+                ) === "0.0"
                   ? depositTokenActions?.approve?.()
                   : depositTokenActions?.deposit?.();
               }

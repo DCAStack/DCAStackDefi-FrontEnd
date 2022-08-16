@@ -30,20 +30,9 @@ export default function DepositEthFundsFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
-
-  console.log(
-    "deposit amount is",
-    weiDepositAmount,
-    weiDepositAmount.toString()
-  );
-
-  useEffect(() => {
-    setDeposit(weiDefaultValue);
-  }, [weiDefaultValue]);
 
   const {
     config: prepareDepositEthSetup,
@@ -53,10 +42,11 @@ export default function DepositEthFundsFlow(
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
-    args: [token?.address, weiDepositAmount],
+    enabled: token?.address.toLowerCase() === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" ? true: false,
+    args: [token?.address, weiDefaultValue],
     overrides: {
       from: address,
-      value: weiDepositAmount,
+      value: weiDefaultValue,
     },
     onError(error) {
       console.log("Deposit ETH Prepared Error", error);

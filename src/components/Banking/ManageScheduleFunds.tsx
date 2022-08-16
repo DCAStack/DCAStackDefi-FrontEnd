@@ -76,11 +76,9 @@ export default function ManageScheduleFunds({
   );
 
   let withdrawActions = WithdrawFundsFlow(selectedToken, weiAmount);
-  let depositActions =
-    selectedToken?.address.toLowerCase() ===
-    "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-      ? DepositEthFundsFlow(selectedToken, weiAmount)
-      : DepositFundsFlow(selectedToken, weiAmount);
+
+  let depositEthActions = DepositEthFundsFlow(selectedToken, weiAmount);
+  let depositTokenActions = DepositFundsFlow(selectedToken, weiAmount);
 
   useEffect(() => {
     //any time token changes, reset input back to 0
@@ -125,6 +123,11 @@ export default function ManageScheduleFunds({
           {items}
         </Menu>
         <NumberInput
+          styles={{
+            input: {
+              textAlign: "center",
+            },
+          }}
           precision={selectedToken?.decimals}
           value={Number(formatUnits(weiAmount, selectedToken?.decimals))}
           radius="xs"
@@ -146,7 +149,7 @@ export default function ManageScheduleFunds({
               selectedToken?.address.toLowerCase() ===
               "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
             ) {
-              if (depositActions?.max?.formatted === "0.0") {
+              if (depositEthActions?.max?.formatted === "0.0") {
                 showNotification({
                   id: "deposit-eth-error",
                   color: "red",
@@ -158,11 +161,11 @@ export default function ManageScheduleFunds({
                   icon: <AlertOctagon />,
                 });
               } else {
-                depositActions?.deposit?.();
+                depositEthActions?.deposit?.();
               }
             } else {
-              if (depositActions?.approveMax) {
-                if (depositActions?.max?.formatted === "0.0") {
+              if (depositTokenActions?.approveMax) {
+                if (depositTokenActions?.max?.formatted === "0.0") {
                   showNotification({
                     id: "deposit-balance-error",
                     color: "red",
@@ -174,9 +177,12 @@ export default function ManageScheduleFunds({
                     icon: <AlertOctagon />,
                   });
                 } else {
-                  formatEther(depositActions?.approveMax) === "0.0"
-                    ? depositActions?.approve?.()
-                    : depositActions?.deposit?.();
+                  formatUnits(
+                    depositTokenActions?.approveMax,
+                    selectedToken?.decimals
+                  ) === "0.0"
+                    ? depositTokenActions?.approve?.()
+                    : depositTokenActions?.deposit?.();
                 }
               }
             }
