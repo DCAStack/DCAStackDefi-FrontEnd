@@ -6,7 +6,8 @@ import { useState } from "react";
 
 import { parseUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
-import ViewToken from "../TokenDisplay/ViewToken";
+import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
+
 import { UserFundsProps } from "../../models/PropTypes";
 import WithdrawFundsFlow from "../Banking/WithdrawFundsFlow";
 import { nullToken } from "../../data/gasTokens";
@@ -61,7 +62,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
   const rows = data.map((item) => (
     <tr key={item.address}>
       <td>
-        <ViewToken token={item} />
+        <TokenBadgeDisplay token={item} />
       </td>
       <td>{item.balance}</td>
       <td>{item.freeBalance}</td>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
   Group,
@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
-import ViewToken from "../TokenDisplay/ViewToken";
+import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
 import { formatEther, formatUnits } from "ethers/lib/utils";
 import { TokenBadgeProps } from "../../models/PropTypes";
@@ -34,10 +34,21 @@ export default function DepositFunds({
 
   let depositTokenActions = DepositFundsFlow(token, weiDepositAmount);
 
+  useEffect(() => {
+    if (!weiDefaultValue.eq(0)) {
+      setDeposit(weiDefaultValue);
+    }
+  }, [weiDefaultValue]);
+
   return (
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
         <NumberInput
+          styles={{
+            input: {
+              textAlign: "center",
+            },
+          }}
           precision={token?.decimals}
           value={Number(formatUnits(weiDepositAmount, token.decimals))}
           label="Deposit DCA Amount"
@@ -49,7 +60,7 @@ export default function DepositFunds({
               ? setDeposit(parseUnits(String(val), token.decimals))
               : setDeposit(BigNumber.from(0))
           }
-          icon={<ViewToken token={token} />}
+          icon={<TokenBadgeDisplay token={token} />}
           iconWidth={115}
           rightSection={
             <Button

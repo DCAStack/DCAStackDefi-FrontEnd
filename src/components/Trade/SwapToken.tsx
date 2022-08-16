@@ -11,9 +11,10 @@ import {
   Divider,
   ScrollArea,
   Text,
+  UnstyledButton,
 } from "@mantine/core";
-import TokenBadge from "../TokenDisplay/TokenBadge";
-import ViewToken from "../TokenDisplay/ViewToken";
+import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
+
 import gasTokens from "../../data/gasTokens";
 import swapTokens from "../../data/swapTokens";
 import { Selector } from "tabler-icons-react";
@@ -109,7 +110,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
                 updateToken(token);
               }}
             >
-              <ViewToken key={index} token={token} />
+              <TokenBadgeDisplay key={index} token={token} />
             </div>
           ))}
         </Group>
@@ -130,7 +131,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
                     updateToken(token);
                   }}
                 >
-                  <TokenBadge token={token} displayTokenName={true} />
+                  <TokenBadgeDisplay token={token} displayTokenName={true} />
                   <Divider my="sm" variant="dashed" />
                 </div>
               ))
@@ -150,7 +151,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
           onClick={() => setOpened(true)}
         >
           {text}&nbsp;&nbsp;
-          <TokenBadge token={token} />
+          <TokenBadgeDisplay token={token} />
         </Button>
       </Group>
     </>
