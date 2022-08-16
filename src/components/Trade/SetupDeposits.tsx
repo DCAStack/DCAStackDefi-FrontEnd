@@ -152,7 +152,7 @@ export default function SetupDeposits({
             token={sellToken}
             weiDefaultValue={
               freeTokenBal.lt(weiDepositAmount)
-                ? weiDepositAmount
+                ? weiDepositAmount.sub(freeTokenBal)
                 : BigNumber.from(0)
             }
           />
@@ -163,7 +163,7 @@ export default function SetupDeposits({
             token={sellToken}
             weiDefaultValue={
               freeTokenBal.lt(weiDepositAmount)
-                ? weiDepositAmount
+                ? weiDepositAmount.sub(freeTokenBal)
                 : BigNumber.from(0)
             }
           />
