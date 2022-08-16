@@ -12,15 +12,16 @@ import {
 } from "@mantine/core";
 import { ChevronDown } from "tabler-icons-react";
 
-import { useAccount } from "wagmi";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { ContractContext } from "../../App";
+import { formatUnits, parseUnits, formatEther } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
 import { UserFundsProps } from "../../models/PropTypes";
 
 import WithdrawFundsFlow from "./WithdrawFundsFlow";
+import DepositEthFundsFlow from "./DepositEthFundsFlow";
+import DepositFundsFlow from "./DepositFundsFlow";
+import { showNotification } from "@mantine/notifications";
+import { AlertOctagon } from "tabler-icons-react";
 
 const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
   control: {
@@ -64,26 +65,26 @@ const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
   },
 }));
 
-export default function WithdrawFunds({
+export default function ManageScheduleFunds({
   userFunds: parsedTokenBalances,
 }: UserFundsProps) {
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
-  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
-  const { address, isConnecting, isDisconnected } = useAccount();
-  const addRecentTransaction = useAddRecentTransaction();
-
+  const [weiAmount, setAmount] = useState(BigNumber.from(0));
   const [opened, setOpened] = useState(false);
   const { classes } = useStyles({ opened });
   const [selectedToken, setSelectedToken] = useState(
     parsedTokenBalances ? parsedTokenBalances[0] : null
   );
 
-  let withdrawActions = WithdrawFundsFlow(selectedToken, weiWithdrawAmount);
+  let withdrawActions = WithdrawFundsFlow(selectedToken, weiAmount);
+  let depositActions =
+    selectedToken?.address.toLowerCase() ===
+    "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      ? DepositEthFundsFlow(selectedToken, weiAmount)
+      : DepositFundsFlow(selectedToken, weiAmount);
 
   useEffect(() => {
     //any time token changes, reset input back to 0
-    setWithdraw(BigNumber.from(0));
+    setAmount(BigNumber.from(0));
   }, [selectedToken]);
 
   let items;
@@ -125,35 +126,64 @@ export default function WithdrawFunds({
         </Menu>
         <NumberInput
           precision={selectedToken?.decimals}
-          value={Number(
-            formatUnits(weiWithdrawAmount, selectedToken?.decimals)
-          )}
+          value={Number(formatUnits(weiAmount, selectedToken?.decimals))}
           radius="xs"
           size="xl"
           hideControls
           onChange={(val) =>
             val
-              ? setWithdraw(parseUnits(String(val), selectedToken?.decimals))
-              : setWithdraw(BigNumber.from(0))
+              ? setAmount(parseUnits(String(val), selectedToken?.decimals))
+              : setAmount(BigNumber.from(0))
           }
-          rightSection={
-            <Button
-              variant="subtle"
-              className={classes.input}
-              compact
-              radius="xs"
-              size="md"
-              onClick={() => {
-                withdrawActions?.max
-                  ? setWithdraw(BigNumber.from(withdrawActions?.max))
-                  : setWithdraw(BigNumber.from(0));
-              }}
-            >
-              MAX
-            </Button>
-          }
-          rightSectionWidth={65}
         />
+        <Button
+          compact
+          className={classes.input}
+          radius="xs"
+          size="xl"
+          onClick={() => {
+            if (
+              selectedToken?.address.toLowerCase() ===
+              "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+            ) {
+              if (depositActions?.max?.formatted === "0.0") {
+                showNotification({
+                  id: "deposit-eth-error",
+                  color: "red",
+                  title: "Insufficient Balance",
+                  message:
+                    "If this was unexpected, please raise an issue on github!",
+                  autoClose: true,
+                  disallowClose: false,
+                  icon: <AlertOctagon />,
+                });
+              } else {
+                depositActions?.deposit?.();
+              }
+            } else {
+              if (depositActions?.approveMax) {
+                if (depositActions?.max?.formatted === "0.0") {
+                  showNotification({
+                    id: "deposit-balance-error",
+                    color: "red",
+                    title: "Insufficient Balance",
+                    message:
+                      "If this was unexpected, please raise an issue on github!",
+                    autoClose: true,
+                    disallowClose: false,
+                    icon: <AlertOctagon />,
+                  });
+                } else {
+                  formatEther(depositActions?.approveMax) === "0.0"
+                    ? depositActions?.approve?.()
+                    : depositActions?.deposit?.();
+                }
+              }
+            }
+          }}
+        >
+          Deposit
+        </Button>{" "}
         <Button
           compact
           className={classes.input}

@@ -150,6 +150,8 @@ export default function DepositEthFundsFlow(
   });
 
   return {
+    approveMax: null,
+    approve: null,
     deposit: depositEth,
     max: maxEthDeposit,
   };

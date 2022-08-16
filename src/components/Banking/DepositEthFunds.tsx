@@ -16,7 +16,7 @@ import { ContractContext } from "../../App";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
 import { BigNumber } from "ethers";
-import DepositEthFundsFlow from "./DepositEthFlow";
+import DepositEthFundsFlow from "./DepositEthFundsFlow";
 
 const useStyles = createStyles((theme) => ({
   input: {

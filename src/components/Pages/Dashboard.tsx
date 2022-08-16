@@ -2,7 +2,8 @@ import { useEffect, useState, useContext } from "react";
 
 import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
 
-import WithdrawFunds from "../Banking/WithdrawFunds";
+import ManageScheduleFunds from "../Banking/ManageScheduleFunds";
+
 import { Tabs } from "@mantine/core";
 import { BuildingBank, Clock, Cash, History } from "tabler-icons-react";
 
@@ -153,7 +154,7 @@ const Dashboard = () => {
           borderBlockColor: theme.white,
         })}
       >
-        <WithdrawFunds userFunds={parsedTokenBalances} />
+        <ManageScheduleFunds userFunds={parsedTokenBalances} />
       </Paper>
       <Space h="xl" />
 
