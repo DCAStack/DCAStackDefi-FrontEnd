@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, ChangeEvent } from "react";
 
 import {
   Group,
-  NumberInput,
+  TextInput,
   Grid,
   Container,
   Button,
@@ -19,12 +19,9 @@ import {
   useContractWrite,
   useAccount,
   useBalance,
-  useContractRead,
   useWaitForTransaction,
-  useNetwork,
 } from "wagmi";
 import { parseEther, formatEther } from "ethers/lib/utils";
-import { ContractInfoProps } from "../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 import { BigNumber } from "ethers";
@@ -42,17 +39,22 @@ interface ISetup {
 export default function DepositGas({
   weiDefaultValue = BigNumber.from(0),
 }: ISetup) {
-  const { chain, chains } = useNetwork();
-
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
+  const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const re = /^\d*\.?\d*$/;
+    if (event.target.value === "" || re.test(event.target.value)) {
+      setDeposit(event.target.value);
+    }
+  };
+
   useEffect(() => {
-    setDeposit(weiDefaultValue);
+    setDeposit(formatEther(weiDefaultValue.toString()));
   }, [weiDefaultValue]);
 
   const {
@@ -62,11 +64,11 @@ export default function DepositGas({
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    enabled: !weiDepositAmount.eq(0) ? true : false,
+    enabled: depositAmount !== "" ? true : false,
     functionName: "depositGas",
     overrides: {
       from: address,
-      value: weiDepositAmount,
+      value: depositAmount !== "" ? parseEther(depositAmount) : parseEther("0"),
     },
     onError(error) {
       console.log("Deposit Gas Prepared Error", error);
@@ -162,23 +164,17 @@ export default function DepositGas({
   return (
     <Container my="deposit_gas">
       <Group align="end" position="center" spacing="xs">
-        <NumberInput
+        <TextInput
           styles={{
             input: {
               textAlign: "center",
             },
           }}
-          precision={chain?.nativeCurrency?.decimals}
-          value={Number(formatEther(weiDepositAmount?.toString()))}
+          value={depositAmount?.toString()}
           label="Deposit Gas Amount"
           radius="xs"
           size="xl"
-          hideControls
-          onChange={(val) =>
-            val
-              ? setDeposit(parseEther(String(val)))
-              : setDeposit(BigNumber.from(0))
-          }
+          onChange={handleChange}
           icon={<GasToken />}
           iconWidth={115}
           rightSection={
@@ -190,8 +186,8 @@ export default function DepositGas({
               size="md"
               onClick={() =>
                 maxDeposit
-                  ? setDeposit(maxDeposit?.value)
-                  : setDeposit(BigNumber.from(0))
+                  ? setDeposit(formatEther(maxDeposit?.value.toString()))
+                  : setDeposit("0")
               }
             >
               MAX

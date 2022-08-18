@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, ChangeEvent } from "react";
 
 import {
   Group,
@@ -13,6 +13,7 @@ import {
   Stack,
   Stepper,
   ActionIcon,
+  TextInput,
 } from "@mantine/core";
 import { DateRangePicker, TimeInput } from "@mantine/dates";
 
@@ -56,7 +57,7 @@ function TradeDCA() {
 
   const { classes } = useStyles();
 
-  const [sellAmount, setSellAmount] = useState(BigNumber.from(0));
+  const [sellAmount, setSellAmount] = useState("0");
   const [tradeFreq, setTradeFreq] = useState(0);
 
   const [sellToken, setSellToken] = useState(nullToken);
@@ -77,15 +78,30 @@ function TradeDCA() {
     currentChain,
     sellToken,
     buyToken,
-    sellAmount.toString(),
+    sellAmount !== ""
+      ? parseUnits(sellAmount, sellToken?.decimals).toString()
+      : parseUnits("0", sellToken?.decimals).toString(),
     tradeFreq,
     date[0],
     date[1],
     numExec
   );
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const re = /^\d*\.?\d*$/;
+    if (event.target.value === "" || re.test(event.target.value)) {
+      setSellAmount(event.target.value);
+    }
+  };
+
   useEffect(() => {
-    if (date[1] && date[0] && !sellAmount.isZero() && tradeFreq !== 0) {
+    if (
+      date[1] &&
+      date[0] &&
+      sellAmount !== "" &&
+      sellAmount !== "0" &&
+      tradeFreq !== 0
+    ) {
       setNumExec(
         Math.floor(
           (date[1].valueOf() - date[0].valueOf()) / (tradeFreq * 86400 * 1000)
@@ -106,7 +122,9 @@ function TradeDCA() {
         setQuote1inch(quoteDetails);
         setEnableRead(true);
       }
-      setDepositAmount(sellAmount.mul(numExec));
+      setDepositAmount(
+        parseUnits(sellAmount, sellToken?.decimals).mul(numExec)
+      );
     }
   }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
 
@@ -202,22 +220,14 @@ function TradeDCA() {
 
             <Container my="setup_dca">
               <Group align="end" position="center" spacing="xl" grow>
-                <NumberInput
+                <TextInput
                   label="Sell Amount"
-                  precision={sellToken?.decimals}
-                  value={Number(formatUnits(sellAmount, sellToken?.decimals))}
+                  value={sellAmount}
                   radius="xs"
                   size="xl"
-                  hideControls
                   placeholder="Sell each DCA..."
                   required
-                  onChange={(val) =>
-                    val
-                      ? setSellAmount(
-                          parseUnits(String(val), sellToken?.decimals)
-                        )
-                      : setSellAmount(BigNumber.from(0))
-                  }
+                  onChange={handleChange}
                 />
                 <NumberInput
                   label="Trade Frequency"
@@ -294,7 +304,11 @@ function TradeDCA() {
             <NewSchedule
               sellToken={sellToken}
               buyToken={buyToken}
-              sellAmount={sellAmount}
+              sellAmount={
+                sellAmount !== ""
+                  ? parseUnits(sellAmount, sellToken?.decimals)
+                  : parseUnits("0", sellToken?.decimals)
+              }
               tradeFreq={BigNumber.from(tradeFreq * 86400)}
               numExec={numExec}
               startDate={date[0]}

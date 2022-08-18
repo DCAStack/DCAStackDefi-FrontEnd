@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, ChangeEvent } from "react";
 
 import {
   Group,
-  NumberInput,
+  TextInput,
   Grid,
   Container,
   Button,
@@ -39,10 +39,17 @@ export default function WithdrawGas() {
 
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
+  const [withdrawAmount, setWithdraw] = useState("0");
   const { classes } = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const re = /^\d*\.?\d*$/;
+    if (event.target.value === "" || re.test(event.target.value)) {
+      setWithdraw(event.target.value);
+    }
+  };
 
   const {
     config: withdrawGasSetup,
@@ -51,9 +58,9 @@ export default function WithdrawGas() {
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    enabled: !weiWithdrawAmount.eq(0) ? true : false,
+    enabled: withdrawAmount !== "" ? true : false,
     functionName: "withdrawGas",
-    args: weiWithdrawAmount,
+    args: withdrawAmount !== "" ? parseEther(withdrawAmount) : parseEther("0"),
     overrides: {
       from: address,
     },
@@ -145,28 +152,27 @@ export default function WithdrawGas() {
     cacheOnBlock: true,
     watch: true,
     onSuccess(data) {
-      console.log("Get User Gas for withdraw Success", data);
+      console.log("Get User Gas for max withdraw Success", data);
     },
     onError(error) {
-      console.log("Get User Gas for withdraw Error", error);
+      console.log("Get User Gas for max withdraw Error", error);
     },
   });
 
   return (
     <Container my="withdraw_gas">
       <Group align="end" position="center" spacing="xs">
-        <NumberInput
-          precision={chain?.nativeCurrency?.decimals}
+        <TextInput
+          styles={{
+            input: {
+              textAlign: "center",
+            },
+          }}
           label="Withdraw Gas Amount"
-          value={Number(formatEther(weiWithdrawAmount.toString()))}
+          value={withdrawAmount?.toString()}
           radius="xs"
           size="xl"
-          hideControls
-          onChange={(val) =>
-            val
-              ? setWithdraw(parseEther(String(val)))
-              : setWithdraw(BigNumber.from(0))
-          }
+          onChange={handleChange}
           icon={<GasToken />}
           iconWidth={115}
           rightSection={
@@ -178,8 +184,8 @@ export default function WithdrawGas() {
               size="md"
               onClick={() =>
                 maxWithdraw
-                  ? setWithdraw(BigNumber.from(maxWithdraw))
-                  : setWithdraw(BigNumber.from(0))
+                  ? setWithdraw(formatEther(maxWithdraw?.toString()))
+                  : setWithdraw("0")
               }
             >
               MAX

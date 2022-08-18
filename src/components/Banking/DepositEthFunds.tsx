@@ -1,8 +1,8 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, ChangeEvent } from "react";
 
 import {
   Group,
-  NumberInput,
+  TextInput,
   Container,
   Button,
   createStyles,
@@ -11,8 +11,7 @@ import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
-
-import { parseEther, formatUnits } from "ethers/lib/utils";
+import { parseEther, formatEther } from "ethers/lib/utils";
 import { ContractContext } from "../../App";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
@@ -31,37 +30,39 @@ export default function DepositEthFunds({
 }: TokenBadgeProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
+  const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
 
-  let depositEthActions = DepositEthFundsFlow(token, weiDepositAmount);
+  let depositEthActions = DepositEthFundsFlow(
+    token,
+    depositAmount !== "" ? parseEther(depositAmount) : parseEther("0")
+  );
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const re = /^\d*\.?\d*$/;
+    if (event.target.value === "" || re.test(event.target.value)) {
+      setDeposit(event.target.value);
+    }
+  };
 
   useEffect(() => {
-    if (!weiDefaultValue.eq(0)) {
-      setDeposit(weiDefaultValue);
-    }
+    setDeposit(formatEther(weiDefaultValue).toString());
   }, [weiDefaultValue]);
 
   return (
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
-        <NumberInput
+        <TextInput
           styles={{
             input: {
               textAlign: "center",
             },
           }}
-          precision={token?.decimals}
-          value={Number(formatUnits(weiDepositAmount, token.decimals))}
+          value={depositAmount?.toString()}
           label="Deposit DCA Amount"
           radius="xs"
           size="xl"
-          hideControls
-          onChange={(val) =>
-            val
-              ? setDeposit(parseEther(String(val)))
-              : setDeposit(BigNumber.from(0))
-          }
+          onChange={handleChange}
           icon={<TokenBadgeDisplay token={token} />}
           iconWidth={115}
           rightSection={
@@ -71,10 +72,12 @@ export default function DepositEthFunds({
               compact
               radius="xl"
               size="md"
-              onClick={() =>
+                onClick={() =>
                 depositEthActions?.max
-                  ? setDeposit(depositEthActions?.max?.value)
-                  : setDeposit(BigNumber.from(0))
+                  ? setDeposit(
+                      formatEther(depositEthActions?.max?.value.toString())
+                    )
+                  : setDeposit("0")
               }
             >
               MAX

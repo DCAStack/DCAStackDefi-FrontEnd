@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 import {
   Group,
-  NumberInput,
+  TextInput,
   Container,
   Button,
   createStyles,
@@ -11,10 +11,11 @@ import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
-import { formatEther, formatUnits } from "ethers/lib/utils";
+import {
+  formatUnits,
+  parseUnits,
+} from "ethers/lib/utils";
 import { TokenBadgeProps } from "../../models/PropTypes";
-
-import { parseUnits } from "ethers/lib/utils";
 
 import { BigNumber } from "ethers";
 import DepositFundsFlow from "./DepositFundsFlow";
@@ -29,35 +30,41 @@ export default function DepositFunds({
   token,
   weiDefaultValue = BigNumber.from(0),
 }: TokenBadgeProps) {
-  const [weiDepositAmount, setDeposit] = useState(BigNumber.from(0));
+  const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
 
-  let depositTokenActions = DepositFundsFlow(token, weiDepositAmount);
+  let depositTokenActions = DepositFundsFlow(
+    token,
+    depositAmount !== ""
+      ? parseUnits(depositAmount, token?.decimals)
+      : parseUnits("0", token?.decimals)
+  );
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const re = /^\d*\.?\d*$/;
+    if (event.target.value === "" || re.test(event.target.value)) {
+      setDeposit(event.target.value);
+    }
+  };
 
   useEffect(() => {
-    setDeposit(weiDefaultValue);
-  }, [weiDefaultValue]);
+    setDeposit(formatUnits(weiDefaultValue, token?.decimals).toString());
+  }, [token?.decimals, weiDefaultValue]);
 
   return (
     <Container my="deposit_funds">
       <Group align="end" position="center" spacing="xs">
-        <NumberInput
+        <TextInput
           styles={{
             input: {
               textAlign: "center",
             },
           }}
-          precision={token?.decimals}
-          value={Number(formatUnits(weiDepositAmount, token.decimals))}
+          value={depositAmount?.toString()}
           label="Deposit DCA Amount"
           radius="xs"
           size="xl"
-          hideControls
-          onChange={(val) =>
-            val
-              ? setDeposit(parseUnits(String(val), token.decimals))
-              : setDeposit(BigNumber.from(0))
-          }
+          onChange={handleChange}
           icon={<TokenBadgeDisplay token={token} />}
           iconWidth={115}
           rightSection={
@@ -67,11 +74,13 @@ export default function DepositFunds({
               compact
               radius="xl"
               size="md"
-              onClick={() => {
+              onClick={() =>
                 depositTokenActions?.max
-                  ? setDeposit(depositTokenActions?.max.value)
-                  : setDeposit(BigNumber.from(0));
-              }}
+                  ? setDeposit(
+                      formatUnits(depositTokenActions?.max?.value.toString(), token?.decimals)
+                    )
+                  : setDeposit("0")
+              }
             >
               MAX
             </Button>

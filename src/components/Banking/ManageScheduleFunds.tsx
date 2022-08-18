@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, ChangeEvent } from "react";
 
 import {
   Group,
-  NumberInput,
+  TextInput,
   Container,
   Button,
   createStyles,
@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { ChevronDown } from "tabler-icons-react";
 
-import { formatUnits, parseUnits, formatEther } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
 import { UserFundsProps } from "../../models/PropTypes";
@@ -68,21 +68,43 @@ const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
 export default function ManageScheduleFunds({
   userFunds: parsedTokenBalances,
 }: UserFundsProps) {
-  const [weiAmount, setAmount] = useState(BigNumber.from(0));
+  const [amount, setAmount] = useState("0");
   const [opened, setOpened] = useState(false);
   const { classes } = useStyles({ opened });
   const [selectedToken, setSelectedToken] = useState(
     parsedTokenBalances ? parsedTokenBalances[0] : null
   );
 
-  let withdrawActions = WithdrawFundsFlow(selectedToken, weiAmount);
+  let withdrawActions = WithdrawFundsFlow(
+    selectedToken,
+    amount !== ""
+      ? parseUnits(amount, selectedToken?.decimals)
+      : parseUnits("0", selectedToken?.decimals)
+  );
 
-  let depositEthActions = DepositEthFundsFlow(selectedToken, weiAmount);
-  let depositTokenActions = DepositFundsFlow(selectedToken, weiAmount);
+  let depositEthActions = DepositEthFundsFlow(
+    selectedToken,
+    amount !== ""
+      ? parseUnits(amount, selectedToken?.decimals)
+      : parseUnits("0", selectedToken?.decimals)
+  );
+  let depositTokenActions = DepositFundsFlow(
+    selectedToken,
+    amount !== ""
+      ? parseUnits(amount, selectedToken?.decimals)
+      : parseUnits("0", selectedToken?.decimals)
+  );
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const re = /^\d*\.?\d*$/;
+    if (event.target.value === "" || re.test(event.target.value)) {
+      setAmount(event.target.value);
+    }
+  };
 
   useEffect(() => {
     //any time token changes, reset input back to 0
-    setAmount(BigNumber.from(0));
+    setAmount("0");
   }, [selectedToken]);
 
   let items;
@@ -122,22 +144,16 @@ export default function ManageScheduleFunds({
         >
           {items}
         </Menu>
-        <NumberInput
+        <TextInput
           styles={{
             input: {
               textAlign: "center",
             },
           }}
-          precision={selectedToken?.decimals}
-          value={Number(formatUnits(weiAmount, selectedToken?.decimals))}
+          value={amount?.toString()}
           radius="xs"
           size="xl"
-          hideControls
-          onChange={(val) =>
-            val
-              ? setAmount(parseUnits(String(val), selectedToken?.decimals))
-              : setAmount(BigNumber.from(0))
-          }
+          onChange={handleChange}
         />
         <Button
           compact
