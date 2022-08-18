@@ -45,7 +45,6 @@ const Trade = () => {
         icon={<AlertCircle size={16} />}
         title="No Fee to DCA!"
         radius="xs"
-        withCloseButton
       >
         All DCA schedules have no fees during the initial launch. Enjoy DCAStack
         fam!
@@ -56,9 +55,9 @@ const Trade = () => {
         radius="xl"
         p="xl"
         withBorder
-        sx={(theme) => ({ 
+        sx={(theme) => ({
           borderColor: theme.white,
-          borderBlockColor: theme.white 
+          borderBlockColor: theme.white,
         })}
       >
         <TradeDCA />

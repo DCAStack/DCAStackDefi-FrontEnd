@@ -159,7 +159,6 @@ const Dashboard = () => {
         title="Token Balances"
         color="orange"
         radius="xs"
-        withCloseButton
       >
         Please note that withdrawing ALL tokens from running schedules will
         cause them to not run! We recommend withdrawing just available :)
