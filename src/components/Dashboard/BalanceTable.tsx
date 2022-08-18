@@ -15,6 +15,7 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 const useStyles = createStyles((theme) => ({
   header: {
     position: "sticky",
+    zIndex: 1000,
     top: 0,
     backgroundColor:
       theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
