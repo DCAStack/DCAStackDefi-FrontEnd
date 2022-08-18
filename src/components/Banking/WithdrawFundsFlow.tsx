@@ -22,15 +22,8 @@ export default function WithdrawFundsFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
   const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
-  
-  useEffect(() => {
-    if (!weiDefaultValue.eq(0)) {
-      setWithdraw(weiDefaultValue);
-    }
-  }, [weiDefaultValue]);
 
   const {
     config: withdrawFundsSetup,
@@ -40,14 +33,14 @@ export default function WithdrawFundsFlow(
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled:
-      !weiWithdrawAmount.eq(0) &&
+      !weiDefaultValue.eq(0) &&
       token !== null &&
       token !== nullToken &&
       token !== undefined
         ? true
         : false,
     functionName: "withdrawFunds",
-    args: [token?.address, weiWithdrawAmount],
+    args: [token?.address, weiDefaultValue],
     onError(error) {
       console.log("Withdraw Gas Prepared Error", error);
     },
