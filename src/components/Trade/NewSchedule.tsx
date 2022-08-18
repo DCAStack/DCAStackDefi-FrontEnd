@@ -1,51 +1,21 @@
-import React from "react";
 import { useEffect, useState, useContext } from "react";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
 
-import {
-  Group,
-  NumberInput,
-  Container,
-  Button,
-  createStyles,
-  Space,
-  NativeSelect,
-  Text,
-  Title,
-  Stack,
-} from "@mantine/core";
-import { DateRangePicker, TimeInput } from "@mantine/dates";
+import { Group, Button, Space, Text, Title, Stack } from "@mantine/core";
 import { BigNumber } from "ethers";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import SwapToken from "./SwapToken";
-import dayjs from "dayjs";
 
 import {
   usePrepareContractWrite,
   useContractWrite,
   useAccount,
-  useBalance,
-  useContractReads,
   useWaitForTransaction,
   useNetwork,
 } from "wagmi";
-import {
-  parseEther,
-  formatEther,
-  parseUnits,
-  formatUnits,
-} from "ethers/lib/utils";
-import { ContractInfoProps } from "../../models/PropTypes";
+import { formatEther, parseUnits, formatUnits } from "ethers/lib/utils";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import { ActionIcon } from "@mantine/core";
-import { SwitchHorizontal, PlayerPlay } from "tabler-icons-react";
-
-import DepositGas from "../Banking/DepositGas";
-import DepositFunds from "../Banking/DepositFunds";
-
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 
 import { nullToken } from "../../data/gasTokens";
 import { IToken } from "../../models/Interfaces";
@@ -53,7 +23,7 @@ import { IToken } from "../../models/Interfaces";
 interface IScheduleParams {
   sellToken: IToken;
   buyToken: IToken;
-  sellAmount: BigNumber;
+  sellAmount: string;
   tradeFreq: BigNumber;
   numExec: number;
   startDate: Date | null;
@@ -103,16 +73,16 @@ export default function NewSchedule({
   const [enablePrep, setPrep] = useState(false);
   const [buttonTxt, setButtonTxt] = useState("Waiting...");
 
-  const formatSellAmount = formatUnits(
-    sellAmount.toString(),
-    sellToken.decimals
-  );
+  const weiSellAmount =
+    sellToken?.decimals !== 0
+      ? parseUnits(sellAmount !== "" ? sellAmount : "0", sellToken?.decimals)
+      : BigNumber.from(0);
 
   useEffect(() => {
     if (
       sellToken !== nullToken &&
       buyToken !== nullToken &&
-      !sellAmount.isZero() &&
+      !weiSellAmount.isZero() &&
       !tradeFreq.isZero() &&
       numExec !== 0 &&
       unixStartDate !== 0 &&
@@ -130,7 +100,7 @@ export default function NewSchedule({
     sellToken,
     buyToken,
     tradeFreq,
-    sellAmount,
+    weiSellAmount,
     numExec,
     unixStartDate,
     unixEndDate,
@@ -149,7 +119,7 @@ export default function NewSchedule({
     enabled: enablePrep,
     args: [
       tradeFreq,
-      sellAmount,
+      weiSellAmount,
       buyToken.address,
       sellToken.address,
       unixStartDate,
@@ -244,7 +214,7 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">You're selling</Text>
             <Text weight={700} color="green">
-              {formatSellAmount} {sellToken.symbol}
+              {sellAmount} {sellToken.symbol}
             </Text>
             <Text size="lg">to buy</Text>
             <Text weight={700} color="green">
@@ -279,7 +249,7 @@ export default function NewSchedule({
             </Text>
             <Text size="lg">because you're swapping</Text>
             <Text weight={700} color="green">
-              {formatSellAmount} {sellToken.symbol}
+              {sellAmount} {sellToken.symbol}
             </Text>
             <Text size="lg">x</Text>
             <Text weight={700} color="green">
