@@ -1,12 +1,24 @@
 import { useEffect, useState, useContext } from "react";
 
-import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
+import {
+  Container,
+  Title,
+  Paper,
+  Space,
+  createStyles,
+  Alert,
+} from "@mantine/core";
 
 import ManageScheduleFunds from "../Banking/ManageScheduleFunds";
 
 import { Tabs } from "@mantine/core";
-import { BuildingBank, Clock, Cash, History } from "tabler-icons-react";
-
+import {
+  BuildingBank,
+  Clock,
+  Cash,
+  History,
+  AlertCircle,
+} from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
 import {
@@ -142,7 +154,16 @@ const Dashboard = () => {
         Dashboard
       </Title>
       <Space h="xl" />
-
+      <Alert
+        icon={<AlertCircle size={16} />}
+        title="Token Balances"
+        color="orange"
+        radius="xs"
+        withCloseButton
+      >
+        Please note that withdrawing ALL tokens from running schedules will
+        cause them to not run! We recommend withdrawing just available :)
+      </Alert>
       <Space h="xl" />
       <Paper
         shadow="xl"

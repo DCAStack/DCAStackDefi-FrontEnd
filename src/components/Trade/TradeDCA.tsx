@@ -17,7 +17,6 @@ import {
 } from "@mantine/core";
 import { DateRangePicker, TimeInput } from "@mantine/dates";
 
-import { showNotification, updateNotification } from "@mantine/notifications";
 import SwapToken from "./SwapToken";
 import dayjs from "dayjs";
 
@@ -78,9 +77,7 @@ function TradeDCA() {
     currentChain,
     sellToken,
     buyToken,
-    sellAmount !== ""
-      ? parseUnits(sellAmount, sellToken?.decimals).toString()
-      : parseUnits("0", sellToken?.decimals).toString(),
+    sellAmount,
     tradeFreq,
     date[0],
     date[1],
@@ -108,25 +105,29 @@ function TradeDCA() {
         )
       );
 
-      if (quoteError) {
-        console.log("could not fetch 1inch: ", quoteError);
-        showNotification({
-          id: "1inch-error",
-          loading: true,
-          title: "Error Fetching Swap Details",
-          message: "Could not get swap details for this DCA!",
-          autoClose: true,
-          disallowClose: false,
-        });
-      } else {
+      if (quoteDetails) {
         setQuote1inch(quoteDetails);
         setEnableRead(true);
       }
-      setDepositAmount(
-        parseUnits(sellAmount, sellToken?.decimals).mul(numExec)
-      );
+
+      const sellAmountFormatted =
+              sellToken?.decimals !== 0
+                ? parseUnits(
+                    sellAmount !== "" ? sellAmount : "0",
+                    sellToken?.decimals
+                  )
+                : BigNumber.from(0);
+      setDepositAmount(sellAmountFormatted.mul(numExec));
     }
-  }, [quoteDetails, date, tradeFreq, sellAmount, numExec, quoteError]);
+  }, [
+    quoteDetails,
+    date,
+    tradeFreq,
+    sellAmount,
+    numExec,
+    quoteError,
+    sellToken?.decimals,
+  ]);
 
   const bnZero = BigNumber.from(0);
   const [freeGasBal, setUserGasBal] = useState<BigNumber>(bnZero);
@@ -304,11 +305,7 @@ function TradeDCA() {
             <NewSchedule
               sellToken={sellToken}
               buyToken={buyToken}
-              sellAmount={
-                sellAmount !== ""
-                  ? parseUnits(sellAmount, sellToken?.decimals)
-                  : parseUnits("0", sellToken?.decimals)
-              }
+              sellAmount={sellAmount}
               tradeFreq={BigNumber.from(tradeFreq * 86400)}
               numExec={numExec}
               startDate={date[0]}

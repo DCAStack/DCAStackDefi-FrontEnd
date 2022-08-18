@@ -17,6 +17,8 @@ import { ContractContext } from "../../App";
 import { IToken } from "../../models/Interfaces";
 
 import { BigNumber } from "ethers";
+import { parseEther } from "ethers/lib/utils";
+
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -26,7 +28,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function DepositEthFundsFlow(
   token: IToken | null,
-  weiDefaultValue: BigNumber
+  defaultValue: string
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -42,11 +44,17 @@ export default function DepositEthFundsFlow(
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
-    enabled: token?.address.toLowerCase() === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" ? true: false,
-    args: [token?.address, weiDefaultValue],
+    enabled:
+      token?.address.toLowerCase() ===
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
+    args: [token?.address, 
+      parseEther(defaultValue !== "" ? defaultValue : "0")
+    ],
     overrides: {
       from: address,
-      value: weiDefaultValue,
+      value: parseEther(defaultValue),
     },
     onError(error) {
       console.log("Deposit ETH Prepared Error", error);

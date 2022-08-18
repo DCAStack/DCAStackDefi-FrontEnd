@@ -20,6 +20,7 @@ import { ContractContext } from "../../App";
 
 import { IToken } from "../../models/Interfaces";
 import { BigNumber } from "ethers";
+import { parseUnits } from "ethers/lib/utils";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -29,7 +30,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function DepositFundsFlow(
   token: IToken | null,
-  weiDefaultValue: BigNumber
+  defaultValue: string
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -74,7 +75,14 @@ export default function DepositFundsFlow(
     contractInterface: contractABI,
     functionName: "depositFunds",
     enabled: enableDepositPrep,
-    args: [token?.address, weiDefaultValue],
+    args: [token?.address, 
+    token?.decimals !== 0
+      ? parseUnits(
+          defaultValue !== "" ? defaultValue : "0",
+          token?.decimals
+        )
+      : BigNumber.from(0)
+    ],
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
     },
@@ -283,7 +291,7 @@ export default function DepositFundsFlow(
       // setDepositPrep(false);
     }
   }, [
-    weiDefaultValue,
+    token?.decimals,
     depositFunds,
     enableDepositPrep,
     depositApproveSetup,

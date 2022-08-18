@@ -11,10 +11,7 @@ import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
-import {
-  formatUnits,
-  parseUnits,
-} from "ethers/lib/utils";
+import { formatUnits } from "ethers/lib/utils";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
 import { BigNumber } from "ethers";
@@ -33,12 +30,7 @@ export default function DepositFunds({
   const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
 
-  let depositTokenActions = DepositFundsFlow(
-    token,
-    depositAmount !== ""
-      ? parseUnits(depositAmount, token?.decimals)
-      : parseUnits("0", token?.decimals)
-  );
+  let depositTokenActions = DepositFundsFlow(token, depositAmount);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const re = /^\d*\.?\d*$/;
@@ -48,7 +40,9 @@ export default function DepositFunds({
   };
 
   useEffect(() => {
-    setDeposit(formatUnits(weiDefaultValue, token?.decimals).toString());
+    if (token?.decimals) {
+      setDeposit(formatUnits(weiDefaultValue, token?.decimals).toString());
+    }
   }, [token?.decimals, weiDefaultValue]);
 
   return (
@@ -77,7 +71,10 @@ export default function DepositFunds({
               onClick={() =>
                 depositTokenActions?.max
                   ? setDeposit(
-                      formatUnits(depositTokenActions?.max?.value.toString(), token?.decimals)
+                      formatUnits(
+                        depositTokenActions?.max?.value.toString(),
+                        token?.decimals
+                      )
                     )
                   : setDeposit("0")
               }

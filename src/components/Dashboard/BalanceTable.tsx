@@ -4,7 +4,6 @@ import { createStyles } from "@mantine/core";
 
 import { useState } from "react";
 
-import { parseUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
@@ -54,10 +53,10 @@ interface IUserBalanceInfo {
 export function UsersTable({ data }: IUserBalanceInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
-  const [weiWithdrawAmount, setWithdraw] = useState(BigNumber.from(0));
+  const [withdrawAmount, setWithdraw] = useState("0");
   const [selectedToken, setSelectedToken] = useState(nullToken);
 
-  let withdrawActions = WithdrawFundsFlow(selectedToken, weiWithdrawAmount);
+  let withdrawActions = WithdrawFundsFlow(selectedToken, withdrawAmount);
 
   const rows = data.map((item) => (
     <tr key={item.address}>
@@ -75,7 +74,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             compact
             onMouseOver={() => {
               setSelectedToken(item);
-              setWithdraw(parseUnits(item.freeBalance, item.decimals));
+              setWithdraw(item.freeBalance);
             }}
             onClick={() => {
               withdrawActions.action?.();
@@ -90,7 +89,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             compact
             onMouseOver={() => {
               setSelectedToken(item);
-              setWithdraw(parseUnits(item.balance, item.decimals));
+              setWithdraw(item.balance);
             }}
             onClick={() => {
               withdrawActions.action?.();

@@ -35,7 +35,7 @@ export default function DepositEthFunds({
 
   let depositEthActions = DepositEthFundsFlow(
     token,
-    depositAmount !== "" ? parseEther(depositAmount) : parseEther("0")
+    depositAmount
   );
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {

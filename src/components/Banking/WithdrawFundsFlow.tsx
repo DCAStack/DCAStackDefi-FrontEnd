@@ -15,10 +15,11 @@ import { ContractContext } from "../../App";
 import { BigNumber } from "ethers";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
+import { parseUnits } from "ethers/lib/utils";
 
 export default function WithdrawFundsFlow(
   token: IToken | null,
-  weiDefaultValue: BigNumber
+  defaultValue: string
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -33,14 +34,20 @@ export default function WithdrawFundsFlow(
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled:
-      !weiDefaultValue.eq(0) &&
+      defaultValue !== "0" &&
+      defaultValue !== "" &&
       token !== null &&
       token !== nullToken &&
       token !== undefined
         ? true
         : false,
     functionName: "withdrawFunds",
-    args: [token?.address, weiDefaultValue],
+    args: [
+      token?.address,
+      token?.decimals !== 0
+        ? parseUnits(defaultValue !== "" ? defaultValue : "0", token?.decimals)
+        : BigNumber.from(0),
+    ],
     onError(error) {
       console.log("Withdraw Gas Prepared Error", error);
     },

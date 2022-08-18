@@ -1,52 +1,16 @@
-import React from "react";
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 
-import {
-  Group,
-  NumberInput,
-  Container,
-  Button,
-  createStyles,
-  Space,
-  NativeSelect,
-  Text,
-  Title,
-  Stack,
-} from "@mantine/core";
-import { DateRangePicker, TimeInput } from "@mantine/dates";
+import { Group, Space, Text, Title, Stack } from "@mantine/core";
 
-import { showNotification, updateNotification } from "@mantine/notifications";
-import SwapToken from "./SwapToken";
-import dayjs from "dayjs";
-
-import {
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractReads,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
-import {
-  parseEther,
-  formatEther,
-  formatUnits,
-  parseUnits,
-} from "ethers/lib/utils";
+import { useAccount, useNetwork } from "wagmi";
+import { formatEther, formatUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
-import { ContractInfoProps } from "../../models/PropTypes";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import { ActionIcon } from "@mantine/core";
-import { SwitchHorizontal, PlayerPlay } from "tabler-icons-react";
 
 import DepositGas from "../Banking/DepositGas";
 import DepositFunds from "../Banking/DepositFunds";
 import DepositEthFunds from "../Banking/DepositEthFunds";
 
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
-
-import { nullToken } from "../../data/gasTokens";
 import { IToken } from "../../models/Interfaces";
 
 interface ISetupDeposits {

@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { ChevronDown } from "tabler-icons-react";
 
-import { formatUnits, parseUnits } from "ethers/lib/utils";
+import { formatUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
 import { UserFundsProps } from "../../models/PropTypes";
@@ -77,22 +77,16 @@ export default function ManageScheduleFunds({
 
   let withdrawActions = WithdrawFundsFlow(
     selectedToken,
-    amount !== ""
-      ? parseUnits(amount, selectedToken?.decimals)
-      : parseUnits("0", selectedToken?.decimals)
+    amount
   );
 
   let depositEthActions = DepositEthFundsFlow(
     selectedToken,
-    amount !== ""
-      ? parseUnits(amount, selectedToken?.decimals)
-      : parseUnits("0", selectedToken?.decimals)
+    amount
   );
   let depositTokenActions = DepositFundsFlow(
     selectedToken,
-    amount !== ""
-      ? parseUnits(amount, selectedToken?.decimals)
-      : parseUnits("0", selectedToken?.decimals)
+    amount
   );
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
