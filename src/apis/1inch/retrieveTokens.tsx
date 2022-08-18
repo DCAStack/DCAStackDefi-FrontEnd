@@ -1,5 +1,7 @@
 import useSWR from "swr";
-import React, { useState } from "react";
+import React from "react";
+import { showNotification } from "@mantine/notifications";
+import { AlertOctagon } from "tabler-icons-react";
 
 export default function use1inchRetrieveTokens(currentChain: number) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -19,7 +21,18 @@ export default function use1inchRetrieveTokens(currentChain: number) {
     }
   }
 
-  if (error) console.log("1inch fetch tokens error", error);
+  if (error) {
+    console.log("1inch fetch tokens error", error);
+    showNotification({
+      id: "1inch-fetch-error",
+      color: "red",
+      title: "Error Fetching Tokens",
+      message: "Could not get token list!",
+      autoClose: true,
+      disallowClose: false,
+      icon: <AlertOctagon />,
+    });
+  }
 
   return {
     tokens: data,

@@ -1,15 +1,12 @@
 import useSWR from "swr";
-import React, { useState } from "react";
-import {
-  parseEther,
-  formatEther,
-  parseUnits,
-  formatUnits,
-} from "ethers/lib/utils";
+import React from "react";
+import { parseEther, formatUnits, parseUnits } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
 import { BigNumber } from "ethers";
 import Big from "big.js";
+import { showNotification } from "@mantine/notifications";
+import { AlertOctagon } from "tabler-icons-react";
 
 export default function use1inchRetrieveQuote(
   currentChain: number,
@@ -28,12 +25,20 @@ export default function use1inchRetrieveQuote(
     currentChain = 1;
   }
 
-  const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${tradeAmount}`;
+  const tradeAmountFormatted =
+    sellCrypto?.decimals !== 0
+      ? parseUnits(
+          tradeAmount !== "" ? tradeAmount : "0",
+          sellCrypto?.decimals
+        ).toString()
+      : "0";
+
+  const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${tradeAmountFormatted}`;
 
   const { data, error } = useSWR(
     sellCrypto !== nullToken &&
       buyCrypto !== nullToken &&
-      tradeAmount !== "0" &&
+      tradeAmountFormatted !== "0" &&
       tradeFreq > 0 &&
       startDate !== null &&
       endDate !== null &&
@@ -74,7 +79,18 @@ export default function use1inchRetrieveQuote(
     }
   }
 
-  if (error) console.log("1inch fetch quote error", error);
+  if (error) {
+    console.log("1inch fetch quote error", error);
+    showNotification({
+      id: "1inch-quote-error",
+      color: "red",
+      title: "Error Fetching Swap Details",
+      message: "Could not get swap details for this DCA!",
+      autoClose: true,
+      disallowClose: false,
+      icon: <AlertOctagon />,
+    });
+  }
 
   return {
     quote: data,
