@@ -37,7 +37,8 @@ export default function use1inchRetrieveQuote(
       tradeFreq > 0 &&
       startDate !== null &&
       endDate !== null &&
-      numExec !== 0
+      numExec !== 0 &&
+      currentChain !== 0
       ? readyUrl
       : null,
     fetcher
