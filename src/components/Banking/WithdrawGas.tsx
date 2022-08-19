@@ -7,7 +7,6 @@ import {
   Container,
   Button,
   createStyles,
-  Avatar,
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { CircleCheck, AlertOctagon } from "tabler-icons-react";
@@ -99,7 +98,7 @@ export default function WithdrawGas() {
         id: "withdraw-gas-error",
         color: "red",
         title: "Error Gas Withdrawal",
-        message: "If this was unexpected, please raise an issue on github!",
+        message: error.message,
         autoClose: true,
         disallowClose: false,
         icon: <AlertOctagon />,
@@ -132,7 +131,7 @@ export default function WithdrawGas() {
         id: "withdraw-gas-pending",
         color: "red",
         title: "Error Gas Withdrawal",
-        message: "If this was unexpected, please raise an issue on github!",
+        message: error.message,
         autoClose: true,
         disallowClose: false,
         icon: <AlertOctagon />,

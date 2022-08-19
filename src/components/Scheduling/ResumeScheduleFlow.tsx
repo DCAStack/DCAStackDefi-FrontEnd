@@ -11,11 +11,14 @@ import {
 } from "wagmi";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import { parseEther } from "ethers/lib/utils";
+import { parseUnits, parseEther } from "ethers/lib/utils";
 
 export default function ResumeScheduleFlow(
   scheduleId: number,
-  enableFunc: boolean = false
+  enableFunc: boolean = false,
+  gasEstimate: string,
+  freeTokenBalance: string,
+  tokenBalance: string
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -37,8 +40,7 @@ export default function ResumeScheduleFlow(
         id: "resume-status-error",
         color: "red",
         title: "Error Resuming Schedule",
-        message:
-          "You may need to top up your deposit and/or gas! Prompting top ups...",
+        message: "You may need to top up your deposit and/or gas!",
         autoClose: true,
         disallowClose: false,
         icon: <AlertOctagon />,

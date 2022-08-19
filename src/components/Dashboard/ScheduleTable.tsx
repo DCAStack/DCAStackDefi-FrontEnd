@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { Coin } from "tabler-icons-react";
 
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
 import { formatUnits } from "ethers/lib/utils";
 import { ContractContext } from "../../App";
 import { BigNumber } from "ethers";
@@ -21,6 +21,8 @@ import { IUserFunds } from "../../models/Interfaces";
 import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
 import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
 import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
+import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
+import { nullToken } from "../../data/gasTokens";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -224,7 +226,15 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
 export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { chain, chains } = useNetwork();
+  const currentChain: number = chain ? chain?.id : 0;
+  const [sellToken, setSellToken] = useState(nullToken);
+  const [buyToken, setBuyToken] = useState(nullToken);
+  const [sellAmount, setSellAmount] = useState("");
+  const [tradeFreq, setTradeFreq] = useState(0);
+  const [date0, setStartDate] = useState<Date | null>(null);
+  const [date1, setEndDate] = useState<Date | null>(null);
+  const [numExec, setNumExec] = useState(0);
 
   const {
     data: userSchedules,
@@ -243,6 +253,21 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
       console.log("Get All User Schedules Error", error);
     },
   });
+
+  const {
+    quote: quoteDetails,
+    isLoading: quoteLoading,
+    isError: quoteError,
+  } = use1inchRetrieveQuote(
+    currentChain,
+    sellToken,
+    buyToken,
+    sellAmount,
+    tradeFreq,
+    date0,
+    date1,
+    numExec
+  );
 
   let formattedUserSchedulesData: IUserScheduleInfo["data"] = [];
 
