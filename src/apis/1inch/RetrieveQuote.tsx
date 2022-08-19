@@ -77,6 +77,19 @@ export default function use1inchRetrieveQuote(
 
       data.swapQuote = bnToAmount.div(bnFromAmount).toString();
     }
+
+    if (data.statusCode) {
+      console.log("1inch fetch quote error", data.error);
+      showNotification({
+        id: "1inch-quote-error",
+        color: "red",
+        title: "Error Fetching Swap Details",
+        message: data.description,
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    }
   }
 
   if (error) {
@@ -85,7 +98,7 @@ export default function use1inchRetrieveQuote(
       id: "1inch-quote-error",
       color: "red",
       title: "Error Fetching Swap Details",
-      message: "Could not get swap details for this DCA!",
+      message: error.message,
       autoClose: true,
       disallowClose: false,
       icon: <AlertOctagon />,

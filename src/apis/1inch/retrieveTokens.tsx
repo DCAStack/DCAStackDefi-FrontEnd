@@ -19,6 +19,18 @@ export default function use1inchRetrieveTokens(currentChain: number) {
     if (data.tokens) {
       data.flattenData = Object.values(data.tokens);
     }
+    if (data.statusCode) {
+      console.log("1inch fetch tokens error", data.error);
+      showNotification({
+        id: "1inch-fetch-error",
+        color: "red",
+        title: "Error Fetching Tokens",
+        message: data.description,
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    }
   }
 
   if (error) {
@@ -27,7 +39,7 @@ export default function use1inchRetrieveTokens(currentChain: number) {
       id: "1inch-fetch-error",
       color: "red",
       title: "Error Fetching Tokens",
-      message: "Could not get token list!",
+      message: error.message,
       autoClose: true,
       disallowClose: false,
       icon: <AlertOctagon />,
