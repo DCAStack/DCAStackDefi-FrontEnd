@@ -1,13 +1,7 @@
-import { useEffect, useState, useContext } from "react";
+import { useState, useContext } from "react";
 
 import {
-  NumberInput,
-  Grid,
-  Container,
   Avatar,
-  Space,
-  Menu,
-  Image,
   createStyles,
   Table,
   ScrollArea,
@@ -15,34 +9,23 @@ import {
   Button,
   Badge,
 } from "@mantine/core";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon, ChevronDown } from "tabler-icons-react";
-import GasToken from "../TokenDisplay/GasToken";
+import { Coin } from "tabler-icons-react";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractRead,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
-import { ContractInfoProps } from "../../models/PropTypes";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { useAccount, useContractRead } from "wagmi";
+import { formatUnits } from "ethers/lib/utils";
 import { ContractContext } from "../../App";
-import swapTokens from "./../../data/swapTokens";
-import { forwardRef } from "react";
-import { Text, Select } from "@mantine/core";
-import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 import { BigNumber } from "ethers";
 import { UserFundsProps } from "../../models/PropTypes";
 import { IUserFunds } from "../../models/Interfaces";
 
+import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
+import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
+import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
+
 const useStyles = createStyles((theme) => ({
   header: {
     position: "sticky",
+    zIndex: 1000,
     top: 0,
     backgroundColor:
       theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
@@ -87,201 +70,13 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
   const [scheduleId, setScheduleId] = useState(0);
-  const [changeStatus, setChangeStatus] = useState(false);
-  const [enableFunc, setEnableFunc] = useState(false);
-  const [enableDeleteFunc, setEnableDeleteFunc] = useState(false);
+  const [enablePause, setEnablePause] = useState(false);
+  const [enableResume, setEnableResume] = useState(false);
+  const [enableDelete, setEnableDelete] = useState(false);
 
-  const addRecentTransaction = useAddRecentTransaction();
-
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
-
-  const {
-    config: modifyStatusConfig,
-    error: prepareModifyStatusError,
-    isError: prepareModifyStatusIsError,
-  } = usePrepareContractWrite({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    enabled: enableFunc,
-    functionName: "changeStatus",
-    args: [scheduleId, changeStatus],
-    onError(error) {
-      console.log("Change Status Prepared Error", error);
-    },
-    onSuccess(data) {
-      console.log("Change Status Prepared Success", data);
-    },
-  });
-
-  const {
-    data: modifyStatusData,
-    error,
-    isError: modifyStatusError,
-    write: modifyStatus,
-  } = useContractWrite({
-    ...modifyStatusConfig,
-    onSuccess(data) {
-      console.log("Change Status Write Success", data);
-
-      showNotification({
-        id: "change-status-pending",
-        loading: true,
-        title: "Pending Schedule Status Change",
-        message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
-        disallowClose: false,
-      });
-    },
-
-    onError(error) {
-      console.log("Change Status Write Error", error);
-
-      showNotification({
-        id: "change-status-error",
-        color: "red",
-        title: "Error Changing Status",
-        message: "If this was unexpected, please raise an issue on github!",
-        autoClose: true,
-        disallowClose: false,
-        icon: <AlertOctagon />,
-      });
-    },
-  });
-
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
-    hash: modifyStatusData?.hash,
-    onSuccess(data) {
-      console.log("Withdraw Funds Success", data);
-
-      addRecentTransaction({
-        hash: data.transactionHash,
-        description: "Modify Schedule Status",
-      });
-
-      updateNotification({
-        id: "change-status-pending",
-        color: "teal",
-        title: "Schedule Status Change Complete",
-        message: "Safe travels :)",
-        icon: <CircleCheck />,
-      });
-
-      setEnableFunc(false);
-    },
-    onError(error) {
-      console.log("Withdraw Gas Error", error);
-
-      updateNotification({
-        id: "change-status-pending",
-        color: "red",
-        title: "Error Changing Status",
-        message: "If this was unexpected, please raise an issue on github!",
-        autoClose: true,
-        disallowClose: false,
-        icon: <AlertOctagon />,
-      });
-    },
-  });
-
-  const {
-    config: deleteScheduleConfig,
-    error: preparedeleteScheduleError,
-    isError: preparedeleteScheduleIsError,
-  } = usePrepareContractWrite({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    enabled: enableDeleteFunc,
-    functionName: "deleteSchedule",
-    args: [scheduleId],
-    onError(error) {
-      console.log("Delete Schedule Prepared Error", error);
-    },
-    onSuccess(data) {
-      console.log("Delete Schedule Prepared Success", data);
-    },
-  });
-
-  const {
-    data: deleteScheduleData,
-    error: deleteScheduleError,
-    isError: deleteScheduleIsError,
-    write: deleteSchedule,
-  } = useContractWrite({
-    ...deleteScheduleConfig,
-    onSuccess(data) {
-      console.log("Delete Schedule Write Success", data);
-
-      showNotification({
-        id: "delete-schedule-pending",
-        loading: true,
-        title: "Delete Schedule Pending",
-        message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
-        disallowClose: false,
-      });
-    },
-
-    onError(error) {
-      console.log("Delete Schedule Write Error", error);
-
-      showNotification({
-        id: "delete-schedule-error",
-        color: "red",
-        title: "Error Deleting Schedule",
-        message: "If this was unexpected, please raise an issue on github!",
-        autoClose: true,
-        disallowClose: false,
-        icon: <AlertOctagon />,
-      });
-    },
-  });
-
-  const { isLoading: deleteTxPending, isSuccess: deleteTxDone } =
-    useWaitForTransaction({
-      hash: deleteScheduleData?.hash,
-      onSuccess(data) {
-        console.log("Delete Schedule Success", data);
-
-        addRecentTransaction({
-          hash: data.transactionHash,
-          description: "Delete Schedule",
-        });
-
-        updateNotification({
-          id: "delete-schedule-pending",
-          color: "teal",
-          title: "Delete Schedule Complete",
-          message: "Don't forget to withdraw your unused schedule balances.",
-          icon: <CircleCheck />,
-        });
-
-        setEnableFunc(false);
-      },
-      onError(error) {
-        console.log("Withdraw Gas Error", error);
-
-        updateNotification({
-          id: "delete-schedule-pending",
-          color: "red",
-          title: "Error Deleting Schedule",
-          message: "If this was unexpected, please raise an issue on github!",
-          autoClose: true,
-          disallowClose: false,
-          icon: <AlertOctagon />,
-        });
-      },
-    });
-
-  useEffect(() => {
-    if (enableFunc === true) {
-      modifyStatus?.();
-    }
-    if (enableDeleteFunc === true) {
-      deleteSchedule?.();
-    }
-  }, [enableFunc, modifyStatus, enableDeleteFunc, deleteSchedule]);
+  let pauseScheduleActions = PauseScheduleFlow(scheduleId, enablePause);
+  let resumeScheduleActions = ResumeScheduleFlow(scheduleId, enableResume);
+  let deleteScheduleActions = DeleteScheduleFlow(scheduleId, enableDelete);
 
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
@@ -294,14 +89,18 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               alt="Sell Token Avatar"
               size={20}
               src={row.sellToken?.logoURI}
-            />
+            >
+              <Coin size={30} />
+            </Avatar>
           }
           rightSection={
             <Avatar
               alt="Buy Token Avatar"
               size={20}
               src={row.buyToken?.logoURI}
-            />
+            >
+              <Coin size={30} />
+            </Avatar>
           }
         >
           {row.sellToken?.symbol} / {row.buyToken?.symbol}
@@ -348,10 +147,12 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               radius="xl"
               size="md"
               compact
-              onClick={() => {
+              onMouseOver={() => {
                 setScheduleId(row.scheduleID);
-                setChangeStatus(false);
-                setEnableFunc(true);
+                setEnablePause(true);
+              }}
+              onClick={() => {
+                pauseScheduleActions.pause?.();
               }}
             >
               Pause
@@ -363,10 +164,12 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               radius="xl"
               size="md"
               compact
-              onClick={() => {
+              onMouseOver={() => {
                 setScheduleId(row.scheduleID);
-                setChangeStatus(true);
-                setEnableFunc(true);
+                setEnableResume(true);
+              }}
+              onClick={() => {
+                resumeScheduleActions.resume?.();
               }}
             >
               Resume
@@ -378,9 +181,12 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             radius="xl"
             size="md"
             compact
-            onClick={() => {
+            onMouseOver={() => {
               setScheduleId(row.scheduleID);
-              setEnableDeleteFunc(true);
+              setEnableDelete(true);
+            }}
+            onClick={() => {
+              deleteScheduleActions.delete?.();
             }}
           >
             Delete
@@ -395,7 +201,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       sx={{ height: 300 }}
       onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
     >
-      <Table sx={{ minWidth: 700 }} striped highlightOnHover fontSize="md">
+      <Table sx={{ minWidth: 800 }} striped highlightOnHover fontSize="md">
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
           <tr>
             <th>Trading Pair</th>
@@ -442,6 +248,10 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
 
   if (userSchedules && mappedUserFunds) {
     for (const key of Object.keys(userSchedules)) {
+      if (userSchedules[key].isActive === false) {
+        //fetch quote
+      }
+
       let addSchedule = {
         scheduleID: Number(key),
         isActive: userSchedules[key].isActive,

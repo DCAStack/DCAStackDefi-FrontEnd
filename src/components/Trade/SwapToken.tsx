@@ -70,16 +70,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
       } else {
         setFilteredTokens(swapTokens[currentChain]);
       }
-    } else if (masterTokenListError) {
-      showNotification({
-        id: "1inch-error",
-        loading: true,
-        title: "Error Fetching Token List",
-        message: "Could not get token list!",
-        autoClose: true,
-        disallowClose: false,
-      });
-    }
+    } 
   };
 
   return (

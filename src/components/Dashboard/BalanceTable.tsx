@@ -120,6 +120,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             <th>Token</th>
             <th>Total Balance</th>
             <th>Balance Not Used in Schedules</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
