@@ -14,7 +14,8 @@ import {
   erc20ABI,
 } from "wagmi";
 import { formatUnits } from "ethers/lib/utils";
-import { MaxUint256 } from "ethers/constants";
+import { ethers } from "ethers";
+
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
@@ -75,13 +76,11 @@ export default function DepositFundsFlow(
     contractInterface: contractABI,
     functionName: "depositFunds",
     enabled: enableDepositPrep,
-    args: [token?.address, 
-    token?.decimals !== 0
-      ? parseUnits(
-          defaultValue !== "" ? defaultValue : "0",
-          token?.decimals
-        )
-      : BigNumber.from(0)
+    args: [
+      token?.address,
+      token?.decimals !== 0
+        ? parseUnits(defaultValue !== "" ? defaultValue : "0", token?.decimals)
+        : BigNumber.from(0),
     ],
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
@@ -171,7 +170,7 @@ export default function DepositFundsFlow(
     contractInterface: erc20ABI,
     functionName: "approve",
     enabled: enableApprovePrep,
-    args: [contractAddr, MaxUint256],
+    args: [contractAddr, ethers.constants.MaxUint256],
     onError(error) {
       console.log("Deposit Prepare Approve Error", error);
     },

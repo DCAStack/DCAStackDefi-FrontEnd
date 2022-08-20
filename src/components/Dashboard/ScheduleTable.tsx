@@ -77,7 +77,13 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const [enableDelete, setEnableDelete] = useState(false);
 
   let pauseScheduleActions = PauseScheduleFlow(scheduleId, enablePause);
-  let resumeScheduleActions = ResumeScheduleFlow(scheduleId, enableResume);
+  let resumeScheduleActions = ResumeScheduleFlow(
+    scheduleId,
+    enableResume,
+    "0",
+    "0",
+    "0"
+  );
   let deleteScheduleActions = DeleteScheduleFlow(scheduleId, enableDelete);
 
   const rows = tableData.map((row) => (
