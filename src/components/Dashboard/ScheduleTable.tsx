@@ -16,7 +16,7 @@ import { formatUnits } from "ethers/lib/utils";
 import { ContractContext } from "../../App";
 import { BigNumber } from "ethers";
 import { UserFundsProps } from "../../models/PropTypes";
-import { IUserFunds } from "../../models/Interfaces";
+import { IToken } from "../../models/Interfaces";
 
 import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
 import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
@@ -63,8 +63,12 @@ interface IUserScheduleInfo {
     lastRun: Date;
     boughtAmount: BigNumber;
     soldAmount: BigNumber;
-    buyToken: IUserFunds;
-    sellToken: IUserFunds;
+    buyToken: IToken;
+    sellToken: IToken;
+    tradeFreq: number;
+    numExecLeft: number;
+    freeBalance?: string;
+    totalBalance?: string;
   }[];
 }
 
@@ -76,13 +80,28 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const [enableResume, setEnableResume] = useState(false);
   const [enableDelete, setEnableDelete] = useState(false);
 
+  const [sellToken, setSellToken] = useState(nullToken);
+  const [buyToken, setBuyToken] = useState(nullToken);
+  const [sellAmount, setSellAmount] = useState("");
+  const [tradeFreq, setTradeFreq] = useState(0);
+  const [date0, setStartDate] = useState<Date | null>(null);
+  const [date1, setEndDate] = useState<Date | null>(null);
+  const [numExec, setNumExec] = useState(0);
+  const [freeBal, setFreeBal] = useState("0");
+  const [totalBal, setTotalBal] = useState("0");
+
   let pauseScheduleActions = PauseScheduleFlow(scheduleId, enablePause);
   let resumeScheduleActions = ResumeScheduleFlow(
     scheduleId,
     enableResume,
-    "0",
-    "0",
-    "0"
+    sellToken,
+    buyToken,
+    sellAmount,
+    tradeFreq,
+    date0,
+    date1,
+    numExec,
+    freeBal
   );
   let deleteScheduleActions = DeleteScheduleFlow(scheduleId, enableDelete);
 
@@ -175,6 +194,14 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               onMouseOver={() => {
                 setScheduleId(row.scheduleID);
                 setEnableResume(true);
+                setSellToken(row.sellToken);
+                setBuyToken(row.buyToken);
+                setSellAmount(row.tradeAmount.toString());
+                setTradeFreq(row.tradeFreq);
+                setStartDate(row.nextRun);
+                setEndDate(row.endDate);
+                setNumExec(row.numExecLeft);
+                setFreeBal(row?.freeBalance ? row.freeBalance : "0");
               }}
               onClick={() => {
                 resumeScheduleActions.resume?.();
@@ -232,15 +259,6 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
 export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { chain, chains } = useNetwork();
-  const currentChain: number = chain ? chain?.id : 0;
-  const [sellToken, setSellToken] = useState(nullToken);
-  const [buyToken, setBuyToken] = useState(nullToken);
-  const [sellAmount, setSellAmount] = useState("");
-  const [tradeFreq, setTradeFreq] = useState(0);
-  const [date0, setStartDate] = useState<Date | null>(null);
-  const [date1, setEndDate] = useState<Date | null>(null);
-  const [numExec, setNumExec] = useState(0);
 
   const {
     data: userSchedules,
@@ -260,29 +278,10 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
     },
   });
 
-  const {
-    quote: quoteDetails,
-    isLoading: quoteLoading,
-    isError: quoteError,
-  } = use1inchRetrieveQuote(
-    currentChain,
-    sellToken,
-    buyToken,
-    sellAmount,
-    tradeFreq,
-    date0,
-    date1,
-    numExec
-  );
-
   let formattedUserSchedulesData: IUserScheduleInfo["data"] = [];
 
   if (userSchedules && mappedUserFunds) {
     for (const key of Object.keys(userSchedules)) {
-      if (userSchedules[key].isActive === false) {
-        //fetch quote
-      }
-
       let addSchedule = {
         scheduleID: Number(key),
         isActive: userSchedules[key].isActive,
@@ -296,9 +295,17 @@ export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
         soldAmount: userSchedules[key].soldAmount,
         buyToken: mappedUserFunds[userSchedules[key].buyToken],
         sellToken: mappedUserFunds[userSchedules[key].sellToken],
-        // remainingBudget: userSchedules[key].remainingBudget,
-        // totalGas: userSchedules[key].totalGas,
-        // tradeFrequency: userSchedules[key].tradeFrequency,
+        remainingBudget: userSchedules[key].remainingBudget.toString(),
+        totalGas: userSchedules[key].totalGas,
+        tradeFreq: userSchedules[key].tradeFrequency.toString() / 86400,
+        numExecLeft: Math.floor(
+          (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
+            new Date(userSchedules[key].scheduleDates[2] * 1000).valueOf()) /
+            userSchedules[key].tradeFrequency.toString() /
+            1000
+        ),
+        freeBalance: mappedUserFunds[userSchedules[key].sellToken].freeBalance,
+        totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
       };
       formattedUserSchedulesData.push(addSchedule);
     }

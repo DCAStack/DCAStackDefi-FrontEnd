@@ -47,8 +47,8 @@ interface IUserBalanceInfo {
     address: string;
     name: string;
     decimals: number;
-    balance: string;
-    freeBalance: string;
+    balance?: string;
+    freeBalance?: string;
   }[];
 }
 export function UsersTable({ data }: IUserBalanceInfo) {
@@ -75,7 +75,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             compact
             onMouseOver={() => {
               setSelectedToken(item);
-              setWithdraw(item.freeBalance);
+              setWithdraw(item?.freeBalance ? item?.freeBalance : "0");
             }}
             onClick={() => {
               withdrawActions.action?.();
@@ -90,7 +90,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             compact
             onMouseOver={() => {
               setSelectedToken(item);
-              setWithdraw(item.balance);
+              setWithdraw(item?.balance ? item?.balance : "0");
             }}
             onClick={() => {
               withdrawActions.action?.();

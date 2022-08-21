@@ -6,6 +6,8 @@ export interface IToken {
   address: string;
   decimals: number;
   logoURI: string;
+  balance?: string;
+  freeBalance?: string;
 }
 
 export interface IContract {

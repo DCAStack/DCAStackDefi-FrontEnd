@@ -38,7 +38,7 @@ import { UserSchedulesPopulated } from "../Dashboard/ScheduleTable";
 import { UserTradesPopulated } from "../Dashboard/TradeTable";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
-import { IUserFunds } from "../../models/Interfaces";
+import { IToken } from "../../models/Interfaces";
 import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
@@ -93,8 +93,8 @@ const Dashboard = () => {
     },
   });
 
-  let parsedTokenBalances: IUserFunds[] = [];
-  let mappedTokenBalances: Record<string, IUserFunds> = {};
+  let parsedTokenBalances: IToken[] = [];
+  let mappedTokenBalances: Record<string, IToken> = {};
   let userTokenBalances = userTokenInfo ? userTokenInfo[0] : [[], [], []];
   let userTokenPurchasing = userTokenInfo ? userTokenInfo[1] : [[]];
   let joinNeededTokens: any = [[], [], []];
