@@ -31,7 +31,7 @@ import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 import { nullToken } from "../../data/gasTokens";
 import NewSchedule from "./NewSchedule";
 import SetupDeposits from "./SetupDeposits";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
+import { formatUnits, parseEther, parseUnits } from "ethers/lib/utils";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -67,6 +67,7 @@ function TradeDCA() {
 
   const [quote1inch, setQuote1inch] = useState({
     estimatedGasDca: BigNumber.from(0),
+    estimatedGasFormatted: "0",
   });
 
   const {
@@ -111,16 +112,17 @@ function TradeDCA() {
       }
 
       const sellAmountFormatted =
-              sellToken?.decimals !== 0
-                ? parseUnits(
-                    sellAmount !== "" ? sellAmount : "0",
-                    sellToken?.decimals
-                  )
-                : BigNumber.from(0);
+        sellToken?.decimals !== 0
+          ? parseUnits(
+              sellAmount !== "" ? sellAmount : "0",
+              sellToken?.decimals
+            )
+          : BigNumber.from(0);
       setDepositAmount(sellAmountFormatted.mul(numExec));
     }
   }, [
     quoteDetails,
+    quote1inch,
     date,
     tradeFreq,
     sellAmount,
@@ -139,7 +141,7 @@ function TradeDCA() {
         addressOrName: contractAddr,
         contractInterface: contractABI,
         functionName: "getFreeGasBalance",
-        args: [quote1inch?.estimatedGasDca],
+        args: [parseEther(quote1inch.estimatedGasFormatted)], //gas for single trade
       },
       {
         addressOrName: contractAddr,

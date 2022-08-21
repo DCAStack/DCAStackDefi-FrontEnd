@@ -13,7 +13,12 @@ import {
   useWaitForTransaction,
   useNetwork,
 } from "wagmi";
-import { formatEther, parseUnits, formatUnits } from "ethers/lib/utils";
+import {
+  formatEther,
+  parseUnits,
+  formatUnits,
+  parseEther,
+} from "ethers/lib/utils";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
@@ -88,7 +93,8 @@ export default function NewSchedule({
       unixStartDate !== 0 &&
       unixEndDate !== 0 &&
       !freeTokenBal.isZero() &&
-      !freeGasBal.isZero()
+      !freeGasBal.isZero() &&
+      quoteDetails.estimatedGasFormatted !== "0"
     ) {
       setPrep(true);
       setButtonTxt("Start DCA");
@@ -106,6 +112,7 @@ export default function NewSchedule({
     unixEndDate,
     freeTokenBal,
     freeGasBal,
+    quoteDetails,
   ]);
 
   const {
@@ -124,6 +131,7 @@ export default function NewSchedule({
       sellToken.address,
       unixStartDate,
       unixEndDate,
+      parseEther(quoteDetails.estimatedGasFormatted),
     ],
     onError(error) {
       console.log("New Schedule Prepared Error", error);
