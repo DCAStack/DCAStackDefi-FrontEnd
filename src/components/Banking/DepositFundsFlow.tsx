@@ -104,7 +104,7 @@ export default function DepositFundsFlow(
         loading: true,
         title: "Pending Token Deposit",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
       setDepositPrep(false);
@@ -141,6 +141,7 @@ export default function DepositFundsFlow(
           title: "Token Deposit Received",
           message: "You're ready to create a schedule!",
           icon: <CircleCheck />,
+          autoClose: true,
         });
 
         setDepositPrep(false);
@@ -193,7 +194,7 @@ export default function DepositFundsFlow(
         loading: true,
         title: "Pending Deposit Spend Approval",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -228,6 +229,7 @@ export default function DepositFundsFlow(
           title: "Deposit Spend Approved",
           message: "Now you can deposit funds!",
           icon: <CircleCheck />,
+          autoClose: true,
         });
 
         setDepositAfterApprove(true);

@@ -54,7 +54,7 @@ export default function DeleteScheduleFlow(
         loading: true,
         title: "Delete Schedule Pending",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -91,6 +91,7 @@ export default function DeleteScheduleFlow(
           title: "Delete Schedule Complete",
           message: "Don't forget to withdraw your unused schedule balances.",
           icon: <CircleCheck />,
+          autoClose: true,
         });
       },
       onError(error) {

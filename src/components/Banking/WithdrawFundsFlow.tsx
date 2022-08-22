@@ -71,7 +71,7 @@ export default function WithdrawFundsFlow(
         loading: true,
         title: "Pending Token Withdrawal",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -107,6 +107,7 @@ export default function WithdrawFundsFlow(
         title: "Token Withdrawal Complete",
         message: "Safe travels :)",
         icon: <CircleCheck />,
+        autoClose: true,
       });
     },
     onError(error) {

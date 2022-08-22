@@ -156,7 +156,7 @@ export default function NewSchedule({
         loading: true,
         title: "Pending Schedule Creation",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -192,6 +192,7 @@ export default function NewSchedule({
         title: "Schedule Created",
         message: "Head over to dashboard to view!",
         icon: <CircleCheck />,
+        autoClose: true,
       });
     },
     onError(error) {
@@ -292,7 +293,9 @@ export default function NewSchedule({
                   {formatUnits(freeTokenBal, sellToken.decimals)}{" "}
                   {sellToken.symbol}
                 </Text>
-                <Text size="lg">not in use, so a deposit is not needed!</Text>
+                <Text size="lg">
+                  available, so an additional deposit is not needed!
+                </Text>
               </Group>
             )}
 
@@ -334,7 +337,7 @@ export default function NewSchedule({
                 <Text weight={700} color="green">
                   {formatEther(freeGasBal)} {networkCurrency}
                 </Text>
-                <Text size="lg">not in use so your deposit is just</Text>
+                <Text size="lg">available so your deposit is just</Text>
                 <Text weight={700} color="green">
                   {formatEther(quoteDetails?.estimatedGasDca.sub(freeGasBal))}{" "}
                   {networkCurrency}
@@ -350,7 +353,7 @@ export default function NewSchedule({
                   {formatEther(freeGasBal)} {networkCurrency}
                 </Text>
                 <Text size="lg">
-                  not in use, so a gas deposit is not needed!
+                  available, so an additional gas deposit is not needed!
                 </Text>
               </Group>
             )}

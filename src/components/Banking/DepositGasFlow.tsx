@@ -56,7 +56,7 @@ export default function DepositGasFlow(defaultValue: string) {
         loading: true,
         title: "Pending Gas Deposit",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -92,6 +92,7 @@ export default function DepositGasFlow(defaultValue: string) {
         title: "Gas Deposit Received",
         message: "Happy DCAing :)",
         icon: <CircleCheck />,
+        autoClose: true,
       });
     },
     onError(error) {

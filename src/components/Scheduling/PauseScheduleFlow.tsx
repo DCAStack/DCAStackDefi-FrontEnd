@@ -6,7 +6,6 @@ import { CircleCheck, AlertOctagon } from "tabler-icons-react";
 import {
   usePrepareContractWrite,
   useContractWrite,
-  useAccount,
   useWaitForTransaction,
 } from "wagmi";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
@@ -18,7 +17,6 @@ export default function PauseScheduleFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   const {
@@ -54,7 +52,7 @@ export default function PauseScheduleFlow(
         loading: true,
         title: "Pending Schedule Pause",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -90,6 +88,7 @@ export default function PauseScheduleFlow(
         title: "Pause Schedule Complete",
         message: "Safe travels :)",
         icon: <CircleCheck />,
+        autoClose: true,
       });
     },
     onError(error) {

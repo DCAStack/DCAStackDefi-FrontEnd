@@ -86,7 +86,7 @@ export default function WithdrawGas() {
         loading: true,
         title: "Pending Gas Withdrawal",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -122,6 +122,7 @@ export default function WithdrawGas() {
         title: "Gas Withdrawal Complete",
         message: "Safe travels :)",
         icon: <CircleCheck />,
+        autoClose: true,
       });
     },
     onError(error) {

@@ -79,7 +79,7 @@ export default function DepositEthFundsFlow(
         loading: true,
         title: "Pending ETH Deposit",
         message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: true,
+        autoClose: false,
         disallowClose: false,
       });
     },
@@ -115,6 +115,7 @@ export default function DepositEthFundsFlow(
         title: "ETH Deposit Received",
         message: "Happy DCAing :)",
         icon: <CircleCheck />,
+        autoClose: true,
       });
     },
     onError(error) {
