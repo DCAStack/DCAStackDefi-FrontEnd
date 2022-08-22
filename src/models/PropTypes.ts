@@ -19,4 +19,5 @@ export interface ContractInfoProps extends BaseProps {
 export interface UserFundsProps extends BaseProps {
     userFunds?: IToken[];
     mappedUserFunds?: Record<string, IToken>;
+    userSchedules?: Record<string, any>;
 }
