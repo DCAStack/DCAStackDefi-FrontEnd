@@ -47,17 +47,15 @@ interface IUserBalanceInfo {
     address: string;
     name: string;
     decimals: number;
-    balance?: string;
-    freeBalance?: string;
+    balance: string;
+    freeBalance: string;
+    withdrawMax: any;
+    withdrawFree: any;
   }[];
 }
 export function UsersTable({ data }: IUserBalanceInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
-  const [withdrawAmount, setWithdraw] = useState("0");
-  const [selectedToken, setSelectedToken] = useState(nullToken);
-
-  let withdrawActions = WithdrawFundsFlow(selectedToken, withdrawAmount);
 
   const rows = data.map((item) => (
     <tr key={item.address}>
@@ -73,12 +71,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             radius="xl"
             size="md"
             compact
-            onMouseOver={() => {
-              setSelectedToken(item);
-              setWithdraw(item?.freeBalance ? item?.freeBalance : "0");
-            }}
             onClick={() => {
-              withdrawActions.action?.();
+              item.withdrawFree?.action?.();
             }}
           >
             Withdraw Available
@@ -88,12 +82,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             radius="xl"
             size="md"
             compact
-            onMouseOver={() => {
-              setSelectedToken(item);
-              setWithdraw(item?.balance ? item?.balance : "0");
-            }}
             onClick={() => {
-              withdrawActions.action?.();
+              item.withdrawMax?.action?.();
             }}
           >
             Withdraw All
@@ -132,5 +122,29 @@ export function UsersTable({ data }: IUserBalanceInfo) {
 export function UserBalancesPopulated({
   userFunds: parsedTokenBalances,
 }: UserFundsProps) {
-  return <UsersTable data={parsedTokenBalances ? parsedTokenBalances : []} />;
+  let formattedUserData: IUserBalanceInfo["data"] = [];
+
+  if (parsedTokenBalances) {
+    Object.keys(parsedTokenBalances).map((key) => {
+      if (parsedTokenBalances[Number(key)].address) {
+        let addDetails = {
+          withdrawMax: WithdrawFundsFlow(
+            parsedTokenBalances[Number(key)],
+            parsedTokenBalances[Number(key)].balance
+          ),
+          withdrawFree: WithdrawFundsFlow(
+            parsedTokenBalances[Number(key)],
+            parsedTokenBalances[Number(key)].freeBalance
+          ),
+        };
+
+        formattedUserData.push({
+          ...parsedTokenBalances[Number(key)],
+          ...addDetails,
+        });
+      }
+    });
+  }
+
+  return <UsersTable data={formattedUserData} />;
 }

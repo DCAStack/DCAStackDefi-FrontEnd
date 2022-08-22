@@ -22,7 +22,7 @@ import { UserBalancesPopulated } from "../Dashboard/BalanceTable";
 import { UserSchedulesPopulated } from "../Dashboard/ScheduleTable";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
-import { IToken } from "../../models/Interfaces";
+import { IToken, IUserFunds } from "../../models/Interfaces";
 import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
@@ -77,7 +77,7 @@ const Dashboard = () => {
     },
   });
 
-  let parsedTokenBalances: IToken[] = [];
+  let parsedTokenBalances: IUserFunds[] = [];
   let mappedTokenBalances: Record<string, IToken> = {};
   let userTokenBalances = userTokenInfo ? userTokenInfo[0] : [[], [], []];
   let userTokenPurchasing = userTokenInfo ? userTokenInfo[1] : [[]];

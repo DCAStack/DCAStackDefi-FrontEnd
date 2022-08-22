@@ -331,9 +331,9 @@ export function UserSchedulesPopulated({
               userSchedules[key].tradeFrequency.toString() /
               1000
           ),
-          freeBalance:
-            mappedUserFunds[userSchedules[key].sellToken].freeBalance,
-          totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
+          // freeBalance:
+          //   mappedUserFunds[userSchedules[key].sellToken].freeBalance,
+          // totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
 
           tokenRefillActions: RefillTokenDepositFlow(
             !userSchedules[key].isActive,
