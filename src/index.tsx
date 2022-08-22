@@ -31,7 +31,8 @@ const localChain: Chain = {
     symbol: "ETH",
   },
   rpcUrls: {
-    default: "http://127.0.0.1:8545/",
+    //TODO
+    default: "http://192.168.0.169:8545",
   },
   testnet: false,
 };
