@@ -79,6 +79,15 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
 
+  const dateOptions = {
+    year: "2-digit",
+    month: "2-digit",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  };
+
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
       <td>
@@ -130,18 +139,48 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       </td>
       <td>
         <Stack spacing="xs">
-          <Text>{row.startDate.toLocaleString()}</Text>
+          <Text>
+            {row.startDate.toLocaleDateString(undefined, {
+              year: "2-digit",
+              month: "2-digit",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+            })}
+          </Text>
           <Text>to</Text>
-          <Text>{row.endDate.toLocaleString()}</Text>
+          <Text>
+            {row.endDate.toLocaleDateString(undefined, {
+              year: "2-digit",
+              month: "2-digit",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+            })}
+          </Text>
         </Stack>
       </td>
 
       <td>
         {row.lastRun.toLocaleString() === "12/31/1969, 7:00:00 PM" && "Never"}
         {row.lastRun.toLocaleString() !== "12/31/1969, 7:00:00 PM" &&
-          row.lastRun.toLocaleString()}
+          row.lastRun.toLocaleDateString(undefined, {
+            year: "2-digit",
+            month: "2-digit",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          })}
       </td>
-      <td>{row.nextRun.toLocaleString()}</td>
+      <td>
+        {row.nextRun.toLocaleDateString(undefined, {
+          year: "2-digit",
+          month: "2-digit",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        })}
+      </td>
       <td>
         {!row.boughtAmount.eq(0) &&
           !row.soldAmount.eq(0) &&
@@ -244,7 +283,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             <th>Duration</th>
             <th>Last Run</th>
             <th>Next Run</th>
-            <th>Average Buy In</th>
+            <th>Avg Buy</th>
             <th>Actions</th>
           </tr>
         </thead>
