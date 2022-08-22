@@ -1,19 +1,18 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 
 import {
   Avatar,
   createStyles,
   Table,
   ScrollArea,
-  Group,
   Button,
   Badge,
+  Stack,
+  Text,
 } from "@mantine/core";
 import { Coin } from "tabler-icons-react";
 
-import { useAccount, useContractRead, useNetwork } from "wagmi";
 import { formatUnits } from "ethers/lib/utils";
-import { ContractContext } from "../../App";
 import { BigNumber } from "ethers";
 import { UserFundsProps } from "../../models/PropTypes";
 import { IToken } from "../../models/Interfaces";
@@ -21,8 +20,8 @@ import { IToken } from "../../models/Interfaces";
 import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
 import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
 import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
-import { nullToken } from "../../data/gasTokens";
+import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
+import RefillGasDepositFlow from "../Scheduling/RefillGasDepositFlow";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -65,92 +64,77 @@ interface IUserScheduleInfo {
     soldAmount: BigNumber;
     buyToken: IToken;
     sellToken: IToken;
-    tradeFreq: number;
+    tradeFreq: string;
     numExecLeft: number;
-    freeBalance?: string;
-    totalBalance?: string;
+    remainingBudget: string;
+    gasRefillActions: any;
+    tokenRefillActions: any;
+    pauseSchedule: any;
+    resumeSchedule: any;
+    deleteSchedule: any;
   }[];
 }
 
 function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
-  const [scheduleId, setScheduleId] = useState(0);
-  const [enablePause, setEnablePause] = useState(false);
-  const [enableResume, setEnableResume] = useState(false);
-  const [enableDelete, setEnableDelete] = useState(false);
-
-  const [sellToken, setSellToken] = useState(nullToken);
-  const [buyToken, setBuyToken] = useState(nullToken);
-  const [sellAmount, setSellAmount] = useState("");
-  const [tradeFreq, setTradeFreq] = useState(0);
-  const [date0, setStartDate] = useState<Date | null>(null);
-  const [date1, setEndDate] = useState<Date | null>(null);
-  const [numExec, setNumExec] = useState(0);
-  const [freeBal, setFreeBal] = useState("0");
-  const [totalBal, setTotalBal] = useState("0");
-
-  let pauseScheduleActions = PauseScheduleFlow(scheduleId, enablePause);
-  let resumeScheduleActions = ResumeScheduleFlow(
-    scheduleId,
-    enableResume,
-    sellToken,
-    buyToken,
-    sellAmount,
-    tradeFreq,
-    date0,
-    date1,
-    numExec,
-    freeBal
-  );
-  let deleteScheduleActions = DeleteScheduleFlow(scheduleId, enableDelete);
 
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
       <td>
-        <Badge
-          sx={{ paddingLeft: 0, paddingRight: 0 }}
-          size="lg"
-          leftSection={
-            <Avatar
-              alt="Sell Token Avatar"
-              size={20}
-              src={row.sellToken?.logoURI}
-            >
-              <Coin size={30} />
-            </Avatar>
-          }
-          rightSection={
-            <Avatar
-              alt="Buy Token Avatar"
-              size={20}
-              src={row.buyToken?.logoURI}
-            >
-              <Coin size={30} />
-            </Avatar>
-          }
-        >
-          {row.sellToken?.symbol} / {row.buyToken?.symbol}
-        </Badge>
+        <Stack align="center" spacing="xs">
+          <Badge
+            sx={{ paddingLeft: 0, paddingRight: 0 }}
+            size="lg"
+            leftSection={
+              <Avatar
+                alt="Sell Token Avatar"
+                size={20}
+                src={row.sellToken?.logoURI}
+              >
+                <Coin size={30} />
+              </Avatar>
+            }
+            rightSection={
+              <Avatar
+                alt="Buy Token Avatar"
+                size={20}
+                src={row.buyToken?.logoURI}
+              >
+                <Coin size={30} />
+              </Avatar>
+            }
+          >
+            {row.sellToken?.symbol} / {row.buyToken?.symbol}
+          </Badge>
+
+          {row.isActive === true && (
+            <Badge color="teal" size="md">
+              Running
+            </Badge>
+          )}
+          {row.isActive === false && (
+            <Badge color="orange" size="md">
+              Paused
+            </Badge>
+          )}
+        </Stack>
       </td>
       <td>
-        {row.isActive === true && (
-          <Badge color="teal" size="md">
-            Running
-          </Badge>
-        )}
-        {row.isActive === false && (
-          <Badge color="orange" size="md">
-            Paused
-          </Badge>
-        )}
+        {formatUnits(row.remainingBudget, row.sellToken?.decimals)}{" "}
+        {row.sellToken?.symbol}
       </td>
-
       <td>
         {formatUnits(row.tradeAmount, row.sellToken?.decimals)}{" "}
         {row.sellToken?.symbol}
       </td>
-      <td>{row.startDate.toLocaleString()}</td>
+      <td>
+        <Stack spacing="xs">
+          <Text>{row.startDate.toLocaleString()}</Text>
+          <Text>to</Text>
+          <Text>{row.endDate.toLocaleString()}</Text>
+        </Stack>
+      </td>
 
       <td>
         {row.lastRun.toLocaleString() === "12/31/1969, 7:00:00 PM" && "Never"}
@@ -158,7 +142,6 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
           row.lastRun.toLocaleString()}
       </td>
       <td>{row.nextRun.toLocaleString()}</td>
-      <td>{row.endDate.toLocaleString()}</td>
       <td>
         {!row.boughtAmount.eq(0) &&
           !row.soldAmount.eq(0) &&
@@ -167,66 +150,82 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       </td>
 
       <td>
-        <Group spacing="xs" position="center">
-          {row.isActive === true && (
+        <Stack align="center" spacing="xs">
+          {row.isActive === true && row.remainingBudget !== "0" && (
             <Button
               color="orange"
               radius="xl"
               size="md"
               compact
-              onMouseOver={() => {
-                setScheduleId(row.scheduleID);
-                setEnablePause(true);
-              }}
               onClick={() => {
-                pauseScheduleActions.pause?.();
+                row.pauseSchedule?.();
               }}
             >
               Pause
             </Button>
           )}
-          {row.isActive === false && (
+          {row.remainingBudget === "0" && (
+            <Button color="teal" radius="xl" size="md" compact>
+              Complete
+            </Button>
+          )}
+          {row.isActive === false && row.remainingBudget !== "0" && (
             <Button
-              color="teal"
+              color="orange"
               radius="xl"
               size="md"
               compact
-              onMouseOver={() => {
-                setScheduleId(row.scheduleID);
-                setEnableResume(true);
-                setSellToken(row.sellToken);
-                setBuyToken(row.buyToken);
-                setSellAmount(row.tradeAmount.toString());
-                setTradeFreq(row.tradeFreq);
-                setStartDate(row.nextRun);
-                setEndDate(row.endDate);
-                setNumExec(row.numExecLeft);
-                setFreeBal(row?.freeBalance ? row.freeBalance : "0");
-              }}
               onClick={() => {
-                resumeScheduleActions.resume?.();
+                row.resumeSchedule?.resume?.();
               }}
+              disabled={!row.resumeSchedule?.resumeStatus}
             >
               Resume
             </Button>
           )}
+
+          {row.isActive === false &&
+            row.remainingBudget !== "0" &&
+            row.tokenRefillActions.needAmount !== "0.0" && (
+              <Button
+                radius="xl"
+                size="md"
+                compact
+                onClick={() => {
+                  row.tokenRefillActions.refill?.();
+                }}
+              >
+                Topup Deposit
+              </Button>
+            )}
+
+          {row.isActive === false &&
+            row.remainingBudget !== "0" &&
+            row.gasRefillActions.needAmount !== "0.0" && (
+              <Button
+                radius="xl"
+                size="md"
+                compact
+                onClick={() => {
+                  row.gasRefillActions.refill?.();
+                }}
+              >
+                Topup Gas
+              </Button>
+            )}
 
           <Button
             color="red"
             radius="xl"
             size="md"
             compact
-            onMouseOver={() => {
-              setScheduleId(row.scheduleID);
-              setEnableDelete(true);
-            }}
             onClick={() => {
-              deleteScheduleActions.delete?.();
+              row.deleteSchedule?.();
             }}
           >
             Delete
           </Button>
-        </Group>
+        </Stack>
       </td>
     </tr>
   ));
@@ -240,12 +239,11 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
           <tr>
             <th>Trading Pair</th>
-            <th>Status</th>
+            <th>Budget</th>
             <th>DCA Amount</th>
-            <th>Start Date</th>
+            <th>Duration</th>
             <th>Last Run</th>
             <th>Next Run</th>
-            <th>End Date</th>
             <th>Average Buy In</th>
             <th>Actions</th>
           </tr>
@@ -256,59 +254,101 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   );
 }
 
-export function UserSchedulesPopulated({ mappedUserFunds }: UserFundsProps) {
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
-
-  const {
-    data: userSchedules,
-    isError,
-    isLoading,
-  } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "getUserSchedules",
-    cacheOnBlock: true,
-    watch: true,
-    onSuccess(data) {
-      console.log("Get All User Schedules Success", data);
-    },
-    onError(error) {
-      console.log("Get All User Schedules Error", error);
-    },
-  });
-
+export function UserSchedulesPopulated({
+  mappedUserFunds,
+  userSchedules,
+}: UserFundsProps) {
   let formattedUserSchedulesData: IUserScheduleInfo["data"] = [];
 
   if (userSchedules && mappedUserFunds) {
-    for (const key of Object.keys(userSchedules)) {
-      let addSchedule = {
-        scheduleID: Number(key),
-        isActive: userSchedules[key].isActive,
-        tradeAmount: userSchedules[key].tradeAmount,
-        startDate: new Date(userSchedules[key].scheduleDates[0] * 1000),
-        lastRun: new Date(userSchedules[key].scheduleDates[1] * 1000),
-        nextRun: new Date(userSchedules[key].scheduleDates[2] * 1000),
-        endDate: new Date(userSchedules[key].scheduleDates[3] * 1000),
+    Object.keys(userSchedules).map((key) => {
+      if (userSchedules[key].scheduleDates) {
+        let addSchedule = {
+          scheduleID: Number(key),
+          isActive: userSchedules[key].isActive,
+          tradeAmount: userSchedules[key].tradeAmount,
+          startDate: new Date(userSchedules[key].scheduleDates[0] * 1000),
+          lastRun: new Date(userSchedules[key].scheduleDates[1] * 1000),
 
-        boughtAmount: userSchedules[key].boughtAmount,
-        soldAmount: userSchedules[key].soldAmount,
-        buyToken: mappedUserFunds[userSchedules[key].buyToken],
-        sellToken: mappedUserFunds[userSchedules[key].sellToken],
-        remainingBudget: userSchedules[key].remainingBudget.toString(),
-        totalGas: userSchedules[key].totalGas,
-        tradeFreq: userSchedules[key].tradeFrequency.toString() / 86400,
-        numExecLeft: Math.floor(
-          (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
-            new Date(userSchedules[key].scheduleDates[2] * 1000).valueOf()) /
-            userSchedules[key].tradeFrequency.toString() /
-            1000
-        ),
-        freeBalance: mappedUserFunds[userSchedules[key].sellToken].freeBalance,
-        totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
-      };
-      formattedUserSchedulesData.push(addSchedule);
-    }
+          nextRun: new Date(userSchedules[key].scheduleDates[2] * 1000),
+          nextRunRaw: userSchedules[key].scheduleDates[2],
+
+          endDate: new Date(userSchedules[key].scheduleDates[3] * 1000),
+          endDateRaw: userSchedules[key].scheduleDates[3],
+
+          boughtAmount: userSchedules[key].boughtAmount,
+          soldAmount: userSchedules[key].soldAmount,
+          buyToken: mappedUserFunds[userSchedules[key].buyToken],
+          sellToken: mappedUserFunds[userSchedules[key].sellToken],
+          remainingBudget: userSchedules[key].remainingBudget.toString(),
+          totalGas: userSchedules[key].totalGas,
+
+          tradeFreq: userSchedules[key].tradeFrequency.toString(),
+          tradeFreqRaw: userSchedules[key].tradeFrequency,
+
+          numExecLeft: Math.floor(
+            (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
+              new Date(userSchedules[key].scheduleDates[2] * 1000).valueOf()) /
+              userSchedules[key].tradeFrequency.toString() /
+              1000
+          ),
+          freeBalance:
+            mappedUserFunds[userSchedules[key].sellToken].freeBalance,
+          totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
+
+          tokenRefillActions: RefillTokenDepositFlow(
+            !userSchedules[key].isActive,
+            userSchedules[key].tradeAmount,
+            userSchedules[key].tradeFrequency,
+            userSchedules[key].scheduleDates[2],
+            userSchedules[key].scheduleDates[3],
+            mappedUserFunds[userSchedules[key].sellToken]
+          ),
+
+          gasRefillActions: RefillGasDepositFlow(
+            !userSchedules[key].isActive,
+            userSchedules[key].tradeAmount,
+            userSchedules[key].tradeFrequency,
+            userSchedules[key].scheduleDates[2],
+            userSchedules[key].scheduleDates[3],
+            mappedUserFunds[userSchedules[key].sellToken],
+            mappedUserFunds[userSchedules[key].buyToken],
+            Math.floor(
+              (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
+                new Date(
+                  userSchedules[key].scheduleDates[2] * 1000
+                ).valueOf()) /
+                userSchedules[key].tradeFrequency.toString() /
+                1000
+            )
+          ),
+          //actions
+          pauseSchedule: PauseScheduleFlow(
+            Number(key),
+            userSchedules[key].isActive
+          )?.pause,
+          deleteSchedule: DeleteScheduleFlow(Number(key), true)?.delete,
+          resumeSchedule: ResumeScheduleFlow(
+            Number(key),
+            !userSchedules[key].isActive,
+            userSchedules[key].tradeAmount,
+            userSchedules[key].tradeFrequency,
+            mappedUserFunds[userSchedules[key].sellToken],
+            mappedUserFunds[userSchedules[key].buyToken],
+            Math.floor(
+              (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
+                new Date(
+                  userSchedules[key].scheduleDates[2] * 1000
+                ).valueOf()) /
+                userSchedules[key].tradeFrequency.toString() /
+                1000
+            )
+          ),
+        };
+
+        formattedUserSchedulesData.push(addSchedule);
+      }
+    });
   }
 
   return <ScheduleTable data={formattedUserSchedulesData} />;

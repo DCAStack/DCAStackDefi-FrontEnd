@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 
 import {
   Container,
@@ -12,30 +12,14 @@ import {
 import ManageScheduleFunds from "../Banking/ManageScheduleFunds";
 
 import { Tabs } from "@mantine/core";
-import {
-  BuildingBank,
-  Clock,
-  Cash,
-  History,
-  AlertCircle,
-} from "tabler-icons-react";
+import { BuildingBank, Clock, AlertCircle } from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractReads,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
+import { useAccount, useContractReads, useNetwork } from "wagmi";
 import { formatUnits } from "ethers/lib/utils";
 
-import { UserHistoryPopulated } from "../Dashboard/HistoryTable";
 import { UserBalancesPopulated } from "../Dashboard/BalanceTable";
 import { UserSchedulesPopulated } from "../Dashboard/ScheduleTable";
-import { UserTradesPopulated } from "../Dashboard/TradeTable";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
 import { IToken } from "../../models/Interfaces";
@@ -97,6 +81,8 @@ const Dashboard = () => {
   let mappedTokenBalances: Record<string, IToken> = {};
   let userTokenBalances = userTokenInfo ? userTokenInfo[0] : [[], [], []];
   let userTokenPurchasing = userTokenInfo ? userTokenInfo[1] : [[]];
+  let userSchedules = userTokenInfo ? userTokenInfo[1] : [[]];
+
   let joinNeededTokens: any = [[], [], []];
 
   if (userTokenPurchasing) {
@@ -123,26 +109,28 @@ const Dashboard = () => {
       if (tokenAddr) {
         let tokenDetails = masterTokenList?.tokens[tokenAddr?.toLowerCase()];
 
-        let addDetails = {
-          logoURI: tokenDetails.logoURI,
-          symbol: tokenDetails.symbol,
-          address: tokenAddr,
-          name: tokenDetails.name,
-          decimals: tokenDetails.decimals,
-          balance: formatUnits(
-            joinNeededTokens[1][index],
-            tokenDetails.decimals
-          ),
-          freeBalance: formatUnits(
-            joinNeededTokens[2][index],
-            tokenDetails.decimals
-          ),
-        };
-        if (!parsedTokenBalances.includes(addDetails)) {
-          if (addDetails.balance !== "0.0") {
-            parsedTokenBalances.push(addDetails);
+        if (tokenDetails) {
+          let addDetails = {
+            logoURI: tokenDetails.logoURI,
+            symbol: tokenDetails.symbol,
+            address: tokenAddr,
+            name: tokenDetails.name,
+            decimals: tokenDetails.decimals,
+            balance: formatUnits(
+              joinNeededTokens[1][index],
+              tokenDetails.decimals
+            ),
+            freeBalance: formatUnits(
+              joinNeededTokens[2][index],
+              tokenDetails.decimals
+            ),
+          };
+          if (!parsedTokenBalances.includes(addDetails)) {
+            if (addDetails.balance !== "0.0") {
+              parsedTokenBalances.push(addDetails);
+            }
+            mappedTokenBalances[`${tokenAddr}`] = addDetails;
           }
-          mappedTokenBalances[`${tokenAddr}`] = addDetails;
         }
       }
     });
@@ -184,7 +172,10 @@ const Dashboard = () => {
         </Tabs.Tab>
 
         <Tabs.Tab label="Schedules" icon={<Clock size={30} />}>
-          <UserSchedulesPopulated mappedUserFunds={mappedTokenBalances} />
+          <UserSchedulesPopulated
+            mappedUserFunds={mappedTokenBalances}
+            userSchedules={userSchedules}
+          />
         </Tabs.Tab>
         {/* 
         <Tabs.Tab label="Trades" icon={<Cash size={30} />}> 
