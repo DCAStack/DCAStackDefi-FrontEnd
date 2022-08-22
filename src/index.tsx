@@ -21,13 +21,13 @@ import App from "./App";
 
 const localChain: Chain = {
   id: 31337,
-  name: "Local ETH",
+  name: "Local",
   network: "local",
   iconUrl: "https://www.svgrepo.com/show/13701/home.svg",
   iconBackground: "#fff",
   nativeCurrency: {
     decimals: 18,
-    name: "Local ETH",
+    name: "Local",
     symbol: "ETH",
   },
   rpcUrls: {
