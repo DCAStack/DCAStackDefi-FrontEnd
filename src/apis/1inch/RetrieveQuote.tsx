@@ -16,7 +16,8 @@ export default function use1inchRetrieveQuote(
   tradeFreq: number,
   startDate: Date | null,
   endDate: Date | null,
-  numExec: number
+  numExec: number,
+  alreadyFormatted?: boolean
 ) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -25,13 +26,18 @@ export default function use1inchRetrieveQuote(
     currentChain = 1;
   }
 
-  const tradeAmountFormatted =
-    sellCrypto?.decimals !== 0
-      ? parseUnits(
-          tradeAmount !== "" ? tradeAmount : "0",
-          sellCrypto?.decimals
-        ).toString()
-      : "0";
+  let tradeAmountFormatted = "0";
+  if (alreadyFormatted) {
+    tradeAmountFormatted = tradeAmount;
+  } else {
+    tradeAmountFormatted =
+      sellCrypto?.decimals !== 0
+        ? parseUnits(
+            tradeAmount !== "" ? tradeAmount : "0",
+            sellCrypto?.decimals
+          ).toString()
+        : "0";
+  }
 
   const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${tradeAmountFormatted}`;
 
