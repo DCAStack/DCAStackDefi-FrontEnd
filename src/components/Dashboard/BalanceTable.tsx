@@ -128,14 +128,20 @@ export function UserBalancesPopulated({
     Object.keys(parsedTokenBalances).map((key) => {
       if (parsedTokenBalances[Number(key)].address) {
         let addDetails = {
-          withdrawMax: WithdrawFundsFlow(
-            parsedTokenBalances[Number(key)],
-            parsedTokenBalances[Number(key)].balance
-          ),
-          withdrawFree: WithdrawFundsFlow(
-            parsedTokenBalances[Number(key)],
-            parsedTokenBalances[Number(key)].freeBalance
-          ),
+          withdrawMax:
+            Number(parsedTokenBalances[Number(key)].balance) > 0
+              ? WithdrawFundsFlow(
+                  parsedTokenBalances[Number(key)],
+                  parsedTokenBalances[Number(key)].balance
+                )
+              : null,
+          withdrawFree:
+            Number(parsedTokenBalances[Number(key)].freeBalance) > 0
+              ? WithdrawFundsFlow(
+                  parsedTokenBalances[Number(key)],
+                  parsedTokenBalances[Number(key)].freeBalance
+                )
+              : null,
         };
 
         formattedUserData.push({
