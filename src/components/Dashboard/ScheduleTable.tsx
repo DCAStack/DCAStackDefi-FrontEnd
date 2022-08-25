@@ -182,10 +182,16 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
         })}
       </td>
       <td>
-        {!row.boughtAmount.eq(0) &&
-          !row.soldAmount.eq(0) &&
-          row.boughtAmount.div(row.soldAmount).toString()}
-        {row.boughtAmount.eq(0) && row.soldAmount.eq(0) && 0}
+        {!row.boughtAmount.eq(0) && !row.soldAmount.eq(0) && (
+          <Text>
+            {row.boughtAmount.div(row.soldAmount).toString()}{" "}
+            {row.buyToken?.symbol}
+          </Text>
+        )}
+
+        {row.boughtAmount.eq(0) && row.soldAmount.eq(0) && (
+          <Text>0 {row.buyToken?.symbol}</Text>
+        )}
       </td>
 
       <td>
@@ -385,6 +391,7 @@ export function UserSchedulesPopulated({
           ),
         };
 
+        console.log("total gas used is", addSchedule.totalGas.toString());
         formattedUserSchedulesData.push(addSchedule);
       }
     });

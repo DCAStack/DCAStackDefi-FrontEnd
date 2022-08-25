@@ -108,14 +108,6 @@ const footerLinks = {
       link: "/trade",
       label: "Trade",
     },
-    {
-      link: "#",
-      label: "Privacy",
-    },
-    {
-      link: "#",
-      label: "TOS",
-    },
   ],
 };
 

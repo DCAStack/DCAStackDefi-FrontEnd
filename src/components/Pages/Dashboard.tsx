@@ -126,7 +126,10 @@ const Dashboard = () => {
             ),
           };
           if (!parsedTokenBalances.includes(addDetails)) {
-            if (addDetails.freeBalance !== "0.0") {
+            if (
+              addDetails.freeBalance !== "0.0" ||
+              addDetails.balance !== "0.0"
+            ) {
               parsedTokenBalances.push(addDetails);
             }
             mappedTokenBalances[`${tokenAddr}`] = addDetails;
