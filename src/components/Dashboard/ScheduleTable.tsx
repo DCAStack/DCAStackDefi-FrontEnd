@@ -13,7 +13,7 @@ import {
 import { Coin } from "tabler-icons-react";
 
 import { formatUnits } from "ethers/lib/utils";
-import { BigNumber } from "ethers";
+import { BigNumber, FixedNumber } from "ethers";
 import { UserFundsProps } from "../../models/PropTypes";
 import { IToken } from "../../models/Interfaces";
 
@@ -22,6 +22,7 @@ import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
 import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
 import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
 import RefillGasDepositFlow from "../Scheduling/RefillGasDepositFlow";
+import Big from "big.js";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -189,7 +190,11 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       <td>
         {!row.boughtAmount.eq(0) && !row.soldAmount.eq(0) && (
           <Text>
-            {row.boughtAmount.div(row.soldAmount).toString()}{" "}
+            {parseFloat(
+              Big(formatUnits(row.boughtAmount, row.buyToken.decimals))
+                .div(formatUnits(row.soldAmount, row.sellToken.decimals))
+                .toFixed(6)
+            )}{" "}
             {row.buyToken?.symbol}
           </Text>
         )}
