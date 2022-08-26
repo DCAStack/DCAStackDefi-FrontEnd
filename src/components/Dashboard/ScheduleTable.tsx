@@ -190,10 +190,11 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       <td>
         {!row.boughtAmount.eq(0) && !row.soldAmount.eq(0) && (
           <Text>
+            ~
             {parseFloat(
               Big(formatUnits(row.boughtAmount, row.buyToken.decimals))
                 .div(formatUnits(row.soldAmount, row.sellToken.decimals))
-                .toFixed(6)
+                .toFixed(2)
             )}{" "}
             {row.buyToken?.symbol}
           </Text>
