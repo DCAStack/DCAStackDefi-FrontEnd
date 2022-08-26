@@ -122,9 +122,14 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               Running
             </Badge>
           )}
-          {row.isActive === false && (
+          {row.isActive === false && row.remainingBudget !== "0" && (
             <Badge color="orange" size="md">
               Paused
+            </Badge>
+          )}
+          {row.isActive === false && row.remainingBudget === "0" && (
+            <Badge color="violet" size="md">
+              Complete
             </Badge>
           )}
         </Stack>
@@ -207,11 +212,6 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               }}
             >
               Pause
-            </Button>
-          )}
-          {row.remainingBudget === "0" && (
-            <Button color="teal" radius="xl" size="md" compact>
-              Complete
             </Button>
           )}
           {row.isActive === false && row.remainingBudget !== "0" && (
@@ -391,7 +391,6 @@ export function UserSchedulesPopulated({
           ),
         };
 
-        console.log("total gas used is", addSchedule.totalGas.toString());
         formattedUserSchedulesData.push(addSchedule);
       }
     });

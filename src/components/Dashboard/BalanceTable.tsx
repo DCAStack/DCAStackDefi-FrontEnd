@@ -62,8 +62,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
       <td>
         <TokenBadgeDisplay token={item} />
       </td>
-      <td>{item.balance}</td>
-      <td>{item.freeBalance}</td>
+      <td>{parseFloat(`${item.balance}`).toFixed(6)}</td>
+      <td>{parseFloat(`${item.freeBalance}`).toFixed(6)}</td>
 
       <td>
         <Group spacing="xs" position="center">

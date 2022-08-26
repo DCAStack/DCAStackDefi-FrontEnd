@@ -75,19 +75,10 @@ export default function ManageScheduleFunds({
     parsedTokenBalances ? parsedTokenBalances[0] : null
   );
 
-  let withdrawActions = WithdrawFundsFlow(
-    selectedToken,
-    amount
-  );
+  let withdrawActions = WithdrawFundsFlow(selectedToken, amount);
 
-  let depositEthActions = DepositEthFundsFlow(
-    selectedToken,
-    amount
-  );
-  let depositTokenActions = DepositFundsFlow(
-    selectedToken,
-    amount
-  );
+  let depositEthActions = DepositEthFundsFlow(selectedToken, amount);
+  let depositTokenActions = DepositFundsFlow(selectedToken, amount);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const re = /^\d*\.?\d*$/;
@@ -109,7 +100,7 @@ export default function ManageScheduleFunds({
         onClick={() => setSelectedToken(item)}
         key={item.address}
       >
-        {item.balance}&nbsp;
+        {parseFloat(`${item.balance}`).toFixed(6)}&nbsp;
         {item.symbol}
       </Menu.Item>
     ));
@@ -129,7 +120,8 @@ export default function ManageScheduleFunds({
               <Group spacing="xs">
                 <Image src={selectedToken?.logoURI} width={30} height={30} />
                 <span className={classes.label}>
-                  {selectedToken?.balance}&nbsp;{selectedToken?.symbol}
+                  {parseFloat(`${selectedToken?.balance}`).toFixed(6)}&nbsp;
+                  {selectedToken?.symbol}
                 </span>
               </Group>
               <ChevronDown size={16} className={classes.icon} />
