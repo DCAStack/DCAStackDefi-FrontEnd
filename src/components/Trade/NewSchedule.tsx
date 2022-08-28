@@ -327,7 +327,7 @@ export default function NewSchedule({
             <Text weight={700} color="green">
               {numExec} times
             </Text>
-            <Text size="xs">(x 2 for a buffer)</Text>
+            <Text size="xs">(+ some buffer)</Text>
           </Group>
 
           {!freeGasBal.eq(0) && //run if additional deposit needed

@@ -15,7 +15,7 @@ import { Tabs } from "@mantine/core";
 import { BuildingBank, Clock, AlertCircle } from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
-import { useAccount, useContractReads, useNetwork } from "wagmi";
+import { useAccount, useBalance, useContractReads, useNetwork } from "wagmi";
 import { formatUnits } from "ethers/lib/utils";
 
 import { UserBalancesPopulated } from "../Dashboard/BalanceTable";
@@ -69,6 +69,7 @@ const Dashboard = () => {
     ],
     cacheOnBlock: true,
     watch: true,
+    enabled: address !== undefined,
     onSuccess(data) {
       console.log("Get All User Token Info Success", data);
     },

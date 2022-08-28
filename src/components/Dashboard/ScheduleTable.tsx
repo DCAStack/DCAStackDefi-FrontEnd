@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { Coin } from "tabler-icons-react";
 
-import { formatUnits } from "ethers/lib/utils";
+import { formatEther, formatUnits, parseEther } from "ethers/lib/utils";
 import { BigNumber, FixedNumber } from "ethers";
 import { UserFundsProps } from "../../models/PropTypes";
 import { IToken } from "../../models/Interfaces";
@@ -23,6 +23,7 @@ import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
 import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
 import RefillGasDepositFlow from "../Scheduling/RefillGasDepositFlow";
 import Big from "big.js";
+import { useNetwork } from "wagmi";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -66,6 +67,7 @@ interface IUserScheduleInfo {
     buyToken: IToken;
     sellToken: IToken;
     tradeFreq: string;
+    totalGas: string;
     numExecLeft: number;
     remainingBudget: string;
     gasRefillActions: any;
@@ -79,6 +81,11 @@ interface IUserScheduleInfo {
 function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const { chain, chains } = useNetwork();
+
+  const networkCurrency: string = chain?.nativeCurrency
+    ? chain.nativeCurrency.symbol
+    : "?";
 
   const dateOptions = {
     year: "2-digit",
@@ -150,8 +157,6 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               year: "2-digit",
               month: "2-digit",
               day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
             })}
           </Text>
           <Text>to</Text>
@@ -160,9 +165,16 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               year: "2-digit",
               month: "2-digit",
               day: "numeric",
+              // hour: "numeric",
+              // minute: "numeric",
+            })}
+          </Text>
+          <Text>at</Text>
+          <Text>
+            {row.endDate.toLocaleTimeString(undefined, {
               hour: "numeric",
               minute: "numeric",
-            })}
+            })}{" "}
           </Text>
         </Stack>
       </td>
@@ -192,9 +204,9 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
           <Text>
             ~
             {parseFloat(
-              Big(formatUnits(row.boughtAmount, row.buyToken.decimals))
-                .div(formatUnits(row.soldAmount, row.sellToken.decimals))
-                .toFixed(2)
+              Big(row.boughtAmount.toString())
+                .div(Big(row.soldAmount.toString()))
+                .toFixed(6)
             )}{" "}
             {row.buyToken?.symbol}
           </Text>
@@ -203,6 +215,12 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
         {row.boughtAmount.eq(0) && row.soldAmount.eq(0) && (
           <Text>0 {row.buyToken?.symbol}</Text>
         )}
+      </td>
+
+      <td>
+        ~
+        {parseFloat(formatEther(row.totalGas.toString()).toString()).toFixed(6)}{" "}
+        {networkCurrency}{" "}
       </td>
 
       <td>
@@ -296,6 +314,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             <th>Last Run</th>
             <th>Next Run</th>
             <th>Avg Buy</th>
+            <th>Gas Spent</th>
             <th>Actions</th>
           </tr>
         </thead>
