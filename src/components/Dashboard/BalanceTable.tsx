@@ -4,13 +4,10 @@ import { createStyles } from "@mantine/core";
 
 import { useState } from "react";
 
-import { BigNumber } from "ethers";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
 import { UserFundsProps } from "../../models/PropTypes";
 import WithdrawFundsFlow from "../Banking/WithdrawFundsFlow";
-import { nullToken } from "../../data/gasTokens";
-import { showNotification, updateNotification } from "@mantine/notifications";
 
 const useStyles = createStyles((theme) => ({
   header: {
