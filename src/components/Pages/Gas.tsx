@@ -46,6 +46,7 @@ const Gas = () => {
     args: address,
     cacheOnBlock: true,
     watch: true,
+    enabled: address !== undefined,
     onSuccess(data) {
       console.log("Get User Gas Success", data);
       data
