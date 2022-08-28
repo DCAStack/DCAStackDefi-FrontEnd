@@ -1,12 +1,18 @@
 import useSWR from "swr";
-import React from "react";
-import { parseEther, formatUnits, parseUnits } from "ethers/lib/utils";
+import React, { useState } from "react";
+import {
+  parseEther,
+  formatUnits,
+  parseUnits,
+  formatEther,
+} from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
 import { BigNumber } from "ethers";
 import Big from "big.js";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
+import { useFeeData } from "wagmi";
 
 export default function use1inchRetrieveQuote(
   currentChain: number,
@@ -20,6 +26,23 @@ export default function use1inchRetrieveQuote(
   alreadyFormatted?: boolean
 ) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const [feeData, setFeeData] = useState(BigNumber.from(0));
+
+  const {
+    data: getFeeData,
+    isError,
+    isLoading,
+  } = useFeeData({
+    watch: true,
+    onSuccess(data) {
+      console.log("Retrieved fee data:", data);
+      setFeeData(data.maxFeePerGas ? data.maxFeePerGas : BigNumber.from(0));
+    },
+    onError(error) {
+      console.log("Could not retrieve fee data:", error);
+      setFeeData(BigNumber.from(0));
+    },
+  });
 
   if (currentChain === 31337) {
     //help with local testing
@@ -56,18 +79,16 @@ export default function use1inchRetrieveQuote(
   );
 
   if (data) {
-    console.log("1inch fetch quote success", data);
+    console.log("1inch fetch quote success", data, feeData.toString());
     if (data?.estimatedGas) {
-      data.estimatedGasFormatted = formatUnits(
-        data.estimatedGas.toString(),
-        "gwei"
+      data.estimatedGasSingleTradeWei = BigNumber.from(data.estimatedGas).mul(
+        feeData
       );
-      let calcGas = data.estimatedGas * numExec * 2; //big number
-      data.estimatedGasDcaGwei = BigNumber.from(calcGas);
-      data.estimatedGasDcaFormatted = formatUnits(
-        data.estimatedGasDcaGwei.toString(),
-        "gwei"
-      );
+      data.estimatedGasFormatted = formatEther(data.estimatedGasSingleTradeWei);
+
+      let calcGas = data.estimatedGasSingleTradeWei.mul(numExec).mul(2);
+
+      data.estimatedGasDcaFormatted = formatEther(calcGas.toString());
       data.estimatedGasDca = BigNumber.from(
         parseEther(data.estimatedGasDcaFormatted)
       );
