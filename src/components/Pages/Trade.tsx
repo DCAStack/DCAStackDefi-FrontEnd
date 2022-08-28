@@ -1,25 +1,7 @@
-import React from "react";
-
-import {
-  Container,
-  Title,
-  Paper,
-  Space,
-  createStyles,
-  Text,
-  Group,
-} from "@mantine/core";
-
-import { useNetwork } from "wagmi";
+import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
 
 import { Alert } from "@mantine/core";
 import { AlertCircle } from "tabler-icons-react";
-
-import { useContractRead } from "wagmi";
-import { useAccount } from "wagmi";
-import { formatEther } from "ethers/lib/utils";
-
-import { ContractInfoProps } from "./../../models/PropTypes";
 
 import TradeDCA from "../Trade/TradeDCA";
 
