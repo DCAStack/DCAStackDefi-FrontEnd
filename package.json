@@ -20,7 +20,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "e2e": "env-cmd -f .env npx synpress run -cf synpress.json --config supportFile='tests/support/index.js'"
   },
   "eslintConfig": {
     "extends": [
@@ -48,9 +49,13 @@
     "@mantine/modals": "^4.2.12",
     "@mantine/notifications": "^4.2.12",
     "@rainbow-me/rainbowkit": "^0.4.5",
+    "@synthetixio/synpress": "^1.2.0",
+    "@testing-library/cypress": "^8.0.3",
     "@types/big.js": "^6.1.5",
     "big.js": "^6.2.1",
+    "cypress": "^10.6.0",
     "dayjs": "^1.11.4",
+    "env-cmd": "^10.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "ethers": "^5.6.9",
     "react-router-dom": "^6.3.0",

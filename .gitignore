@@ -26,3 +26,6 @@ yarn-error.log*
 
 #hardhat
 artifacts
+
+#synpress
+videos
