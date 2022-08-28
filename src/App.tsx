@@ -12,10 +12,10 @@ import Gas from "./components/Pages/Gas";
 
 import { IContract } from "./models/Interfaces";
 import { Interface } from "ethers/lib/utils";
-import DCAStack from "./artifacts/contracts/DCAStack.sol/DCAStack.json";
+import DCAStack from "./deployments/localhost/DCAStack.json";
 
 const dcastackABI = DCAStack.abi;
-const dcastackAddr = "0x367761085BF3C12e5DA2Df99AC6E1a824612b8fb";
+const dcastackAddr = DCAStack.address;
 
 const DCAStackContract = {
   address: dcastackAddr,
