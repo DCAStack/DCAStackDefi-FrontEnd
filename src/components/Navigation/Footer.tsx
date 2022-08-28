@@ -45,15 +45,9 @@ interface FooterCenteredProps {
 function FooterCentered({ links }: FooterCenteredProps) {
   const { classes } = useStyles();
   const items = links.map((link) => (
-    <a
-      key={link.label}
-      href={link.link}
-      onClick={(event) => event.preventDefault()}
-    >
-      <Anchor component={Link} to={`${link.link}`}>
-        {link.label}
-      </Anchor>
-    </a>
+    <Anchor inherit component={Link} key={link.label} to={`${link.link}`}>
+      {link.label}
+    </Anchor>
   ));
 
   return (

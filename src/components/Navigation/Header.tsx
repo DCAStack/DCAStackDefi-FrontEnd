@@ -164,22 +164,23 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
     }
 
     return (
-      <a
-        key={link.label}
-        href={link.link}
-        className={cx(classes.link, {
-          [classes.linkActive]: active === link.link,
-        })}
-        onClick={(event) => {
-          event.preventDefault();
+      <Anchor
+        inherit
+        component={Link}
+        onClick={(event: any) => {
+          // console.log("this", event, event.preventDefault());
+          // event.preventDefault();
           setActive(link.link);
           toggleOpened(false);
         }}
+        key={link.label}
+        to={`${link.link}`}
+        className={cx(classes.link, {
+          [classes.linkActive]: active === link.link,
+        })}
       >
-        <Anchor component={Link} to={`${link.link}`} inherit>
-          {link.label}
-        </Anchor>
-      </a>
+        {link.label}
+      </Anchor>
     );
   });
 
