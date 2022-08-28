@@ -28,11 +28,7 @@ export default function use1inchRetrieveQuote(
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const [feeData, setFeeData] = useState(BigNumber.from(0));
 
-  const {
-    data: getFeeData,
-    isError,
-    isLoading,
-  } = useFeeData({
+  useFeeData({
     watch: true,
     onSuccess(data) {
       console.log("Retrieved fee data:", data);
