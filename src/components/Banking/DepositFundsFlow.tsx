@@ -42,6 +42,30 @@ export default function DepositFundsFlow(
   const [enableApprovePrep, setApprovePrep] = useState(false);
   const [enableDepositPrep, setDepositPrep] = useState(false);
   const [depositAfterApprove, setDepositAfterApprove] = useState(false);
+  const [maxDeposit, setMaxDeposit] = useState(BigNumber.from(0));
+
+  const {
+    data: maxTokenDeposit,
+    isError: maxTokenDepositIsError,
+    isLoading: maxTokenDepositIsLoading,
+  } = useBalance({
+    addressOrName: address,
+    token: token?.address,
+    watch: true,
+    enabled:
+      token?.address.toLowerCase() !==
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        ? true
+        : false,
+    onSuccess(data) {
+      console.log("Get User Wallet Token Balance Success", data);
+      setMaxDeposit(data.value);
+    },
+    onError(error) {
+      console.log("Get User Wallet Token Balance Error", error);
+      setMaxDeposit(BigNumber.from(0));
+    },
+  });
 
   const {
     data: depositApproveSetup,
@@ -59,6 +83,7 @@ export default function DepositFundsFlow(
     args: [address, contractAddr],
     cacheOnBlock: true,
     watch: true,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get User Fund Allowance Success", data);
     },
@@ -75,13 +100,16 @@ export default function DepositFundsFlow(
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
-    enabled: enableDepositPrep,
+    enabled: enableDepositPrep && !maxDeposit.eq(0),
     args: [
       token?.address,
       token?.decimals !== 0
         ? parseUnits(defaultValue !== "" ? defaultValue : "0", token?.decimals)
         : BigNumber.from(0),
     ],
+    overrides: {
+      from: address,
+    },
     onError(error) {
       console.log("Deposit Prepare Funds Error", error);
     },
@@ -172,6 +200,9 @@ export default function DepositFundsFlow(
     functionName: "approve",
     enabled: enableApprovePrep,
     args: [contractAddr, ethers.constants.MaxUint256],
+    overrides: {
+      from: address,
+    },
     onError(error) {
       console.log("Deposit Prepare Approve Error", error);
     },
@@ -250,27 +281,6 @@ export default function DepositFundsFlow(
         setDepositPrep(false);
       },
     });
-
-  const {
-    data: maxTokenDeposit,
-    isError: maxTokenDepositIsError,
-    isLoading: maxTokenDepositIsLoading,
-  } = useBalance({
-    addressOrName: address,
-    token: token?.address,
-    watch: true,
-    enabled:
-      token?.address.toLowerCase() !==
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-        ? true
-        : false,
-    onSuccess(data) {
-      console.log("Get User Wallet Token Balance Success", data);
-    },
-    onError(error) {
-      console.log("Get User Wallet Token Balance Error", error);
-    },
-  });
 
   useEffect(() => {
     //flow 1: approve then deposit

@@ -70,6 +70,7 @@ const Dashboard = () => {
     cacheOnBlock: true,
     watch: true,
     enabled: address !== undefined,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get All User Token Info Success", data);
     },

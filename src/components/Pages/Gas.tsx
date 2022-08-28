@@ -47,6 +47,7 @@ const Gas = () => {
     cacheOnBlock: true,
     watch: true,
     enabled: address !== undefined,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get User Gas Success", data);
       data

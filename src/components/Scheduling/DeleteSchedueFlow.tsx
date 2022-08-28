@@ -31,6 +31,9 @@ export default function DeleteScheduleFlow(
     enabled: enableFunc,
     functionName: "deleteSchedule",
     args: [scheduleId],
+    overrides: {
+      from: address,
+    },
     onError(error) {
       console.log("Delete Schedule Prepared Error", error);
     },

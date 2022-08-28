@@ -152,6 +152,7 @@ export default function WithdrawGas() {
     cacheOnBlock: true,
     watch: true,
     enabled: address !== undefined,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get User Gas for max withdraw Success", data);
     },

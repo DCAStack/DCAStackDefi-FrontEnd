@@ -46,6 +46,7 @@ export default function GasOverview() {
     ],
     cacheOnBlock: true,
     watch: true,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get User Free Gas Success", data);
       let userGasBalance = data[0];

@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 
-import { useContractRead } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import { ContractContext } from "../../App";
 import { formatUnits } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
@@ -21,6 +21,7 @@ export default function RefillTokenDepositFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
+  const { address, isConnecting, isDisconnected } = useAccount();
 
   const [needToken, setNeedToken] = useState("0.0");
 
@@ -33,6 +34,7 @@ export default function RefillTokenDepositFlow(
     functionName: "calculateDeposit",
     args: [tradeAmount, tradeFrequency, startDate, endDate, sellToken.address],
     enabled: enableFunc,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get Token Needed Deposit Success", data.toString());
       setNeedToken(formatUnits(data, sellToken?.decimals));

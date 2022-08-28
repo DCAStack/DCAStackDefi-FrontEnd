@@ -8,6 +8,7 @@ import {
   useContractWrite,
   useWaitForTransaction,
   useNetwork,
+  useAccount,
 } from "wagmi";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -31,6 +32,7 @@ export default function ResumeScheduleFlow(
   const addRecentTransaction = useAddRecentTransaction();
   const { chain, chains } = useNetwork();
   const currentChain: number = chain ? chain?.id : 0;
+  const { address, isConnecting, isDisconnected } = useAccount();
 
   const [quote1inch, setQuote1inch] = useState({
     estimatedGasFormatted: "0",
@@ -71,6 +73,9 @@ export default function ResumeScheduleFlow(
     enabled: enableFunc && enableRead && !remainingBudget.eq(0),
     functionName: "resumeSchedule",
     args: [scheduleId, parseEther(quote1inch.estimatedGasFormatted)],
+    overrides: {
+      from: address,
+    },
     onError(error) {
       console.log("Resume Status Prepared Error", error);
       setEnableWrite(false);

@@ -133,6 +133,9 @@ export default function NewSchedule({
       unixEndDate,
       parseEther(quoteDetails.estimatedGasFormatted),
     ],
+    overrides: {
+      from: address,
+    },
     onError(error) {
       console.log("New Schedule Prepared Error", error);
     },

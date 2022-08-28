@@ -7,6 +7,7 @@ import {
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction,
+  useAccount,
 } from "wagmi";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
@@ -18,6 +19,7 @@ export default function PauseScheduleFlow(
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const addRecentTransaction = useAddRecentTransaction();
+  const { address, isConnecting, isDisconnected } = useAccount();
 
   const {
     config: modifyStatusConfig,
@@ -29,6 +31,9 @@ export default function PauseScheduleFlow(
     enabled: enableFunc,
     functionName: "pauseSchedule",
     args: [scheduleId],
+    overrides: {
+      from: address,
+    },
     onError(error) {
       console.log("Pause Status Prepared Error", error);
     },

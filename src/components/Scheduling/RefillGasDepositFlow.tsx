@@ -3,7 +3,7 @@ import { useEffect, useContext, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 
-import { useNetwork, useContractRead } from "wagmi";
+import { useNetwork, useContractRead, useAccount } from "wagmi";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 import { parseEther, formatEther } from "ethers/lib/utils";
@@ -27,6 +27,7 @@ export default function RefillGasDepositFlow(
   const addRecentTransaction = useAddRecentTransaction();
   const { chain, chains } = useNetwork();
   const currentChain: number = chain ? chain?.id : 0;
+  const { address, isConnecting, isDisconnected } = useAccount();
 
   const networkCurrency: string = chain?.nativeCurrency
     ? chain.nativeCurrency.symbol
@@ -74,6 +75,7 @@ export default function RefillGasDepositFlow(
       endDate,
     ],
     enabled: enableFunc && enableRead,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get Gas Needed Deposit Success", data.toString());
       setNeedGas(formatEther(data));
