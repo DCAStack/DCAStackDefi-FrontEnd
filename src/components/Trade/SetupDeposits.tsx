@@ -47,7 +47,8 @@ export default function SetupDeposits({
           <Title order={4}>Contract Gas Balance</Title>
           {!freeGasBal?.isZero() && (
             <Text size="lg" color="green">
-              Have: {formatEther(freeGasBal)} {networkCurrency}
+              Have: ~{parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
+              {networkCurrency}
             </Text>
           )}
           {freeGasBal?.isZero() && (
@@ -62,7 +63,10 @@ export default function SetupDeposits({
           )}
           {estimatedGas?.gt(freeGasBal) && (
             <Text size="lg" color="red">
-              Need: {formatEther(estimatedGas?.sub(freeGasBal).toString())}{" "}
+              Need: ~
+              {parseFloat(formatEther(estimatedGas?.sub(freeGasBal))).toFixed(
+                6
+              )}{" "}
               {networkCurrency}
             </Text>
           )}
@@ -84,7 +88,10 @@ export default function SetupDeposits({
           <Title order={4}>Contract Deposit Balance</Title>
           {!freeTokenBal?.isZero() && (
             <Text size="lg" color="green">
-              Have: {formatUnits(freeTokenBal, sellToken.decimals)}{" "}
+              Have: ~
+              {parseFloat(
+                formatUnits(freeTokenBal, sellToken.decimals)
+              ).toFixed(6)}{" "}
               {sellToken.symbol}
             </Text>
           )}
@@ -96,11 +103,13 @@ export default function SetupDeposits({
 
           {freeTokenBal?.lt(weiDepositAmount) && (
             <Text size="lg" color="red">
-              Need:{" "}
-              {formatUnits(
-                weiDepositAmount?.sub(freeTokenBal),
-                sellToken.decimals
-              )}{" "}
+              Need: ~
+              {parseFloat(
+                formatUnits(
+                  weiDepositAmount?.sub(freeTokenBal),
+                  sellToken.decimals
+                )
+              ).toFixed(6)}{" "}
               {sellToken.symbol}
             </Text>
           )}

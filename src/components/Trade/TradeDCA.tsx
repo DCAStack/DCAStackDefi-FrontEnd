@@ -153,6 +153,7 @@ function TradeDCA() {
     enabled: enableRead,
     cacheOnBlock: true,
     watch: true,
+    overrides: { from: address },
     onSuccess(data) {
       console.log("Get User Funds Success", data);
       let userGasBalance = data[0];
