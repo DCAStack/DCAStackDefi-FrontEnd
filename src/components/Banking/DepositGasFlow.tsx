@@ -1,30 +1,26 @@
 import { useContext } from "react";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { parseEther } from "ethers/lib/utils";
 import {
-  usePrepareContractWrite,
-  useContractWrite,
   useAccount,
   useBalance,
+  useContractWrite,
+  usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { parseEther } from "ethers/lib/utils";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
 export default function DepositGasFlow(defaultValue: string) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    config: depositGasSetup,
-    error: depositGasError,
-    isError: prepareDepositGasError,
-  } = usePrepareContractWrite({
+  const { config: depositGasSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled: defaultValue !== "" ? true : false,
@@ -41,12 +37,7 @@ export default function DepositGasFlow(defaultValue: string) {
     },
   });
 
-  const {
-    data,
-    error,
-    isError: depositError,
-    write: depositGas,
-  } = useContractWrite({
+  const { data, write: depositGas } = useContractWrite({
     ...depositGasSetup,
     onSuccess(data) {
       console.log("Deposit Gas Write Success", data);
@@ -76,7 +67,7 @@ export default function DepositGasFlow(defaultValue: string) {
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: data?.hash,
     onSuccess(data) {
       console.log("Deposit Gas Success", data);
@@ -110,11 +101,7 @@ export default function DepositGasFlow(defaultValue: string) {
     },
   });
 
-  const {
-    data: maxDeposit,
-    isError,
-    isLoading,
-  } = useBalance({
+  const { data: maxDeposit } = useBalance({
     addressOrName: address,
     watch: true,
     onSuccess(data) {

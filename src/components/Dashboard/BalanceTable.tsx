@@ -1,4 +1,4 @@
-import { Table, Group, ScrollArea, Button } from "@mantine/core";
+import { Button, Group, ScrollArea, Table } from "@mantine/core";
 
 import { createStyles } from "@mantine/core";
 
@@ -125,20 +125,14 @@ export function UserBalancesPopulated({
     Object.keys(parsedTokenBalances).map((key) => {
       if (parsedTokenBalances[Number(key)].address) {
         let addDetails = {
-          withdrawMax:
-            Number(parsedTokenBalances[Number(key)].balance) > 0
-              ? WithdrawFundsFlow(
-                  parsedTokenBalances[Number(key)],
-                  parsedTokenBalances[Number(key)].balance
-                )
-              : null,
-          withdrawFree:
-            Number(parsedTokenBalances[Number(key)].freeBalance) > 0
-              ? WithdrawFundsFlow(
-                  parsedTokenBalances[Number(key)],
-                  parsedTokenBalances[Number(key)].freeBalance
-                )
-              : null,
+          withdrawMax: WithdrawFundsFlow(
+            parsedTokenBalances[Number(key)],
+            parsedTokenBalances[Number(key)].balance
+          ),
+          withdrawFree: WithdrawFundsFlow(
+            parsedTokenBalances[Number(key)],
+            parsedTokenBalances[Number(key)].freeBalance
+          ),
         };
 
         formattedUserData.push({
@@ -146,6 +140,7 @@ export function UserBalancesPopulated({
           ...addDetails,
         });
       }
+      return true;
     });
   }
 

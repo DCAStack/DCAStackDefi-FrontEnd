@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@synthetixio/synpress": "^1.2.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
@@ -10,6 +11,7 @@
     "@types/node": "^16.11.43",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "env-cmd": "^10.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -21,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "e2e": "env-cmd -f .env npx synpress run -cf synpress.json --config supportFile='tests/support/index.js'"
+    "e2e": "env-cmd -f .env npx synpress run -b firefox -cf synpress.json --config supportFile='tests/support/index.js'"
   },
   "eslintConfig": {
     "extends": [
@@ -49,13 +51,11 @@
     "@mantine/modals": "^4.2.12",
     "@mantine/notifications": "^4.2.12",
     "@rainbow-me/rainbowkit": "^0.4.5",
-    "@synthetixio/synpress": "^1.2.0",
     "@testing-library/cypress": "^8.0.3",
     "@types/big.js": "^6.1.5",
     "big.js": "^6.2.1",
-    "cypress": "^10.6.0",
+    "cypress": "^8.7.0",
     "dayjs": "^1.11.4",
-    "env-cmd": "^10.1.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "ethers": "^5.6.9",
     "react-router-dom": "^6.3.0",

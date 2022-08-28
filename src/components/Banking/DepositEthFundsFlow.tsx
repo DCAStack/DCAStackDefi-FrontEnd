@@ -1,29 +1,21 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 
-import { createStyles } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import {
-  usePrepareContractWrite,
-  useContractWrite,
   useAccount,
   useBalance,
+  useContractWrite,
+  usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
 import { IToken } from "../../models/Interfaces";
 
-import { BigNumber } from "ethers";
 import { parseEther } from "ethers/lib/utils";
-
-const useStyles = createStyles((theme) => ({
-  input: {
-    height: 60,
-  },
-}));
 
 export default function DepositEthFundsFlow(
   token: IToken | null,
@@ -31,15 +23,10 @@ export default function DepositEthFundsFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { classes } = useStyles();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    config: prepareDepositEthSetup,
-    error: prepareDepositEthSetupError,
-    isError: prepareDepositEthSetupIsError,
-  } = usePrepareContractWrite({
+  const { config: prepareDepositEthSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
@@ -64,12 +51,7 @@ export default function DepositEthFundsFlow(
     },
   });
 
-  const {
-    data,
-    error,
-    isError: depositEthIsError,
-    write: depositEth,
-  } = useContractWrite({
+  const { data, write: depositEth } = useContractWrite({
     ...prepareDepositEthSetup,
     onSuccess(data) {
       console.log("Deposit ETH Write Success", data);
@@ -99,7 +81,7 @@ export default function DepositEthFundsFlow(
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: data?.hash,
     onSuccess(data) {
       console.log("Deposit ETH Success", data);
@@ -133,11 +115,7 @@ export default function DepositEthFundsFlow(
     },
   });
 
-  const {
-    data: maxEthDeposit,
-    isError,
-    isLoading,
-  } = useBalance({
+  const { data: maxEthDeposit } = useBalance({
     addressOrName: address,
     watch: true,
     onSuccess(data) {

@@ -1,15 +1,14 @@
-import React from "react";
 import {
-  createStyles,
-  Title,
-  Text,
   Button,
   Container,
+  createStyles,
+  Text,
+  Title,
   useMantineTheme,
 } from "@mantine/core";
-import { Dots } from "./Dots";
 import { Link } from "react-router-dom";
 import { BrandGithub, Speedboat } from "tabler-icons-react";
+import { Dots } from "./Dots";
 
 const useStyles = createStyles((theme) => ({
   // could improve this

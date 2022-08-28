@@ -1,21 +1,21 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { BigNumber } from "ethers";
+import { parseUnits } from "ethers/lib/utils";
 import {
-  usePrepareContractWrite,
-  useContractWrite,
   useAccount,
   useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
-import { BigNumber } from "ethers";
-import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
-import { parseUnits } from "ethers/lib/utils";
+import { IToken } from "../../models/Interfaces";
 
 export default function WithdrawFundsFlow(
   token: IToken | null,
@@ -23,14 +23,10 @@ export default function WithdrawFundsFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    config: withdrawFundsSetup,
-    error: prepareWithdrawFundsError,
-    isError: prepareWithdrawFundsIsError,
-  } = usePrepareContractWrite({
+  const { config: withdrawFundsSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled:
@@ -59,12 +55,7 @@ export default function WithdrawFundsFlow(
     },
   });
 
-  const {
-    data,
-    error,
-    isError: withdrawFundsError,
-    write: withdrawFunds,
-  } = useContractWrite({
+  const { data, write: withdrawFunds } = useContractWrite({
     ...withdrawFundsSetup,
     onSuccess(data) {
       console.log("Withdraw Funds Write Success", data);
@@ -94,7 +85,7 @@ export default function WithdrawFundsFlow(
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: data?.hash,
     onSuccess(data) {
       console.log("Withdraw Funds Success", data);
@@ -128,11 +119,7 @@ export default function WithdrawFundsFlow(
     },
   });
 
-  const {
-    data: maxWithdraw,
-    isError: maxWithdrawIsError,
-    isLoading: maxWithdrawIsLoading,
-  } = useContractRead({
+  const { data: maxWithdraw } = useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "userTokenBalances",

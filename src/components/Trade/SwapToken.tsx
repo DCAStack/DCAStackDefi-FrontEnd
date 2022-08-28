@@ -1,33 +1,23 @@
-import { createStyles } from "@mantine/core";
 import { ChangeEvent, useEffect, useState } from "react";
 
-import { useNetwork } from "wagmi";
 import {
   Button,
-  Modal,
-  Group,
-  TextInput,
-  Space,
   Divider,
+  Group,
+  Modal,
   ScrollArea,
+  Space,
   Text,
-  UnstyledButton,
+  TextInput,
 } from "@mantine/core";
+import { useNetwork } from "wagmi";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
-import gasTokens from "../../data/gasTokens";
-import swapTokens from "../../data/swapTokens";
 import { Selector } from "tabler-icons-react";
+import swapTokens from "../../data/swapTokens";
 
-import { IToken } from "../../models/Interfaces";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
-import { showNotification, updateNotification } from "@mantine/notifications";
-
-const useStyles = createStyles((theme) => ({
-  input: {
-    height: 60,
-  },
-}));
+import { IToken } from "../../models/Interfaces";
 
 interface ISwapInfo {
   text: string;
@@ -36,16 +26,11 @@ interface ISwapInfo {
 }
 
 export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
-  const { classes } = useStyles();
-  const { chain, chains } = useNetwork();
+  const { chain } = useNetwork();
   const [opened, setOpened] = useState(false);
   const currentChain: number = chain ? chain?.id : 0;
 
-  const {
-    tokens: masterTokenList,
-    isLoading: masterTokenListLoading,
-    isError: masterTokenListError,
-  } = use1inchRetrieveTokens(currentChain);
+  const { tokens: masterTokenList } = use1inchRetrieveTokens(currentChain);
 
   const [token, setToken] = useState(currToken);
   const tokensList: IToken[] = swapTokens[currentChain];
@@ -70,7 +55,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
       } else {
         setFilteredTokens(swapTokens[currentChain]);
       }
-    } 
+    }
   };
 
   return (

@@ -1,13 +1,6 @@
 import { TokenBadgeProps } from "../../models/PropTypes";
-import { createStyles, Text, Badge, Avatar, Stack } from "@mantine/core";
+import { Text, Badge, Avatar, Stack } from "@mantine/core";
 import { Coin } from "tabler-icons-react";
-
-const useStyles = createStyles((theme) => ({
-  imgDim: {
-    height: 30,
-    width: 30,
-  },
-}));
 
 export const TokenBadgeDisplay = ({
   token,

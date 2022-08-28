@@ -1,27 +1,26 @@
-import { useEffect, useState, useContext, ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import {
-  Group,
-  TextInput,
-  Container,
   Button,
+  Container,
   createStyles,
-  UnstyledButton,
-  Menu,
+  Group,
   Image,
+  Menu,
+  TextInput,
+  UnstyledButton,
 } from "@mantine/core";
 import { ChevronDown } from "tabler-icons-react";
 
 import { formatUnits } from "ethers/lib/utils";
-import { BigNumber } from "ethers";
 
 import { UserFundsProps } from "../../models/PropTypes";
 
-import WithdrawFundsFlow from "./WithdrawFundsFlow";
-import DepositEthFundsFlow from "./DepositEthFundsFlow";
-import DepositFundsFlow from "./DepositFundsFlow";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
+import DepositEthFundsFlow from "./DepositEthFundsFlow";
+import DepositFundsFlow from "./DepositFundsFlow";
+import WithdrawFundsFlow from "./WithdrawFundsFlow";
 
 const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
   control: {

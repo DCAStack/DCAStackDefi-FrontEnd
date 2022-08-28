@@ -1,29 +1,29 @@
 import { useContext } from "react";
 
 import {
+  Alert,
   Container,
-  Title,
+  createStyles,
   Paper,
   Space,
-  createStyles,
-  Alert,
+  Title,
 } from "@mantine/core";
 
 import ManageScheduleFunds from "../Banking/ManageScheduleFunds";
 
 import { Tabs } from "@mantine/core";
-import { BuildingBank, Clock, AlertCircle } from "tabler-icons-react";
+import { AlertCircle, BuildingBank, Clock } from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
-import { useAccount, useBalance, useContractReads, useNetwork } from "wagmi";
 import { formatUnits } from "ethers/lib/utils";
+import { useAccount, useContractReads, useNetwork } from "wagmi";
 
+import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 import { UserBalancesPopulated } from "../Dashboard/BalanceTable";
 import { UserSchedulesPopulated } from "../Dashboard/ScheduleTable";
-import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
-import { IToken, IUserFunds } from "../../models/Interfaces";
 import { BigNumber } from "ethers";
+import { IToken, IUserFunds } from "../../models/Interfaces";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -38,23 +38,15 @@ const Dashboard = () => {
   const { classes } = useStyles();
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
 
-  const { chain, chains } = useNetwork();
+  const { chain } = useNetwork();
 
   const currentChain: number = chain ? chain?.id : 0;
 
-  const {
-    tokens: masterTokenList,
-    isLoading: tokenFetchLoading,
-    isError: tokenFetchIsError,
-  } = use1inchRetrieveTokens(currentChain);
+  const { tokens: masterTokenList } = use1inchRetrieveTokens(currentChain);
 
-  const {
-    data: userTokenInfo,
-    isError,
-    isLoading,
-  } = useContractReads({
+  const { data: userTokenInfo } = useContractReads({
     contracts: [
       {
         addressOrName: contractAddr,

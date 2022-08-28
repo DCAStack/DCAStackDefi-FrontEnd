@@ -1,22 +1,20 @@
-import React from "react";
-import { useEffect, useState, useContext } from "react";
+import { useContext, useState } from "react";
 
-import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
+import { Container, createStyles, Paper, Space, Title } from "@mantine/core";
 
-import WithdrawGas from "../Banking/WithdrawGas";
 import DepositGas from "../Banking/DepositGas";
+import WithdrawGas from "../Banking/WithdrawGas";
 
 import { useNetwork } from "wagmi";
 
 import { Alert } from "@mantine/core";
 import { AlertCircle } from "tabler-icons-react";
 
-import { useContractRead } from "wagmi";
-import { useAccount } from "wagmi";
 import { formatEther } from "ethers/lib/utils";
+import { useAccount, useContractRead } from "wagmi";
 
-import { ContractContext } from "../../App";
 import { BigNumber } from "ethers";
+import { ContractContext } from "../../App";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -31,15 +29,11 @@ const Gas = () => {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const { classes } = useStyles();
-  const { chain, chains } = useNetwork();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { chain } = useNetwork();
+  const { address } = useAccount();
   const [curUserGasBal, setUserGasBal] = useState("0");
 
-  const {
-    data: userGasBalance,
-    isError,
-    isLoading,
-  } = useContractRead({
+  useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "userGasBalances",

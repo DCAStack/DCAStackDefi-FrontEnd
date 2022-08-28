@@ -2,28 +2,28 @@ import { useState } from "react";
 
 import {
   Avatar,
-  createStyles,
-  Table,
-  ScrollArea,
-  Button,
   Badge,
+  Button,
+  createStyles,
+  ScrollArea,
   Stack,
+  Table,
   Text,
 } from "@mantine/core";
 import { Coin } from "tabler-icons-react";
 
-import { formatEther, formatUnits, parseEther } from "ethers/lib/utils";
-import { BigNumber, FixedNumber } from "ethers";
-import { UserFundsProps } from "../../models/PropTypes";
+import { BigNumber } from "ethers";
+import { formatEther, formatUnits } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
+import { UserFundsProps } from "../../models/PropTypes";
 
-import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
-import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
-import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
-import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
-import RefillGasDepositFlow from "../Scheduling/RefillGasDepositFlow";
 import Big from "big.js";
 import { useNetwork } from "wagmi";
+import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
+import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
+import RefillGasDepositFlow from "../Scheduling/RefillGasDepositFlow";
+import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
+import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -81,20 +81,20 @@ interface IUserScheduleInfo {
 function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
-  const { chain, chains } = useNetwork();
+  const { chain } = useNetwork();
 
   const networkCurrency: string = chain?.nativeCurrency
     ? chain.nativeCurrency.symbol
     : "?";
 
-  const dateOptions = {
-    year: "2-digit",
-    month: "2-digit",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-  };
+  // const dateOptions = {
+  //   year: "2-digit",
+  //   month: "2-digit",
+  //   day: "numeric",
+  //   hour: "numeric",
+  //   minute: "numeric",
+  //   second: "numeric",
+  // };
 
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
@@ -419,6 +419,7 @@ export function UserSchedulesPopulated({
 
         formattedUserSchedulesData.push(addSchedule);
       }
+      return true;
     });
   }
 

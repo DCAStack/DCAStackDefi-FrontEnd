@@ -1,37 +1,34 @@
-import { useEffect, useState, useContext, ChangeEvent } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 
 import {
-  Group,
-  NumberInput,
-  Container,
-  Button,
-  createStyles,
-  Space,
-  NativeSelect,
-  Text,
-  Title,
-  Stack,
-  Stepper,
   ActionIcon,
+  Button,
+  Container,
+  createStyles,
+  Group,
+  NativeSelect,
+  NumberInput,
+  Space,
+  Stepper,
   TextInput,
 } from "@mantine/core";
 import { DateRangePicker, TimeInput } from "@mantine/dates";
 
-import SwapToken from "./SwapToken";
 import dayjs from "dayjs";
+import SwapToken from "./SwapToken";
 
-import { useAccount, useNetwork, useContractReads } from "wagmi";
 import { BigNumber } from "ethers";
+import { useAccount, useContractReads, useNetwork } from "wagmi";
 
-import { ContractContext } from "../../App";
 import { SwitchHorizontal } from "tabler-icons-react";
+import { ContractContext } from "../../App";
 
 import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
 
+import { parseEther, parseUnits } from "ethers/lib/utils";
 import { nullToken } from "../../data/gasTokens";
 import NewSchedule from "./NewSchedule";
 import SetupDeposits from "./SetupDeposits";
-import { formatUnits, parseEther, parseUnits } from "ethers/lib/utils";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -50,8 +47,8 @@ function TradeDCA() {
     setActive((current) => (current > 0 ? current - 1 : current));
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { chain, chains } = useNetwork();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { chain } = useNetwork();
+  const { address } = useAccount();
   const currentChain: number = chain ? chain?.id : 0;
 
   const { classes } = useStyles();
@@ -70,11 +67,7 @@ function TradeDCA() {
     estimatedGasFormatted: "0",
   });
 
-  const {
-    quote: quoteDetails,
-    isLoading: quoteLoading,
-    isError: quoteError,
-  } = use1inchRetrieveQuote(
+  const { quote: quoteDetails, isError: quoteError } = use1inchRetrieveQuote(
     currentChain,
     sellToken,
     buyToken,
@@ -135,7 +128,7 @@ function TradeDCA() {
   const [freeGasBal, setUserGasBal] = useState<BigNumber>(bnZero);
   const [freeTokenBal, setUserBal] = useState<BigNumber>(bnZero);
 
-  const { data, isError, isLoading } = useContractReads({
+  useContractReads({
     contracts: [
       {
         addressOrName: contractAddr,

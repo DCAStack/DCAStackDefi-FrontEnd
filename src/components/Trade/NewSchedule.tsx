@@ -1,25 +1,25 @@
-import { useEffect, useState, useContext } from "react";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { useContext, useEffect, useState } from "react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
-import { Group, Button, Space, Text, Title, Stack } from "@mantine/core";
+import { Button, Group, Space, Stack, Text, Title } from "@mantine/core";
 import { BigNumber } from "ethers";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useAccount,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import {
   formatEther,
-  parseUnits,
   formatUnits,
   parseEther,
+  parseUnits,
 } from "ethers/lib/utils";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import {
+  useAccount,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { ContractContext } from "../../App";
 
 import { nullToken } from "../../data/gasTokens";
@@ -56,8 +56,8 @@ export default function NewSchedule({
 }: IScheduleParams) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { chain, chains } = useNetwork();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { chain } = useNetwork();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   let startDateTime = null;
@@ -115,11 +115,7 @@ export default function NewSchedule({
     quoteDetails,
   ]);
 
-  const {
-    config: prepareNewScheduleSetup,
-    error: prepareNewScheduleError,
-    isError: prepareNewScheduleIsError,
-  } = usePrepareContractWrite({
+  const { config: prepareNewScheduleSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "createDcaSchedule",
@@ -144,12 +140,7 @@ export default function NewSchedule({
     },
   });
 
-  const {
-    data,
-    error,
-    isError: newScheduleError,
-    write: newSchedule,
-  } = useContractWrite({
+  const { data, write: newSchedule } = useContractWrite({
     ...prepareNewScheduleSetup,
     onSuccess(data) {
       console.log("New Schedule Write Success", data);
@@ -179,7 +170,7 @@ export default function NewSchedule({
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: data?.hash,
     onSuccess(data) {
       console.log("New Schedule Success", data);

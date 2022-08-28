@@ -1,20 +1,19 @@
-import React, { useState } from "react";
 import {
-  createStyles,
-  Header,
-  Container,
-  Group,
-  Burger,
-  Paper,
-  Transition,
-  Menu,
-  Center,
   Anchor,
-  Image,
+  Burger,
+  Center,
+  Container,
+  createStyles,
+  Group,
+  Header,
+  Menu,
+  Paper,
   Text,
+  Transition,
 } from "@mantine/core";
 import { useBooleanToggle } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "tabler-icons-react";
 

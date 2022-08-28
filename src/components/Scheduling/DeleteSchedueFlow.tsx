@@ -1,15 +1,15 @@
-import { useEffect, useContext } from "react";
+import { useContext } from "react";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import {
-  usePrepareContractWrite,
-  useContractWrite,
   useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
 export default function DeleteScheduleFlow(
@@ -18,14 +18,10 @@ export default function DeleteScheduleFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const {
-    config: deleteScheduleConfig,
-    error: preparedeleteScheduleError,
-    isError: preparedeleteScheduleIsError,
-  } = usePrepareContractWrite({
+  const { config: deleteScheduleConfig } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled: enableFunc,
@@ -42,12 +38,7 @@ export default function DeleteScheduleFlow(
     },
   });
 
-  const {
-    data: deleteScheduleData,
-    error: deleteScheduleError,
-    isError: deleteScheduleIsError,
-    write: deleteSchedule,
-  } = useContractWrite({
+  const { data: deleteScheduleData, write: deleteSchedule } = useContractWrite({
     ...deleteScheduleConfig,
     onSuccess(data) {
       console.log("Delete Schedule Write Success", data);
@@ -77,40 +68,39 @@ export default function DeleteScheduleFlow(
     },
   });
 
-  const { isLoading: deleteTxPending, isSuccess: deleteTxDone } =
-    useWaitForTransaction({
-      hash: deleteScheduleData?.hash,
-      onSuccess(data) {
-        console.log("Delete Schedule Success", data);
+  useWaitForTransaction({
+    hash: deleteScheduleData?.hash,
+    onSuccess(data) {
+      console.log("Delete Schedule Success", data);
 
-        addRecentTransaction({
-          hash: data.transactionHash,
-          description: "Delete Schedule",
-        });
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Delete Schedule",
+      });
 
-        updateNotification({
-          id: "delete-schedule-pending",
-          color: "teal",
-          title: "Delete Schedule Complete",
-          message: "Don't forget to withdraw your unused schedule balances.",
-          icon: <CircleCheck />,
-          autoClose: true,
-        });
-      },
-      onError(error) {
-        console.log("Withdraw Gas Error", error);
+      updateNotification({
+        id: "delete-schedule-pending",
+        color: "teal",
+        title: "Delete Schedule Complete",
+        message: "Don't forget to withdraw your unused schedule balances.",
+        icon: <CircleCheck />,
+        autoClose: true,
+      });
+    },
+    onError(error) {
+      console.log("Withdraw Gas Error", error);
 
-        updateNotification({
-          id: "delete-schedule-pending",
-          color: "red",
-          title: "Error Deleting Schedule",
-          message: error.message,
-          autoClose: true,
-          disallowClose: false,
-          icon: <AlertOctagon />,
-        });
-      },
-    });
+      updateNotification({
+        id: "delete-schedule-pending",
+        color: "red",
+        title: "Error Deleting Schedule",
+        message: error.message,
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+    },
+  });
 
   return {
     delete: deleteSchedule,

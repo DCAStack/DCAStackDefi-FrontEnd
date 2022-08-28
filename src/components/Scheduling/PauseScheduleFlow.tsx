@@ -1,15 +1,15 @@
-import { useEffect, useContext } from "react";
+import { useContext } from "react";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useWaitForTransaction,
-  useAccount,
-} from "wagmi";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import {
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { ContractContext } from "../../App";
 
 export default function PauseScheduleFlow(
@@ -19,13 +19,9 @@ export default function PauseScheduleFlow(
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const addRecentTransaction = useAddRecentTransaction();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
 
-  const {
-    config: modifyStatusConfig,
-    error: prepareModifyStatusError,
-    isError: prepareModifyStatusIsError,
-  } = usePrepareContractWrite({
+  const { config: modifyStatusConfig } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled: enableFunc,
@@ -42,12 +38,7 @@ export default function PauseScheduleFlow(
     },
   });
 
-  const {
-    data: modifyStatusData,
-    error,
-    isError: modifyStatusError,
-    write: pauseSchedule,
-  } = useContractWrite({
+  const { data: modifyStatusData, write: pauseSchedule } = useContractWrite({
     ...modifyStatusConfig,
     onSuccess(data) {
       console.log("Pause Status Write Success", data);
@@ -77,7 +68,7 @@ export default function PauseScheduleFlow(
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: modifyStatusData?.hash,
     onSuccess(data) {
       console.log("Pause Schedule Success", data);

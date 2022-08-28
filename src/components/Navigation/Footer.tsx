@@ -1,14 +1,6 @@
-import React from "react";
-import {
-  createStyles,
-  Anchor,
-  Group,
-  ActionIcon,
-  Image,
-  Text,
-} from "@mantine/core";
-import { BrandTwitter, BrandGithub } from "tabler-icons-react";
+import { ActionIcon, Anchor, createStyles, Group, Text } from "@mantine/core";
 import { Link } from "react-router-dom";
+import { BrandGithub, BrandTwitter } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   // could improve this

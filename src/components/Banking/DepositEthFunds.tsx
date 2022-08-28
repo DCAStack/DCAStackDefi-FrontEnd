@@ -1,18 +1,17 @@
-import { useState, useContext, useEffect, ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import {
+  Button,
+  Container,
+  createStyles,
   Group,
   TextInput,
-  Container,
-  Button,
-  createStyles,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
-import { parseEther, formatEther } from "ethers/lib/utils";
-import { ContractContext } from "../../App";
+import { formatEther } from "ethers/lib/utils";
 import { TokenBadgeProps } from "../../models/PropTypes";
 
 import { BigNumber } from "ethers";
@@ -28,15 +27,10 @@ export default function DepositEthFunds({
   token,
   weiDefaultValue = BigNumber.from(0),
 }: TokenBadgeProps) {
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
   const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
 
-  let depositEthActions = DepositEthFundsFlow(
-    token,
-    depositAmount
-  );
+  let depositEthActions = DepositEthFundsFlow(token, depositAmount);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const re = /^\d*\.?\d*$/;
@@ -72,7 +66,7 @@ export default function DepositEthFunds({
               compact
               radius="xl"
               size="md"
-                onClick={() =>
+              onClick={() =>
                 depositEthActions?.max
                   ? setDeposit(
                       formatEther(depositEthActions?.max?.value.toString())

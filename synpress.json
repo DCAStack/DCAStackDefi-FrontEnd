@@ -7,6 +7,7 @@
   "videosFolder": "videos",
   "video": true,
   "chromeWebSecurity": true,
+  "firefoxWebSecurity": true,
   "viewportWidth": 1366,
   "viewportHeight": 850,
   "component": {

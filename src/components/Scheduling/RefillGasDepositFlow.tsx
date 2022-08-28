@@ -1,15 +1,14 @@
-import { useEffect, useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 
-import { useNetwork, useContractRead, useAccount } from "wagmi";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { ContractContext } from "../../App";
-import { parseEther, formatEther } from "ethers/lib/utils";
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
-import { IToken } from "../../models/Interfaces";
 import { BigNumber } from "@ethersproject/bignumber";
+import { formatEther, parseEther } from "ethers/lib/utils";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
+import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
+import { ContractContext } from "../../App";
+import { IToken } from "../../models/Interfaces";
 import DepositGasFlow from "../Banking/DepositGasFlow";
 
 export default function RefillGasDepositFlow(
@@ -24,14 +23,9 @@ export default function RefillGasDepositFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const addRecentTransaction = useAddRecentTransaction();
-  const { chain, chains } = useNetwork();
+  const { chain } = useNetwork();
   const currentChain: number = chain ? chain?.id : 0;
-  const { address, isConnecting, isDisconnected } = useAccount();
-
-  const networkCurrency: string = chain?.nativeCurrency
-    ? chain.nativeCurrency.symbol
-    : "?";
+  const { address } = useAccount();
 
   const [quote1inch, setQuote1inch] = useState({
     estimatedGasFormatted: "0",
@@ -41,11 +35,7 @@ export default function RefillGasDepositFlow(
 
   let depositGasActions = DepositGasFlow(needGas);
 
-  const {
-    quote: quoteDetails,
-    isLoading: quoteLoading,
-    isError: quoteError,
-  } = use1inchRetrieveQuote(
+  const { quote: quoteDetails } = use1inchRetrieveQuote(
     currentChain,
     sellToken,
     buyToken,

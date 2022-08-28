@@ -1,6 +1,6 @@
+import { Container, createStyles, SimpleGrid, Text } from "@mantine/core";
 import React from "react";
-import { createStyles, Text, SimpleGrid, Container } from "@mantine/core";
-import { Key, Coin, ShieldLock, World } from "tabler-icons-react";
+import { Coin, Key, ShieldLock, World } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   feature: {

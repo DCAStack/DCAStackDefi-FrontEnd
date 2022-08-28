@@ -1,4 +1,4 @@
-import { Container, Title, Paper, Space, createStyles } from "@mantine/core";
+import { Container, createStyles, Paper, Space, Title } from "@mantine/core";
 
 import { Alert } from "@mantine/core";
 import { AlertCircle } from "tabler-icons-react";

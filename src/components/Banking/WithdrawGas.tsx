@@ -1,31 +1,26 @@
-import { useEffect, useState, useContext, ChangeEvent } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 
 import {
+  Button,
+  Container,
+  createStyles,
   Group,
   TextInput,
-  Grid,
-  Container,
-  Button,
-  createStyles,
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 import GasToken from "../TokenDisplay/GasToken";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useAccount,
-  useBalance,
-  useContractRead,
-  useWaitForTransaction,
-  useNetwork,
-} from "wagmi";
-import { parseEther, formatEther } from "ethers/lib/utils";
-import { ContractInfoProps } from "./../../models/PropTypes";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { formatEther, parseEther } from "ethers/lib/utils";
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { ContractContext } from "../../App";
-import { BigNumber } from "ethers";
 
 const useStyles = createStyles((theme) => ({
   input: {
@@ -34,13 +29,11 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function WithdrawGas() {
-  const { chain, chains } = useNetwork();
-
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const [withdrawAmount, setWithdraw] = useState("0");
   const { classes } = useStyles();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -50,11 +43,7 @@ export default function WithdrawGas() {
     }
   };
 
-  const {
-    config: withdrawGasSetup,
-    error: withdrawGasError,
-    isError: prepareWithdrawGasError,
-  } = usePrepareContractWrite({
+  const { config: withdrawGasSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled: withdrawAmount !== "" ? true : false,
@@ -71,12 +60,7 @@ export default function WithdrawGas() {
     },
   });
 
-  const {
-    data,
-    error,
-    isError: withdrawError,
-    write: withdrawGas,
-  } = useContractWrite({
+  const { data, write: withdrawGas } = useContractWrite({
     ...withdrawGasSetup,
     onSuccess(data) {
       console.log("Withdraw Gas Write Success", data);
@@ -106,7 +90,7 @@ export default function WithdrawGas() {
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: data?.hash,
     onSuccess(data) {
       console.log("Withdraw Gas Success", data);
@@ -140,11 +124,7 @@ export default function WithdrawGas() {
     },
   });
 
-  const {
-    data: maxWithdraw,
-    isError,
-    isLoading,
-  } = useContractRead({
+  const { data: maxWithdraw } = useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "userGasBalances",

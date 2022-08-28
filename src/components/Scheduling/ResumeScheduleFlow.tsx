@@ -1,21 +1,21 @@
-import { useEffect, useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
-import {
-  usePrepareContractWrite,
-  useContractWrite,
-  useWaitForTransaction,
-  useNetwork,
-  useAccount,
-} from "wagmi";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { ContractContext } from "../../App";
-import { parseEther } from "ethers/lib/utils";
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
-import { IToken } from "../../models/Interfaces";
 import { BigNumber } from "@ethersproject/bignumber";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { parseEther } from "ethers/lib/utils";
+import {
+  useAccount,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
+import { ContractContext } from "../../App";
+import { IToken } from "../../models/Interfaces";
 
 export default function ResumeScheduleFlow(
   scheduleId: number,
@@ -30,9 +30,9 @@ export default function ResumeScheduleFlow(
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const addRecentTransaction = useAddRecentTransaction();
-  const { chain, chains } = useNetwork();
+  const { chain } = useNetwork();
   const currentChain: number = chain ? chain?.id : 0;
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
 
   const [quote1inch, setQuote1inch] = useState({
     estimatedGasFormatted: "0",
@@ -40,11 +40,7 @@ export default function ResumeScheduleFlow(
   const [enableRead, setEnableRead] = useState(false);
   const [enableWrite, setEnableWrite] = useState(false);
 
-  const {
-    quote: quoteDetails,
-    isLoading: quoteLoading,
-    isError: quoteError,
-  } = use1inchRetrieveQuote(
+  const { quote: quoteDetails } = use1inchRetrieveQuote(
     currentChain,
     sellToken,
     buyToken,
@@ -63,11 +59,7 @@ export default function ResumeScheduleFlow(
     }
   }, [quoteDetails]);
 
-  const {
-    config: modifyStatusConfig,
-    error: prepareModifyStatusError,
-    isError: prepareModifyStatusIsError,
-  } = usePrepareContractWrite({
+  const { config: modifyStatusConfig } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     enabled: enableFunc && enableRead && !remainingBudget.eq(0),
@@ -86,12 +78,7 @@ export default function ResumeScheduleFlow(
     },
   });
 
-  const {
-    data: modifyStatusData,
-    error,
-    isError: modifyStatusError,
-    write: resumeSchedule,
-  } = useContractWrite({
+  const { data: modifyStatusData, write: resumeSchedule } = useContractWrite({
     ...modifyStatusConfig,
     onSuccess(data) {
       console.log("Resume Status Write Success", data);
@@ -121,7 +108,7 @@ export default function ResumeScheduleFlow(
     },
   });
 
-  const { isLoading: txPending, isSuccess: txDone } = useWaitForTransaction({
+  useWaitForTransaction({
     hash: modifyStatusData?.hash,
     onSuccess(data) {
       console.log("Resume Schedule Success", data);

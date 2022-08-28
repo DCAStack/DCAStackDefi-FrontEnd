@@ -1,33 +1,26 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { createStyles } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { CircleCheck, AlertOctagon } from "tabler-icons-react";
+import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
+import { ethers } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
 import {
-  usePrepareContractWrite,
-  useContractWrite,
+  erc20ABI,
   useAccount,
   useBalance,
   useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
   useWaitForTransaction,
-  erc20ABI,
 } from "wagmi";
-import { formatUnits } from "ethers/lib/utils";
-import { ethers } from "ethers";
 
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { ContractContext } from "../../App";
 
-import { IToken } from "../../models/Interfaces";
 import { BigNumber } from "ethers";
 import { parseUnits } from "ethers/lib/utils";
-
-const useStyles = createStyles((theme) => ({
-  input: {
-    height: 60,
-  },
-}));
+import { IToken } from "../../models/Interfaces";
 
 export default function DepositFundsFlow(
   token: IToken | null,
@@ -35,8 +28,7 @@ export default function DepositFundsFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { classes } = useStyles();
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   const [enableApprovePrep, setApprovePrep] = useState(false);
@@ -44,11 +36,7 @@ export default function DepositFundsFlow(
   const [depositAfterApprove, setDepositAfterApprove] = useState(false);
   const [maxDeposit, setMaxDeposit] = useState(BigNumber.from(0));
 
-  const {
-    data: maxTokenDeposit,
-    isError: maxTokenDepositIsError,
-    isLoading: maxTokenDepositIsLoading,
-  } = useBalance({
+  const { data: maxTokenDeposit } = useBalance({
     addressOrName: address,
     token: token?.address,
     watch: true,
@@ -67,11 +55,7 @@ export default function DepositFundsFlow(
     },
   });
 
-  const {
-    data: depositApproveSetup,
-    isError: depositApproveError,
-    isLoading: depositApproveLoading,
-  } = useContractRead({
+  const { data: depositApproveSetup } = useContractRead({
     addressOrName: token ? token.address : "",
     contractInterface: erc20ABI,
     functionName: "allowance",
@@ -92,11 +76,7 @@ export default function DepositFundsFlow(
     },
   });
 
-  const {
-    config: depositFundsSetup,
-    error: depositFundsError,
-    isError: prepareDepositFundsError,
-  } = usePrepareContractWrite({
+  const { config: depositFundsSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "depositFunds",
@@ -118,30 +98,64 @@ export default function DepositFundsFlow(
     },
   });
 
-  const {
-    data: depositFundsWriteData,
-    error: depositFundsWriteError,
-    isError: depositFundsWriteIsError,
-    write: depositFunds,
-  } = useContractWrite({
-    ...depositFundsSetup,
+  const { data: depositFundsWriteData, write: depositFunds } = useContractWrite(
+    {
+      ...depositFundsSetup,
+      onSuccess(data) {
+        console.log("Deposit Funds Write Success", data);
+        showNotification({
+          id: "deposit-token-pending",
+          loading: true,
+          title: "Pending Token Deposit",
+          message: "Waiting for your tx. Check status on your account tab.",
+          autoClose: false,
+          disallowClose: false,
+        });
+        setDepositPrep(false);
+        setDepositAfterApprove(false);
+      },
+      onError(error) {
+        console.log("Deposit Funds Write Error", error);
+        showNotification({
+          id: "deposit-token-error",
+          color: "red",
+          title: "Error Token Deposit",
+          message: error.message,
+          autoClose: true,
+          disallowClose: false,
+          icon: <AlertOctagon />,
+        });
+      },
+    }
+  );
+
+  useWaitForTransaction({
+    hash: depositFundsWriteData?.hash,
     onSuccess(data) {
-      console.log("Deposit Funds Write Success", data);
-      showNotification({
-        id: "deposit-token-pending",
-        loading: true,
-        title: "Pending Token Deposit",
-        message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: false,
-        disallowClose: false,
+      console.log("Deposit Funds Success", data);
+
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Deposit Token",
       });
+
+      updateNotification({
+        id: "deposit-token-pending",
+        color: "teal",
+        title: "Token Deposit Received",
+        message: "You're ready to create a schedule!",
+        icon: <CircleCheck />,
+        autoClose: true,
+      });
+
       setDepositPrep(false);
-      setDepositAfterApprove(false);
     },
+
     onError(error) {
-      console.log("Deposit Funds Write Error", error);
-      showNotification({
-        id: "deposit-token-error",
+      console.log("Deposit Funds Error", error);
+
+      updateNotification({
+        id: "deposit-token-pending",
         color: "red",
         title: "Error Token Deposit",
         message: error.message,
@@ -152,49 +166,7 @@ export default function DepositFundsFlow(
     },
   });
 
-  const { isLoading: depositTxPending, isSuccess: depositTxDone } =
-    useWaitForTransaction({
-      hash: depositFundsWriteData?.hash,
-      onSuccess(data) {
-        console.log("Deposit Funds Success", data);
-
-        addRecentTransaction({
-          hash: data.transactionHash,
-          description: "Deposit Token",
-        });
-
-        updateNotification({
-          id: "deposit-token-pending",
-          color: "teal",
-          title: "Token Deposit Received",
-          message: "You're ready to create a schedule!",
-          icon: <CircleCheck />,
-          autoClose: true,
-        });
-
-        setDepositPrep(false);
-      },
-
-      onError(error) {
-        console.log("Deposit Funds Error", error);
-
-        updateNotification({
-          id: "deposit-token-pending",
-          color: "red",
-          title: "Error Token Deposit",
-          message: error.message,
-          autoClose: true,
-          disallowClose: false,
-          icon: <AlertOctagon />,
-        });
-      },
-    });
-
-  const {
-    config: prepareDepositApprove,
-    error: prepareDepositApproveError,
-    isError: prepareDepositApproveIsError,
-  } = usePrepareContractWrite({
+  const { config: prepareDepositApprove } = usePrepareContractWrite({
     addressOrName: token ? token.address : "",
     contractInterface: erc20ABI,
     functionName: "approve",
@@ -211,65 +183,24 @@ export default function DepositFundsFlow(
     },
   });
 
-  const {
-    data: depositApproveWriteData,
-    error: depositApproveWriteError,
-    isError: depositApproveWriteIsError,
-    write: approveFunds,
-  } = useContractWrite({
-    ...prepareDepositApprove,
-    onSuccess(data) {
-      console.log("Deposit Approve Success", data);
-      showNotification({
-        id: "deposit-approve-pending",
-        loading: true,
-        title: "Pending Deposit Spend Approval",
-        message: "Waiting for your tx. Check status on your account tab.",
-        autoClose: false,
-        disallowClose: false,
-      });
-    },
-    onError(error) {
-      console.log("Deposit Approve Error", error);
-      showNotification({
-        id: "deposit-approve-error",
-        color: "red",
-        title: "Error Deposit Spend Approval",
-        message: error.message,
-        autoClose: true,
-        disallowClose: false,
-        icon: <AlertOctagon />,
-      });
-    },
-  });
-
-  const { isLoading: approveTxPending, isSuccess: approveTxDone } =
-    useWaitForTransaction({
-      hash: depositApproveWriteData?.hash,
+  const { data: depositApproveWriteData, write: approveFunds } =
+    useContractWrite({
+      ...prepareDepositApprove,
       onSuccess(data) {
-        console.log("Approval Transaction Success", data);
-
-        addRecentTransaction({
-          hash: data.transactionHash,
-          description: "Approve Token Spend",
-        });
-
-        updateNotification({
+        console.log("Deposit Approve Success", data);
+        showNotification({
           id: "deposit-approve-pending",
-          color: "teal",
-          title: "Deposit Spend Approved",
-          message: "Now you can deposit funds!",
-          icon: <CircleCheck />,
-          autoClose: true,
+          loading: true,
+          title: "Pending Deposit Spend Approval",
+          message: "Waiting for your tx. Check status on your account tab.",
+          autoClose: false,
+          disallowClose: false,
         });
-
-        setDepositAfterApprove(true);
       },
       onError(error) {
-        console.log("Approval Transaction Error", error);
-
-        updateNotification({
-          id: "deposit-approve-pending",
+        console.log("Deposit Approve Error", error);
+        showNotification({
+          id: "deposit-approve-error",
           color: "red",
           title: "Error Deposit Spend Approval",
           message: error.message,
@@ -277,10 +208,46 @@ export default function DepositFundsFlow(
           disallowClose: false,
           icon: <AlertOctagon />,
         });
-
-        setDepositPrep(false);
       },
     });
+
+  useWaitForTransaction({
+    hash: depositApproveWriteData?.hash,
+    onSuccess(data) {
+      console.log("Approval Transaction Success", data);
+
+      addRecentTransaction({
+        hash: data.transactionHash,
+        description: "Approve Token Spend",
+      });
+
+      updateNotification({
+        id: "deposit-approve-pending",
+        color: "teal",
+        title: "Deposit Spend Approved",
+        message: "Now you can deposit funds!",
+        icon: <CircleCheck />,
+        autoClose: true,
+      });
+
+      setDepositAfterApprove(true);
+    },
+    onError(error) {
+      console.log("Approval Transaction Error", error);
+
+      updateNotification({
+        id: "deposit-approve-pending",
+        color: "red",
+        title: "Error Deposit Spend Approval",
+        message: error.message,
+        autoClose: true,
+        disallowClose: false,
+        icon: <AlertOctagon />,
+      });
+
+      setDepositPrep(false);
+    },
+  });
 
   useEffect(() => {
     //flow 1: approve then deposit

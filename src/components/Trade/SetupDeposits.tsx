@@ -1,15 +1,12 @@
-import { useContext } from "react";
+import { Group, Space, Stack, Text, Title } from "@mantine/core";
 
-import { Group, Space, Text, Title, Stack } from "@mantine/core";
-
-import { useAccount, useNetwork } from "wagmi";
-import { formatEther, formatUnits } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
-import { ContractContext } from "../../App";
+import { formatEther, formatUnits } from "ethers/lib/utils";
+import { useNetwork } from "wagmi";
 
-import DepositGas from "../Banking/DepositGas";
-import DepositFunds from "../Banking/DepositFunds";
 import DepositEthFunds from "../Banking/DepositEthFunds";
+import DepositFunds from "../Banking/DepositFunds";
+import DepositGas from "../Banking/DepositGas";
 
 import { IToken } from "../../models/Interfaces";
 
@@ -28,13 +25,7 @@ export default function SetupDeposits({
   freeTokenBal,
   freeGasBal,
 }: ISetupDeposits) {
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
-  const { chain, chains } = useNetwork();
-  const { address, isConnecting, isDisconnected } = useAccount();
-  const currentChain: number = chain ? chain?.id : 0;
-
-  const bnZero = BigNumber.from(0);
+  const { chain } = useNetwork();
 
   const networkCurrency: string = chain?.nativeCurrency
     ? chain.nativeCurrency.symbol

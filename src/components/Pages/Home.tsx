@@ -1,6 +1,5 @@
-import React from "react";
-import { HeroText } from "../Home/Hero";
 import { FeaturesAsymmetrical } from "../Home/Features";
+import { HeroText } from "../Home/Hero";
 
 const Home = () => {
   return (

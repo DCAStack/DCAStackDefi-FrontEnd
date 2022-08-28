@@ -3,11 +3,11 @@ import { useContext, useState } from "react";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 
+import { BigNumber } from "@ethersproject/bignumber";
+import { formatUnits } from "ethers/lib/utils";
 import { useAccount, useContractRead } from "wagmi";
 import { ContractContext } from "../../App";
-import { formatUnits } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
-import { BigNumber } from "@ethersproject/bignumber";
 import DepositEthFundsFlow from "../Banking/DepositEthFundsFlow";
 import DepositFundsFlow from "../Banking/DepositFundsFlow";
 
@@ -21,7 +21,7 @@ export default function RefillTokenDepositFlow(
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address } = useAccount();
 
   const [needToken, setNeedToken] = useState("0.0");
 

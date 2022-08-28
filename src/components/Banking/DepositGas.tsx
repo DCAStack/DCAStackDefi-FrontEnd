@@ -1,18 +1,18 @@
-import { useEffect, useState, ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import {
+  Button,
+  Container,
+  createStyles,
   Group,
   TextInput,
-  Container,
-  Button,
-  createStyles,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import GasToken from "../TokenDisplay/GasToken";
 
-import { formatEther } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
+import { formatEther } from "ethers/lib/utils";
 import DepositGasFlow from "./DepositGasFlow";
 
 const useStyles = createStyles((theme) => ({
