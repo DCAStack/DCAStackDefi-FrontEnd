@@ -401,6 +401,7 @@ export function UserSchedulesPopulated({
           resumeSchedule: ResumeScheduleFlow(
             Number(key),
             !userSchedules[key].isActive,
+            userSchedules[key].remainingBudget,
             userSchedules[key].tradeAmount,
             userSchedules[key].tradeFrequency,
             mappedUserFunds[userSchedules[key].sellToken],

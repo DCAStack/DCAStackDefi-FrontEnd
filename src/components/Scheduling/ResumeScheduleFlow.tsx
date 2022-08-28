@@ -19,6 +19,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 export default function ResumeScheduleFlow(
   scheduleId: number,
   enableFunc: boolean = false,
+  remainingBudget: BigNumber,
   tradeAmount: BigNumber,
   tradeFrequency: BigNumber,
   sellToken: IToken,
@@ -67,7 +68,7 @@ export default function ResumeScheduleFlow(
   } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    enabled: enableFunc && enableRead,
+    enabled: enableFunc && enableRead && !remainingBudget.eq(0),
     functionName: "resumeSchedule",
     args: [scheduleId, parseEther(quote1inch.estimatedGasFormatted)],
     onError(error) {
