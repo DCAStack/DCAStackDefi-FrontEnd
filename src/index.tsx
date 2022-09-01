@@ -49,7 +49,7 @@ const { chains, provider, webSocketProvider } = configureChains(
       : []),
   ],
   [
-    alchemyProvider({ apiKey: "Lq61gi9ZudTC_-u8ZvfmowXkrf6Eqeut" }),
+    // alchemyProvider({ apiKey: "Lq61gi9ZudTC_-u8ZvfmowXkrf6Eqeut" }),
     publicProvider(),
     jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default }) }),
   ]
