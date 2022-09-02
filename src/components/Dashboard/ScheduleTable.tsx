@@ -306,7 +306,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
           <tr>
             <th>Trading Pair</th>
-            <th>Budget</th>
+            <th>Budget Left</th>
             <th>DCA Amount</th>
             <th>Duration</th>
             <th>Last Run</th>

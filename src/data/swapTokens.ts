@@ -109,7 +109,7 @@ const swapTokens: Record<number, IToken[]> = {
         },
     ],
     31337:
-        [ //mainnet
+        [ //local mainnet
             {
                 address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
                 decimals: 18,
