@@ -8,7 +8,6 @@ import {
 } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { BrandGithub, Speedboat } from "tabler-icons-react";
-import { Dots } from "./Dots";
 
 const useStyles = createStyles((theme) => ({
   // could improve this
@@ -102,11 +101,6 @@ export function HeroText() {
 
   return (
     <Container className={classes.wrapper} size={1400}>
-      <Dots className={classes.dots} style={{ left: 0, top: 0 }} />
-      <Dots className={classes.dots} style={{ left: 60, top: 0 }} />
-      <Dots className={classes.dots} style={{ left: 0, top: 140 }} />
-      <Dots className={classes.dots} style={{ right: 0, top: 60 }} />
-
       <div className={classes.inner}>
         <Title className={classes.title}>
           Welcome to{" "}
