@@ -55,7 +55,7 @@ function FooterCentered({ links }: FooterCenteredProps) {
           <ActionIcon
             size="lg"
             component="a"
-            href={"https://twitter.com/"}
+            href={"https://twitter.com/DcaStack"}
             target="_blank"
             rel="noopener noreferrer"
           >

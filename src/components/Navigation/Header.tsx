@@ -248,15 +248,15 @@ const headerLinks = {
       label: "Help",
       links: [
         {
-          link: "https://docs.dcastack.com/",
+          link: "https://defidocs.dcastack.com/",
           label: "Documentation",
         },
         {
-          link: "https://github.com/",
+          link: "https://github.com/DCAStack",
           label: "Report An Issue",
         },
         {
-          link: "https://github.com/",
+          link: "https://twitter.com/DcaStack",
           label: "Contact Us",
         },
         {

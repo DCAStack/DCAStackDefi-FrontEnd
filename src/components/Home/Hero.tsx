@@ -139,7 +139,7 @@ export function HeroText() {
             variant="default"
             color="gray"
             component="a"
-            href={"https://github.com/"}
+            href={"https://github.com/DCAStack"}
             target="_blank"
             rel="noopener noreferrer"
             leftIcon={<BrandGithub size={20} />}
