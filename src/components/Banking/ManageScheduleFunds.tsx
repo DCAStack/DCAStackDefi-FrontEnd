@@ -99,7 +99,7 @@ export default function ManageScheduleFunds({
         onClick={() => setSelectedToken(item)}
         key={item.address}
       >
-        {parseFloat(`${item.balance}`).toFixed(6)}&nbsp;
+        ~ {parseFloat(`${item.balance}`).toFixed(2)}&nbsp;
         {item.symbol}
       </Menu.Item>
     ));
@@ -119,7 +119,7 @@ export default function ManageScheduleFunds({
               <Group spacing="xs">
                 <Image src={selectedToken?.logoURI} width={30} height={30} />
                 <span className={classes.label}>
-                  {parseFloat(`${selectedToken?.balance}`).toFixed(6)}&nbsp;
+                  ~ {parseFloat(`${selectedToken?.balance}`).toFixed(2)}&nbsp;
                   {selectedToken?.symbol}
                 </span>
               </Group>
