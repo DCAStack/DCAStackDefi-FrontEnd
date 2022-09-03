@@ -64,7 +64,7 @@ function FooterCentered({ links }: FooterCenteredProps) {
           <ActionIcon
             size="lg"
             component="a"
-            href={"https://github.com/"}
+            href={"https://github.com/DCAStack"}
             target="_blank"
             rel="noopener noreferrer"
           >
