@@ -24,6 +24,7 @@ import { ContractContext } from "../../App";
 
 import { nullToken } from "../../data/gasTokens";
 import { IToken } from "../../models/Interfaces";
+import { useNavigate } from "react-router-dom";
 
 interface IScheduleParams {
   sellToken: IToken;
@@ -59,6 +60,7 @@ export default function NewSchedule({
   const { chain } = useNetwork();
   const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
+  const nav = useNavigate();
 
   let startDateTime = null;
   let endDateTime = null;
@@ -184,10 +186,12 @@ export default function NewSchedule({
         id: "new-schedule-pending",
         color: "teal",
         title: "Schedule Created",
-        message: "Head over to dashboard to view!",
+        message: "Let's go to the dashboard to view!",
         icon: <CircleCheck />,
         autoClose: true,
       });
+
+      nav("/dashboard");
     },
     onError(error) {
       console.log("New Schedule Error", error);
