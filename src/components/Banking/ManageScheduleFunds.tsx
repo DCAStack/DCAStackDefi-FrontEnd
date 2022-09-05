@@ -119,7 +119,10 @@ export default function ManageScheduleFunds({
               <Group spacing="xs">
                 <Image src={selectedToken?.logoURI} width={30} height={30} />
                 <span className={classes.label}>
-                  ~ {parseFloat(`${selectedToken?.balance}`).toFixed(2)}&nbsp;
+                  {selectedToken?.balance !== undefined &&
+                    parseFloat(`${selectedToken?.balance}`).toFixed(2)}
+                  {selectedToken?.balance === undefined && "Tokens..."}
+                  &nbsp;
                   {selectedToken?.symbol}
                 </span>
               </Group>
