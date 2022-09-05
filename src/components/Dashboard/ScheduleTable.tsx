@@ -196,9 +196,11 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
         {!row.boughtAmount.eq(0) && !row.soldAmount.eq(0) && (
           <Text>
             ~
-            {Big(row.boughtAmount.toString())
-              .div(Big(row.soldAmount.toString()))
-              .toString()}{" "}
+            {parseFloat(
+              Big(row.boughtAmount.toString())
+                .div(Big(row.soldAmount.toString()))
+                .toString()
+            ).toFixed(6)}{" "}
             {row.buyToken?.symbol}
           </Text>
         )}
@@ -244,8 +246,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             </Button>
           )}
 
-          {row.isActive === false &&
-            row.remainingBudget !== "0" &&
+          {row.remainingBudget !== "0" &&
             row.tokenRefillActions.needAmount !== "0.0" && (
               <Button
                 radius="xl"
@@ -259,8 +260,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               </Button>
             )}
 
-          {row.isActive === false &&
-            row.remainingBudget !== "0" &&
+          {row.remainingBudget !== "0" &&
             row.gasRefillActions.needAmount !== "0.0" && (
               <Button
                 radius="xl"
@@ -407,7 +407,7 @@ export function UserSchedulesPopulated({
             )
           ),
         };
-
+        console.log("gas", addSchedule.totalGas.toString());
         formattedUserSchedulesData.push(addSchedule);
       }
       return true;
