@@ -26,6 +26,10 @@ yarn-error.log*
 
 #hardhat
 artifacts
+DCAStack_Implementation.json
+DCAStack_Proxy.json
+DefaultProxyAdmin.json
+solcInputs
 
 #synpress
 videos
