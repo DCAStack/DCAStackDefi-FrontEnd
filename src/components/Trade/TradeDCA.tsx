@@ -42,7 +42,7 @@ function TradeDCA() {
 
   const [active, setActive] = useState(0);
   const nextStep = () =>
-    setActive((current) => (current < 2 ? current + 1 : current));
+    setActive((current) => (current < 4 ? current + 1 : current));
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
   const { address: contractAddr, abi: contractABI } =
@@ -182,7 +182,9 @@ function TradeDCA() {
         breakpoint="sm"
         size="xl"
       >
-        <Stepper.Step label="First step" description="Setup DCA Schedule">
+        <Stepper.Step label="First Step" description="Trading Pairs">
+          <Space h="xl" />
+
           <Container my="setup_schedule">
             <Container my="setup_swap">
               <Group align="center" position="center" spacing="xs" grow>
@@ -214,7 +216,13 @@ function TradeDCA() {
             </Container>
 
             <Space h="xl" />
+          </Container>
+        </Stepper.Step>
 
+        <Stepper.Step label="Second Step" description="Frequency">
+          <Space h="xl" />
+
+          <Container my="schedule_frequency">
             <Container my="setup_dca">
               <Group align="end" position="center" spacing="xl" grow>
                 <TextInput
@@ -282,9 +290,13 @@ function TradeDCA() {
                 />
               </Group>
             </Container>
+          </Container>
+        </Stepper.Step>
 
-            <Space h="xl" />
+        <Stepper.Step label="Third Step" description="Balances">
+          <Space h="xl" />
 
+          <Container my="schedule_balances">
             <Container my="setup_deposits">
               <SetupDeposits
                 sellToken={sellToken}
@@ -296,7 +308,10 @@ function TradeDCA() {
             </Container>
           </Container>
         </Stepper.Step>
-        <Stepper.Step label="Second step" description="Verify Details">
+
+        <Stepper.Step label="Last Step" description="Verify Details">
+          <Space h="xl" />
+
           <Container my="start_dca">
             <NewSchedule
               sellToken={sellToken}
@@ -322,9 +337,9 @@ function TradeDCA() {
             Back
           </Button>
         )}
-        {active === 0 && (
+        {active !== 3 && (
           <Button onClick={nextStep} size="xl">
-            Review
+            Next
           </Button>
         )}
       </Group>
