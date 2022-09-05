@@ -13,7 +13,6 @@ import {
   Chain,
 } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
-import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
@@ -31,7 +30,6 @@ const localChain: Chain = {
     symbol: "ETH",
   },
   rpcUrls: {
-    //TODO
     default: "http://192.168.0.169:8545",
   },
   testnet: false,
@@ -39,17 +37,10 @@ const localChain: Chain = {
 
 const { chains, provider, webSocketProvider } = configureChains(
   [
-    localChain,
-    chain.mainnet,
     chain.polygon,
-    chain.optimism,
-    chain.arbitrum,
-    ...(process.env.REACT_APP_ENABLE_TESTNETS === "true"
-      ? [chain.goerli, chain.kovan, chain.rinkeby, chain.ropsten]
-      : []),
+    ...(process.env.REACT_APP_ENABLE_DEV === "true" ? [localChain] : []),
   ],
   [
-    // alchemyProvider({ apiKey: "Lq61gi9ZudTC_-u8ZvfmowXkrf6Eqeut" }),
     publicProvider(),
     jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default }) }),
   ]
