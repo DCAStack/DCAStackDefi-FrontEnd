@@ -145,8 +145,10 @@ const Dashboard = () => {
         color="orange"
         radius="xs"
       >
-        Please note that withdrawing ALL tokens from running schedules will
-        cause them to not run! We recommend withdrawing just available :)
+        Please note that selecting WITHDRAW ALL will withdraw all tokens
+        including those used in schedules which will cause them to not run!
+        Select WITHDRAW AVAILABLE to withdraw what is not being used in a
+        schedule.
       </Alert>
       <Space h="xl" />
       <Paper

@@ -235,7 +235,7 @@ function TradeDCA() {
                   onChange={handleChange}
                 />
                 <NumberInput
-                  label="Trade Frequency"
+                  label="Trade Every"
                   placeholder="DCA every..."
                   radius="xs"
                   size="xl"
@@ -249,6 +249,7 @@ function TradeDCA() {
                 />
                 <NativeSelect
                   data={["Days"]}
+                  disabled
                   label="Trade On"
                   radius="xs"
                   size="xl"
