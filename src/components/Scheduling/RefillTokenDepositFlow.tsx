@@ -17,7 +17,8 @@ export default function RefillTokenDepositFlow(
   tradeFrequency: BigNumber,
   startDate: BigNumber,
   endDate: BigNumber,
-  sellToken: IToken
+  sellToken: IToken,
+  currScheduleBalance: BigNumber
 ) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
@@ -37,7 +38,8 @@ export default function RefillTokenDepositFlow(
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get Token Needed Deposit Success", data.toString());
-      setNeedToken(formatUnits(data, sellToken?.decimals));
+      const adjustData = data.sub(currScheduleBalance);
+      setNeedToken(formatUnits(adjustData, sellToken?.decimals));
     },
     onError(error) {
       console.log("Get Token Needed Deposit Error", error);

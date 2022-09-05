@@ -358,16 +358,17 @@ export function UserSchedulesPopulated({
           // totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
 
           tokenRefillActions: RefillTokenDepositFlow(
-            !userSchedules[key].isActive,
+            userSchedules[key].isActive,
             userSchedules[key].tradeAmount,
             userSchedules[key].tradeFrequency,
             userSchedules[key].scheduleDates[2],
             userSchedules[key].scheduleDates[3],
-            mappedUserFunds[userSchedules[key].sellToken]
+            mappedUserFunds[userSchedules[key].sellToken],
+            userSchedules[key].remainingBudget
           ),
 
           gasRefillActions: RefillGasDepositFlow(
-            !userSchedules[key].isActive,
+            userSchedules[key].isActive,
             userSchedules[key].tradeAmount,
             userSchedules[key].tradeFrequency,
             userSchedules[key].scheduleDates[2],
@@ -407,7 +408,7 @@ export function UserSchedulesPopulated({
             )
           ),
         };
-        console.log("gas", addSchedule.totalGas.toString());
+
         formattedUserSchedulesData.push(addSchedule);
       }
       return true;
