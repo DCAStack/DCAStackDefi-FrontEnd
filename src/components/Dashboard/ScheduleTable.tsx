@@ -169,19 +169,12 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
               // minute: "numeric",
             })}
           </Text>
-          <Text>at</Text>
-          <Text>
-            {row.endDate.toLocaleTimeString(undefined, {
-              hour: "numeric",
-              minute: "numeric",
-            })}{" "}
-          </Text>
         </Stack>
       </td>
 
       <td>
-        {row.lastRun.toLocaleString() === "12/31/1969, 7:00:00 PM" && "Never"}
-        {row.lastRun.toLocaleString() !== "12/31/1969, 7:00:00 PM" &&
+        {row.lastRun.toLocaleString().includes("12/31/1969") && "Never"}
+        {!row.lastRun.toLocaleString().includes("12/31/1969") &&
           row.lastRun.toLocaleDateString(undefined, {
             year: "2-digit",
             month: "2-digit",
