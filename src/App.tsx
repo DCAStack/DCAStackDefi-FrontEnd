@@ -13,6 +13,7 @@ import Gas from "./components/Pages/Gas";
 import { IContract } from "./models/Interfaces";
 import { Interface } from "ethers/lib/utils";
 import DCAStack from "./deployments/localhost/DCAStack.json";
+import { usePageTracking } from "./utils/tracking/tracking";
 
 const dcastackABI = DCAStack.abi;
 const dcastackAddr = DCAStack.address;
@@ -25,6 +26,7 @@ const DCAStackContract = {
 export const ContractContext = createContext<IContract>(DCAStackContract);
 
 function App() {
+  usePageTracking();
   return (
     <MantineProvider
       theme={{ colorScheme: "dark" }}
