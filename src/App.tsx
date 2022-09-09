@@ -13,6 +13,8 @@ import Gas from "./components/Pages/Gas";
 import { IContract } from "./models/Interfaces";
 import { Interface } from "ethers/lib/utils";
 import DCAStack from "./deployments/localhost/DCAStack.json";
+import Disclaimer from "./components/Pages/Disclaimer";
+import Privacy from "./components/Pages/Privacy";
 
 const dcastackABI = DCAStack.abi;
 const dcastackAddr = DCAStack.address;
@@ -39,6 +41,8 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="trade" element={<Trade />} />
               <Route path="gas" element={<Gas />} />
+              <Route path="disclaimer" element={<Disclaimer />} />
+              <Route path="privacy" element={<Privacy />} />
             </Routes>
           </ContractContext.Provider>
         </AppShell>
