@@ -9,6 +9,10 @@ import {
 import { Link } from "react-router-dom";
 import { BrandGithub, Speedboat } from "tabler-icons-react";
 
+function throwErr(): never {
+  throw new Error('Something went wrong');
+}
+
 const useStyles = createStyles((theme) => ({
   // could improve this
   wrapper: {
@@ -140,8 +144,17 @@ export function HeroText() {
           >
             View Github
           </Button>
+          <Button
+            className={classes.control}
+            leftIcon={<BrandGithub size={20} />}
+            onClick={() =>
+              throwErr()
+            }
+          >
+            Test Crash
+          </Button>
         </div>
       </div>
-    </Container>
+    </Container >
   );
 }
