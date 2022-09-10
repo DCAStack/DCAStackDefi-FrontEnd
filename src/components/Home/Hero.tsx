@@ -9,6 +9,10 @@ import {
 import { Link } from "react-router-dom";
 import { BrandGithub, Speedboat } from "tabler-icons-react";
 
+function throwErr(): never {
+  throw new Error("Testing exception");
+}
+
 const useStyles = createStyles((theme) => ({
   // could improve this
   wrapper: {
@@ -137,6 +141,17 @@ export function HeroText() {
             target="_blank"
             rel="noopener noreferrer"
             leftIcon={<BrandGithub size={20} />}
+          >
+            View Github
+          </Button>
+          <Button
+            className={classes.control}
+            size="lg"
+            variant="default"
+            color="gray"
+            component="a"
+            leftIcon={<BrandGithub size={20} />}
+            onClick={() => throwErr()}
           >
             View Github
           </Button>

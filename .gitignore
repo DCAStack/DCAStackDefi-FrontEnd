@@ -33,3 +33,6 @@ solcInputs
 
 #synpress
 videos
+
+#sentry
+.sentryclirc
