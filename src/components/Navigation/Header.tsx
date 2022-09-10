@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useBooleanToggle } from "@mantine/hooks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "tabler-icons-react";
 
@@ -119,6 +119,10 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
   const [opened, toggleOpened] = useBooleanToggle(false);
   const [active, setActive] = useState(location.pathname);
   const { classes, cx } = useStyles();
+
+  useEffect(() => {
+    setActive(location.pathname);
+  }, [location]);
 
   const items = links.map((link) => {
     const menuItems = link.links?.map((item) => (

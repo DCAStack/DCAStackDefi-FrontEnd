@@ -128,7 +128,6 @@ export function FooterLinks({ data }: FooterLinksProps) {
         to={link.link}
         key={index}
         className={classes.link}
-        target="_blank"
       >
         {link.label}
       </Anchor>
