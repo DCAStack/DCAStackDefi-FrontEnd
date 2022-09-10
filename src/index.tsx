@@ -22,7 +22,7 @@ import { BrowserTracing } from "@sentry/tracing";
 import App from "./App";
 
 Sentry.init({
-  dsn: "https://0f5e5450b952473ab96211d981311aba@o1101699.ingest.sentry.io/6720013",
+  dsn: process.env.REACT_APP_SENTRY_DSN,
   integrations: [new BrowserTracing()],
   tracesSampleRate: 1.0,
   release: "0.1",
