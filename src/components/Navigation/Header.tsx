@@ -167,7 +167,6 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
         inherit
         component={Link}
         onClick={(event: any) => {
-          // console.log("this", event, event.preventDefault());
           // event.preventDefault();
           setActive(link.link);
           toggleOpened(false);

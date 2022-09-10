@@ -128,7 +128,7 @@ export function FooterLinks({ data }: FooterLinksProps) {
         to={link.link}
         key={index}
         className={classes.link}
-        rel="noopener"
+        target="_blank"
       >
         {link.label}
       </Anchor>
