@@ -158,16 +158,18 @@ export function FooterLinks({ data }: FooterLinksProps) {
     <footer className={classes.footer}>
       <Container className={classes.inner}>
         <div className={classes.logo}>
-          <Text
-            component="span"
-            align="center"
-            variant="gradient"
-            gradient={{ from: "indigo", to: "cyan", deg: 45 }}
-            size="xl"
-            weight={800}
-          >
-            DCA Stack
-          </Text>
+          <Anchor component={Link} to={`/`}>
+            <Text
+              component="span"
+              align="center"
+              variant="gradient"
+              gradient={{ from: "indigo", to: "cyan", deg: 45 }}
+              size="xl"
+              weight={800}
+            >
+              DCA Stack
+            </Text>
+          </Anchor>
           <Text size="xs" color="dimmed" className={classes.description}>
             Automate your crypto dollar cost averaging on defi.
           </Text>
