@@ -16,7 +16,23 @@ import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
+
 import App from "./App";
+
+Sentry.init({
+  dsn: process.env.REACT_APP_SENTRY_DSN,
+  integrations: [new BrowserTracing()],
+  tracesSampleRate: 1.0,
+  release: "0.1",
+  beforeSend(event, hint) {
+    if (event.exception) {
+      Sentry.showReportDialog({ eventId: event.event_id });
+    }
+    return event;
+  },
+});
 
 const localChain: Chain = {
   id: 31337,
@@ -61,9 +77,8 @@ const wagmiClient = createClient({
 const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   <Text>
     By connecting your wallet, you agree to the{" "}
-    <Link href="/privacy">Privacy Policy</Link> and
-    acknowledge you have read and understand the protocol{" "}
-    <Link href="/disclaimer">Disclaimer</Link>
+    <Link href="/privacy">Privacy Policy</Link> and acknowledge you have read
+    and understand the protocol <Link href="/disclaimer">Disclaimer</Link>
   </Text>
 );
 

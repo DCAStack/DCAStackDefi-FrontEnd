@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      if ("Proxy" in window) {
+        var n = {
+          get: function(o, e) {
+            return new Proxy(function(n) {
+              return "flush" === e || "close" === e
+                ? Promise.resolve()
+                : "function" == typeof n
+                ? n(window.Sentry)
+                : window.Sentry;
+            }, n);
+          },
+        };
+        window.Sentry = new Proxy({}, n);
+      }
+    </script>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
