@@ -35,7 +35,7 @@ export default function SetupDeposits({
     <div>
       <Group align="center" position="center" grow>
         <Stack>
-          <Title order={4}>Contract Gas Balance</Title>
+          <Title order={4}>Contract Gas Bal.</Title>
           {!freeGasBal?.isZero() && (
             <Text size="lg" color="green">
               Have: ~{parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
@@ -76,7 +76,7 @@ export default function SetupDeposits({
 
       <Group align="center" position="center" grow>
         <Stack>
-          <Title order={4}>Contract Deposit Balance</Title>
+          <Title order={4}>Contract Deposit Bal.</Title>
           {!freeTokenBal?.isZero() && (
             <Text size="lg" color="green">
               Have: ~
