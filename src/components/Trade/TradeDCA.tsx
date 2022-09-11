@@ -267,6 +267,7 @@ function TradeDCA() {
                     tradeFreq !== 0 ? date.getDate() % tradeFreq !== 0 : false
                   }
                   value={date}
+                  inputFormat="MM/DD/YY"
                   firstDayOfWeek="sunday"
                   dropdownType="modal"
                   label="Select DCA Schedule"
