@@ -29,7 +29,7 @@ export default function use1inchRetrieveQuote(
   const [feeData, setFeeData] = useState(BigNumber.from(0));
 
   useFeeData({
-    watch: true,
+    watch: false, //prevent changing gas prices
     onSuccess(data) {
       console.log("Retrieved fee data:", data);
       setFeeData(data.maxFeePerGas ? data.maxFeePerGas : BigNumber.from(0));
