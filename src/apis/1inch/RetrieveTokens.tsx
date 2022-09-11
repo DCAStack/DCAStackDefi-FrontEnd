@@ -17,6 +17,7 @@ export default function use1inchRetrieveTokens(currentChain: number) {
 
   if (data) {
     if (data.tokens) {
+      console.log("1inch fetch tokens success", data.tokens);
       data.flattenData = Object.values(data.tokens);
     }
     if (data.statusCode) {
