@@ -35,7 +35,7 @@ export default function use1inchRetrieveQuote(
       setFeeData(data.maxFeePerGas ? data.maxFeePerGas : BigNumber.from(0));
     },
     onError(error) {
-      console.log("Could not retrieve fee data:", error);
+      console.error("Could not retrieve fee data:", error);
       setFeeData(BigNumber.from(0));
     },
   });
@@ -102,7 +102,7 @@ export default function use1inchRetrieveQuote(
     }
 
     if (data.statusCode) {
-      console.log("1inch fetch quote error", data.error);
+      console.error("1inch fetch quote error", data.error);
       showNotification({
         id: "1inch-quote-error",
         color: "red",
@@ -116,7 +116,7 @@ export default function use1inchRetrieveQuote(
   }
 
   if (error) {
-    console.log("1inch fetch quote error", error);
+    console.error("1inch fetch quote error", error);
     showNotification({
       id: "1inch-quote-error",
       color: "red",

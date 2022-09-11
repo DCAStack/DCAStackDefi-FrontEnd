@@ -49,7 +49,7 @@ const Gas = () => {
         : setUserGasBal("0");
     },
     onError(error) {
-      console.log("Get User Gas Error", error);
+      console.error("Get User Gas Error", error);
       setUserGasBal("0");
     },
   });

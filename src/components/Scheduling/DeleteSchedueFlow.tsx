@@ -31,7 +31,7 @@ export default function DeleteScheduleFlow(
       from: address,
     },
     onError(error) {
-      console.log("Delete Schedule Prepared Error", error);
+      console.error("Delete Schedule Prepared Error", error);
     },
     onSuccess(data) {
       console.log("Delete Schedule Prepared Success", data);
@@ -54,7 +54,7 @@ export default function DeleteScheduleFlow(
     },
 
     onError(error) {
-      console.log("Delete Schedule Write Error", error);
+      console.error("Delete Schedule Write Error", error);
 
       showNotification({
         id: "delete-schedule-error",
@@ -88,7 +88,7 @@ export default function DeleteScheduleFlow(
       });
     },
     onError(error) {
-      console.log("Withdraw Gas Error", error);
+      console.error("Withdraw Gas Error", error);
 
       updateNotification({
         id: "delete-schedule-pending",

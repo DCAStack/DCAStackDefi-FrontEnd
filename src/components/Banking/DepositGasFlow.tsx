@@ -30,7 +30,7 @@ export default function DepositGasFlow(defaultValue: string) {
       value: defaultValue !== "" ? parseEther(defaultValue) : parseEther("0"),
     },
     onError(error) {
-      console.log("Deposit Gas Prepared Error", error);
+      console.error("Deposit Gas Prepared Error", error);
     },
     onSuccess(data) {
       console.log("Deposit Gas Prepared Success", data);
@@ -53,7 +53,7 @@ export default function DepositGasFlow(defaultValue: string) {
     },
 
     onError(error) {
-      console.log("Deposit Gas Write Error", error);
+      console.error("Deposit Gas Write Error", error);
 
       showNotification({
         id: "deposit-gas-error",
@@ -87,7 +87,7 @@ export default function DepositGasFlow(defaultValue: string) {
       });
     },
     onError(error) {
-      console.log("Deposit Gas Error", error);
+      console.error("Deposit Gas Error", error);
 
       updateNotification({
         id: "deposit-gas-pending",
@@ -108,7 +108,7 @@ export default function DepositGasFlow(defaultValue: string) {
       console.log("Get User Wallet Gas Balance Success", data);
     },
     onError(error) {
-      console.log("Get User Wallet Gas Balance Error", error);
+      console.error("Get User Wallet Gas Balance Error", error);
     },
   });
 

@@ -69,7 +69,7 @@ export default function ResumeScheduleFlow(
       from: address,
     },
     onError(error) {
-      console.log("Resume Status Prepared Error", error);
+      console.error("Resume Status Prepared Error", error);
       setEnableWrite(false);
     },
     onSuccess(data) {
@@ -94,7 +94,7 @@ export default function ResumeScheduleFlow(
     },
 
     onError(error) {
-      console.log("Resume Status Write Error", error);
+      console.error("Resume Status Write Error", error);
 
       showNotification({
         id: "resume-status-error",
@@ -128,7 +128,7 @@ export default function ResumeScheduleFlow(
       });
     },
     onError(error) {
-      console.log("Resume Schedule Error", error);
+      console.error("Resume Schedule Error", error);
 
       updateNotification({
         id: "resume-status-pending",

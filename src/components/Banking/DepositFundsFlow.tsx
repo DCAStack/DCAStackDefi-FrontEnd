@@ -50,7 +50,7 @@ export default function DepositFundsFlow(
       setMaxDeposit(data.value);
     },
     onError(error) {
-      console.log("Get User Wallet Token Balance Error", error);
+      console.error("Get User Wallet Token Balance Error", error);
       setMaxDeposit(BigNumber.from(0));
     },
   });
@@ -72,7 +72,7 @@ export default function DepositFundsFlow(
       console.log("Get User Fund Allowance Success", data);
     },
     onError(error) {
-      console.log("Get User Fund Allowance Error", error);
+      console.error("Get User Fund Allowance Error", error);
     },
   });
 
@@ -91,7 +91,7 @@ export default function DepositFundsFlow(
       from: address,
     },
     onError(error) {
-      console.log("Deposit Prepare Funds Error", error);
+      console.error("Deposit Prepare Funds Error", error);
     },
     onSuccess(data) {
       console.log("Deposit Prepare Funds Success", data);
@@ -115,7 +115,7 @@ export default function DepositFundsFlow(
         setDepositAfterApprove(false);
       },
       onError(error) {
-        console.log("Deposit Funds Write Error", error);
+        console.error("Deposit Funds Write Error", error);
         showNotification({
           id: "deposit-token-error",
           color: "red",
@@ -152,7 +152,7 @@ export default function DepositFundsFlow(
     },
 
     onError(error) {
-      console.log("Deposit Funds Error", error);
+      console.error("Deposit Funds Error", error);
 
       updateNotification({
         id: "deposit-token-pending",
@@ -176,7 +176,7 @@ export default function DepositFundsFlow(
       from: address,
     },
     onError(error) {
-      console.log("Deposit Prepare Approve Error", error);
+      console.error("Deposit Prepare Approve Error", error);
     },
     onSuccess(data) {
       console.log("Deposit Prepare Approve Success", data);
@@ -198,7 +198,7 @@ export default function DepositFundsFlow(
         });
       },
       onError(error) {
-        console.log("Deposit Approve Error", error);
+        console.error("Deposit Approve Error", error);
         showNotification({
           id: "deposit-approve-error",
           color: "red",
@@ -233,7 +233,7 @@ export default function DepositFundsFlow(
       setDepositAfterApprove(true);
     },
     onError(error) {
-      console.log("Approval Transaction Error", error);
+      console.error("Approval Transaction Error", error);
 
       updateNotification({
         id: "deposit-approve-pending",

@@ -31,7 +31,7 @@ export default function PauseScheduleFlow(
       from: address,
     },
     onError(error) {
-      console.log("Pause Status Prepared Error", error);
+      console.error("Pause Status Prepared Error", error);
     },
     onSuccess(data) {
       console.log("Pause Status Prepared Success", data);
@@ -54,7 +54,7 @@ export default function PauseScheduleFlow(
     },
 
     onError(error) {
-      console.log("Pause Status Write Error", error);
+      console.error("Pause Status Write Error", error);
 
       showNotification({
         id: "pause-status-error",
@@ -88,7 +88,7 @@ export default function PauseScheduleFlow(
       });
     },
     onError(error) {
-      console.log("Pause Schedule Error", error);
+      console.error("Pause Schedule Error", error);
 
       updateNotification({
         id: "pause-status-pending",

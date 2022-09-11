@@ -67,7 +67,7 @@ const Dashboard = () => {
       console.log("Get All User Token Info Success", data);
     },
     onError(error) {
-      console.log("Get All User Token Info Error", error);
+      console.error("Get All User Token Info Error", error);
     },
   });
 

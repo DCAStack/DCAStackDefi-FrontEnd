@@ -53,7 +53,7 @@ export default function WithdrawGas() {
       from: address,
     },
     onError(error) {
-      console.log("Withdraw Gas Prepared Error", error);
+      console.error("Withdraw Gas Prepared Error", error);
     },
     onSuccess(data) {
       console.log("Withdraw Gas Prepared Success", data);
@@ -76,7 +76,7 @@ export default function WithdrawGas() {
     },
 
     onError(error) {
-      console.log("Withdraw Gas Write Error", error);
+      console.error("Withdraw Gas Write Error", error);
 
       showNotification({
         id: "withdraw-gas-error",
@@ -110,7 +110,7 @@ export default function WithdrawGas() {
       });
     },
     onError(error) {
-      console.log("Withdraw Gas Error", error);
+      console.error("Withdraw Gas Error", error);
 
       updateNotification({
         id: "withdraw-gas-pending",
@@ -137,7 +137,7 @@ export default function WithdrawGas() {
       console.log("Get User Gas for max withdraw Success", data);
     },
     onError(error) {
-      console.log("Get User Gas for max withdraw Error", error);
+      console.error("Get User Gas for max withdraw Error", error);
     },
   });
 

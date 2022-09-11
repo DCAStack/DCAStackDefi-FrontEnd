@@ -21,7 +21,7 @@ export default function use1inchRetrieveTokens(currentChain: number) {
       data.flattenData = Object.values(data.tokens);
     }
     if (data.statusCode) {
-      console.log("1inch fetch tokens error", data.error);
+      console.error("1inch fetch tokens error", data.error);
       showNotification({
         id: "1inch-fetch-error",
         color: "red",
@@ -35,7 +35,7 @@ export default function use1inchRetrieveTokens(currentChain: number) {
   }
 
   if (error) {
-    console.log("1inch fetch tokens error", error);
+    console.error("1inch fetch tokens error", error);
     showNotification({
       id: "1inch-fetch-error",
       color: "red",

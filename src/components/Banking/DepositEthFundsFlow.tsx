@@ -44,7 +44,7 @@ export default function DepositEthFundsFlow(
       value: parseEther(defaultValue !== "" ? defaultValue : "0"),
     },
     onError(error) {
-      console.log("Deposit ETH Prepared Error", error);
+      console.error("Deposit ETH Prepared Error", error);
     },
     onSuccess(data) {
       console.log("Deposit ETH Prepared Success", data);
@@ -67,7 +67,7 @@ export default function DepositEthFundsFlow(
     },
 
     onError(error) {
-      console.log("Deposit ETH Write Error", error);
+      console.error("Deposit ETH Write Error", error);
 
       showNotification({
         id: "deposit-eth-error",
@@ -101,7 +101,7 @@ export default function DepositEthFundsFlow(
       });
     },
     onError(error) {
-      console.log("Deposit ETH Error", error);
+      console.error("Deposit ETH Error", error);
 
       updateNotification({
         id: "deposit-eth-pending",
@@ -122,7 +122,7 @@ export default function DepositEthFundsFlow(
       console.log("Get User Wallet ETH Balance Success", data);
     },
     onError(error) {
-      console.log("Get User Wallet ETH Balance Error", error);
+      console.error("Get User Wallet ETH Balance Error", error);
     },
   });
 

@@ -82,6 +82,10 @@ const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   </Text>
 );
 
+if (process.env.REACT_APP_STAGE === "production") {
+  console.log = () => {};
+}
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

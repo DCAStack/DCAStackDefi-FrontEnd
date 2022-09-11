@@ -135,7 +135,7 @@ export default function NewSchedule({
       from: address,
     },
     onError(error) {
-      console.log("New Schedule Prepared Error", error);
+      console.error("New Schedule Prepared Error", error);
     },
     onSuccess(data) {
       console.log("New Schedule Prepared Success", data);
@@ -158,7 +158,7 @@ export default function NewSchedule({
     },
 
     onError(error) {
-      console.log("New Schedule Write Error", error);
+      console.error("New Schedule Write Error", error);
 
       showNotification({
         id: "new-schedule-error",
@@ -194,7 +194,7 @@ export default function NewSchedule({
       nav("/dashboard");
     },
     onError(error) {
-      console.log("New Schedule Error", error);
+      console.error("New Schedule Error", error);
 
       updateNotification({
         id: "new-schedule-pending",

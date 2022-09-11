@@ -168,7 +168,7 @@ function TradeDCA() {
       );
     },
     onError(error) {
-      console.log("Get User Funds Error", error);
+      console.error("Get User Funds Error", error);
       setUserGasBal(bnZero);
       setUserBal(bnZero);
     },

@@ -71,7 +71,7 @@ export default function RefillGasDepositFlow(
       setNeedGas(formatEther(data));
     },
     onError(error) {
-      console.log("Get Gas Needed Deposit Error", error);
+      console.error("Get Gas Needed Deposit Error", error);
       setNeedGas("0.0");
     },
   });

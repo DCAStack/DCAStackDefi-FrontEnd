@@ -48,7 +48,7 @@ export default function WithdrawFundsFlow(
       from: address,
     },
     onError(error) {
-      console.log("Withdraw Gas Prepared Error", error);
+      console.error("Withdraw Gas Prepared Error", error);
     },
     onSuccess(data) {
       console.log("Withdraw Gas Prepared Success", data);
@@ -71,7 +71,7 @@ export default function WithdrawFundsFlow(
     },
 
     onError(error) {
-      console.log("Withdraw Funds Write Error", error);
+      console.error("Withdraw Funds Write Error", error);
 
       showNotification({
         id: "withdraw-token-error",
@@ -105,7 +105,7 @@ export default function WithdrawFundsFlow(
       });
     },
     onError(error) {
-      console.log("Withdraw Gas Error", error);
+      console.error("Withdraw Gas Error", error);
 
       updateNotification({
         id: "withdraw-token-pending",
@@ -135,7 +135,7 @@ export default function WithdrawFundsFlow(
       console.log("Get Max Withdraw Success", data);
     },
     onError(error) {
-      console.log("Get Max Withdraw Error", error);
+      console.error("Get Max Withdraw Error", error);
     },
   });
 

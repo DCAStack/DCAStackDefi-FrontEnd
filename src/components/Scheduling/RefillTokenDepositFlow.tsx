@@ -42,13 +42,12 @@ export default function RefillTokenDepositFlow(
       setNeedToken(formatUnits(adjustData, sellToken?.decimals));
     },
     onError(error) {
-      console.log("Get Token Needed Deposit Error", error);
+      console.error("Get Token Needed Deposit Error", error);
       setNeedToken("0.0");
     },
   });
 
   function triggerRefill() {
-    console.log("we hit this");
     if (
       sellToken?.address.toLowerCase() ===
       "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
