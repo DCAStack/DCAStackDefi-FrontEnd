@@ -23,7 +23,8 @@ export default function use1inchRetrieveQuote(
   startDate: Date | null,
   endDate: Date | null,
   numExec: number,
-  alreadyFormatted?: boolean
+  alreadyFormatted?: boolean,
+  bufferMultiplier: number = 2
 ) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const [feeData, setFeeData] = useState(BigNumber.from(0));
@@ -82,7 +83,9 @@ export default function use1inchRetrieveQuote(
       );
       data.estimatedGasFormatted = formatEther(data.estimatedGasSingleTradeWei);
 
-      let calcGas = data.estimatedGasSingleTradeWei.mul(numExec).mul(2);
+      let calcGas = data.estimatedGasSingleTradeWei
+        .mul(numExec)
+        .mul(bufferMultiplier);
 
       data.estimatedGasDcaFormatted = formatEther(calcGas.toString());
       data.estimatedGasDca = BigNumber.from(

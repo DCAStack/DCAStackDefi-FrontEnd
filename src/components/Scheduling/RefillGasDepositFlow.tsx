@@ -44,7 +44,8 @@ export default function RefillGasDepositFlow(
     new Date(),
     new Date(),
     numExec,
-    true
+    true,
+    1 //use a buffer multiplier of 1, since we already have a buffer applied
   );
 
   useEffect(() => {
