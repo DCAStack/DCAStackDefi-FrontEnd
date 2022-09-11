@@ -38,7 +38,9 @@ export default function RefillTokenDepositFlow(
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get Token Needed Deposit Success", data.toString());
-      const adjustData = data.sub(currScheduleBalance);
+      const adjustData = data.sub(currScheduleBalance).gt(0)
+        ? data.sub(currScheduleBalance)
+        : BigNumber.from(0);
       setNeedToken(formatUnits(adjustData, sellToken?.decimals));
     },
     onError(error) {
@@ -63,7 +65,7 @@ export default function RefillTokenDepositFlow(
           icon: <AlertOctagon />,
         });
       } else {
-        console.log("depositEthActions");
+        console.log("depositEthActions", depositEthActions);
 
         depositEthActions?.deposit?.();
       }
