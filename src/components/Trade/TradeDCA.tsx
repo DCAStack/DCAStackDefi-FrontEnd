@@ -151,7 +151,7 @@ function TradeDCA() {
       console.log("Get User Funds Success", data);
       let userGasBalance = data[0];
       userGasBalance
-        ? setUserGasBal(BigNumber.from(userGasBalance._hex))
+        ? setUserGasBal(BigNumber.from(userGasBalance._hex).mul(2))
         : setUserGasBal(bnZero);
 
       console.log("Free gas balance is", userGasBalance?.toString());
