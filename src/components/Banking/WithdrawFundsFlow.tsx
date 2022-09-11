@@ -31,6 +31,8 @@ export default function WithdrawFundsFlow(
     contractInterface: contractABI,
     enabled:
       defaultValue !== "0" &&
+      defaultValue !== "0.0" &&
+      !defaultValue.includes("-") &&
       defaultValue !== "" &&
       token !== null &&
       token !== nullToken &&
@@ -48,10 +50,10 @@ export default function WithdrawFundsFlow(
       from: address,
     },
     onError(error) {
-      console.error("Withdraw Gas Prepared Error", error);
+      console.error("Withdraw Funds Prepared Error", error);
     },
     onSuccess(data) {
-      console.log("Withdraw Gas Prepared Success", data);
+      console.log("Withdraw Funds Prepared Success", data);
     },
   });
 

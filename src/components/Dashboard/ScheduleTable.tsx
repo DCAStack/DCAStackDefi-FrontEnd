@@ -125,11 +125,22 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             {row.sellToken?.symbol} / {row.buyToken?.symbol}
           </Badge>
 
-          {row.isActive === true && (
-            <Badge color="teal" size="md">
-              Running
-            </Badge>
-          )}
+          {row.isActive === true &&
+            row.remainingBudget !== "0" &&
+            (row.tokenRefillActions.needAmount !== "0.0" ||
+              row.gasRefillActions.needAmount !== "0.0") && (
+              <Badge color="red" size="md">
+                Error
+              </Badge>
+            )}
+          {row.isActive === true &&
+            row.remainingBudget !== "0" &&
+            row.tokenRefillActions.needAmount === "0.0" &&
+            row.gasRefillActions.needAmount === "0.0" && (
+              <Badge color="teal" size="md">
+                Active
+              </Badge>
+            )}
           {row.isActive === false && row.remainingBudget !== "0" && (
             <Badge color="orange" size="md">
               Paused

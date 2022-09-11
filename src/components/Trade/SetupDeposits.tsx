@@ -36,15 +36,21 @@ export default function SetupDeposits({
       <Group align="center" position="center" grow>
         <Stack>
           <Title order={4}>Contract Gas Bal.</Title>
-          {!freeGasBal?.isZero() && (
+          {freeGasBal?.gt(0) && (
             <Text size="lg" color="green">
               Have: ~{parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
               {networkCurrency}
             </Text>
           )}
-          {freeGasBal?.isZero() && (
+          {freeGasBal?.eq(0) && (
             <Text size="lg" color="red">
               Have: 0 {networkCurrency}
+            </Text>
+          )}
+          {freeGasBal?.lt(0) && (
+            <Text size="lg" color="red">
+              Have: {parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
+              {networkCurrency}
             </Text>
           )}
           {estimatedGas?.lte(freeGasBal) && (
@@ -77,7 +83,7 @@ export default function SetupDeposits({
       <Group align="center" position="center" grow>
         <Stack>
           <Title order={4}>Contract Deposit Bal.</Title>
-          {!freeTokenBal?.isZero() && (
+          {freeTokenBal.gt(0) && (
             <Text size="lg" color="green">
               Have: ~
               {parseFloat(
@@ -86,9 +92,18 @@ export default function SetupDeposits({
               {sellToken.symbol}
             </Text>
           )}
-          {freeTokenBal?.isZero() && (
+          {freeTokenBal.eq(0) && (
             <Text size="lg" color="red">
               Have: 0 {sellToken.symbol}
+            </Text>
+          )}
+          {freeTokenBal.lt(0) && (
+            <Text size="lg" color="red">
+              Have:{" "}
+              {parseFloat(
+                formatUnits(freeTokenBal, sellToken.decimals)
+              ).toFixed(6)}{" "}
+              {sellToken.symbol}
             </Text>
           )}
 
@@ -132,6 +147,14 @@ export default function SetupDeposits({
             }
           />
         )}
+        {freeTokenBal.lt(0) ||
+          (freeGasBal?.lt(0) && (
+            <Text size="xs" color="orange">
+              If you're seeing negative balances, you may have forgot to pause
+              an active schedule. Or you may be low on gas / token deposits for
+              running schedules. Head over to the dashboard to see what's up.
+            </Text>
+          ))}
       </Group>
     </div>
   );

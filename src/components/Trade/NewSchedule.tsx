@@ -89,13 +89,13 @@ export default function NewSchedule({
     if (
       sellToken !== nullToken &&
       buyToken !== nullToken &&
-      !weiSellAmount.isZero() &&
-      !tradeFreq.isZero() &&
+      weiSellAmount.gt(0) &&
+      tradeFreq.gt(0) &&
       numExec !== 0 &&
       unixStartDate !== 0 &&
       unixEndDate !== 0 &&
-      !freeTokenBal.isZero() &&
-      !freeGasBal.isZero() &&
+      freeTokenBal.gt(0) &&
+      freeGasBal.gt(0) &&
       quoteDetails.estimatedGasFormatted !== "0"
     ) {
       setPrep(true);
@@ -264,7 +264,7 @@ export default function NewSchedule({
             </Text>
           </Group>
 
-          {!freeTokenBal.eq(0) && //run if additional deposit needed
+          {freeTokenBal.gt(0) && //run if additional deposit needed
             weiDepositAmount.gt(freeTokenBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you have</Text>
@@ -273,6 +273,25 @@ export default function NewSchedule({
                   {sellToken.symbol}
                 </Text>
                 <Text size="lg">not in use so your deposit is just</Text>
+                <Text weight={700} color="green">
+                  {formatUnits(
+                    weiDepositAmount.sub(freeTokenBal),
+                    sellToken.decimals
+                  )}{" "}
+                  {sellToken.symbol}
+                </Text>
+              </Group>
+            )}
+
+          {freeTokenBal.lt(0) && //run if negative
+            weiDepositAmount.gt(freeTokenBal) && (
+              <Group align="end" position="left" spacing="xs">
+                <Text size="lg">But you need</Text>
+                <Text weight={700} color="red">
+                  {formatUnits(freeTokenBal.abs(), sellToken.decimals)}{" "}
+                  {sellToken.symbol}
+                </Text>
+                <Text size="lg">available so your deposit is </Text>
                 <Text weight={700} color="green">
                   {formatUnits(
                     weiDepositAmount.sub(freeTokenBal),
@@ -328,7 +347,7 @@ export default function NewSchedule({
             <Text size="xs">(+ some buffer)</Text>
           </Group>
 
-          {!freeGasBal.eq(0) && //run if additional deposit needed
+          {freeGasBal.gt(0) && //run if additional deposit needed
             quoteDetails?.estimatedGasDca.gt(freeGasBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you have</Text>
@@ -336,6 +355,21 @@ export default function NewSchedule({
                   {formatEther(freeGasBal)} {networkCurrency}
                 </Text>
                 <Text size="lg">available so your deposit is just</Text>
+                <Text weight={700} color="green">
+                  {formatEther(quoteDetails?.estimatedGasDca.sub(freeGasBal))}{" "}
+                  {networkCurrency}
+                </Text>
+              </Group>
+            )}
+
+          {freeGasBal.lt(0) && //run if negative
+            quoteDetails?.estimatedGasDca.gt(freeGasBal) && (
+              <Group align="end" position="left" spacing="xs">
+                <Text size="lg">But you need</Text>
+                <Text weight={700} color="red">
+                  {formatEther(freeGasBal.abs())} {networkCurrency}
+                </Text>
+                <Text size="lg">available so your deposit is </Text>
                 <Text weight={700} color="green">
                   {formatEther(quoteDetails?.estimatedGasDca.sub(freeGasBal))}{" "}
                   {networkCurrency}
