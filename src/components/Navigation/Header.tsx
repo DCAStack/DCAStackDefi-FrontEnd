@@ -206,7 +206,17 @@ function HeaderResponsive({ links }: HeaderResponsiveProps) {
           <Group ml={50} spacing={5} className={classes.links}>
             {items}
           </Group>
-          <ConnectButton />
+          <ConnectButton
+            chainStatus="icon"
+            accountStatus={{
+              smallScreen: "avatar",
+              largeScreen: "full",
+            }}
+            showBalance={{
+              smallScreen: false,
+              largeScreen: false,
+            }}
+          />
         </Group>
 
         <Burger
