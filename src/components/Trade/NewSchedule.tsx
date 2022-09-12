@@ -94,8 +94,8 @@ export default function NewSchedule({
       numExec !== 0 &&
       unixStartDate !== 0 &&
       unixEndDate !== 0 &&
-      freeTokenBal.gt(0) &&
-      freeGasBal.gt(0) &&
+      freeTokenBal.gte(weiDepositAmount) &&
+      freeGasBal.gte(quoteDetails.minGasDca) &&
       quoteDetails.estimatedGasFormatted !== "0"
     ) {
       setPrep(true);
@@ -115,6 +115,7 @@ export default function NewSchedule({
     freeTokenBal,
     freeGasBal,
     quoteDetails,
+    weiDepositAmount,
   ]);
 
   const { config: prepareNewScheduleSetup } = usePrepareContractWrite({

@@ -63,7 +63,7 @@ function TradeDCA() {
   const [enableRead, setEnableRead] = useState(false);
 
   const [quote1inch, setQuote1inch] = useState({
-    estimatedGasDca: BigNumber.from(0),
+    minGasDca: BigNumber.from(0),
     estimatedGasFormatted: "0",
   });
 
@@ -302,7 +302,7 @@ function TradeDCA() {
             <Container my="setup_deposits">
               <SetupDeposits
                 sellToken={sellToken}
-                estimatedGas={quote1inch?.estimatedGasDca}
+                estimatedGas={quote1inch?.minGasDca}
                 depositAmount={depositAmount}
                 freeGasBal={freeGasBal}
                 freeTokenBal={freeTokenBal}
