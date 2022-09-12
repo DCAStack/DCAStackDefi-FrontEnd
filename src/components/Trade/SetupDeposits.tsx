@@ -147,14 +147,13 @@ export default function SetupDeposits({
             }
           />
         )}
-        {freeTokenBal.lt(0) ||
-          (freeGasBal?.lt(0) && (
-            <Text size="xs" color="orange">
-              If you're seeing negative balances, you may have forgot to pause
-              an active schedule. Or you may be low on gas / token deposits for
-              running schedules. Head over to the dashboard to see what's up.
-            </Text>
-          ))}
+        {(freeTokenBal.lt(0) || freeGasBal?.lt(0)) && (
+          <Text size="xs" color="orange">
+            If you're seeing negative balances, you may have forgot to pause an
+            active schedule. Or you may be low on gas / token deposits for
+            running schedules. Head over to the dashboard to see what's up.
+          </Text>
+        )}
       </Group>
     </div>
   );
