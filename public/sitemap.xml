@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <url>
+        <loc>https://www.dcastack.com/</loc>
+    </url>
+
+    <url>
+        <loc>https://www.dcastack.com/trade</loc>
+    </url>
+
+    <url>
+        <loc>https://www.dcastack.com/gas</loc>
+    </url>
+
+    <url>
+        <loc>https://www.dcastack.com/dashboard</loc>
+    </url>
+
+    <url>
+        <loc>https://status.dcastack.com/</loc>
+    </url>
+
+    <url>
+        <loc>https://defidocs.dcastack.com/</loc>
+    </url>
+
+</urlset>
