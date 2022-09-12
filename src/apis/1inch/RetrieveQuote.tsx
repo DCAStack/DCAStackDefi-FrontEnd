@@ -30,7 +30,7 @@ export default function use1inchRetrieveQuote(
   const [feeData, setFeeData] = useState(BigNumber.from(0));
 
   useFeeData({
-    watch: false, //prevent changing gas prices
+    watch: true,
     onSuccess(data) {
       console.log("Retrieved fee data:", data);
       setFeeData(data.maxFeePerGas ? data.maxFeePerGas : BigNumber.from(0));
@@ -81,7 +81,14 @@ export default function use1inchRetrieveQuote(
       data.estimatedGasSingleTradeWei = BigNumber.from(data.estimatedGas).mul(
         feeData
       );
-      data.estimatedGasFormatted = formatEther(data.estimatedGasSingleTradeWei);
+      data.estimatedGasFormattedMin = formatEther(
+        data.estimatedGasSingleTradeWei
+      );
+
+      //buffer used for single trade calcs
+      data.estimatedGasFormatted = formatEther(
+        data.estimatedGasSingleTradeWei.mul(bufferMultiplier).toString()
+      );
 
       let calcGas = data.estimatedGasSingleTradeWei
         .mul(numExec)
@@ -91,6 +98,11 @@ export default function use1inchRetrieveQuote(
       data.estimatedGasDca = BigNumber.from(
         parseEther(data.estimatedGasDcaFormatted)
       );
+
+      let minGas = data.estimatedGasSingleTradeWei.mul(numExec);
+
+      data.minGasDcaFormatted = formatEther(minGas.toString());
+      data.minGasDca = BigNumber.from(parseEther(data.minGasDcaFormatted));
     }
 
     if (data?.toTokenAmount && data?.fromTokenAmount) {
