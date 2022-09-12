@@ -95,7 +95,7 @@ export default function NewSchedule({
       unixStartDate !== 0 &&
       unixEndDate !== 0 &&
       freeTokenBal.gte(weiDepositAmount) &&
-      freeGasBal.gte(quoteDetails.minGasDca) &&
+      freeGasBal.gte(quoteDetails.estimatedGasDca) &&
       quoteDetails.estimatedGasFormatted !== "0"
     ) {
       setPrep(true);

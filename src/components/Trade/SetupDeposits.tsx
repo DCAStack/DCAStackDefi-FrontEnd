@@ -60,7 +60,7 @@ export default function SetupDeposits({
           )}
           {estimatedGas?.gt(freeGasBal) && (
             <Text size="lg" color="red">
-              Need: ~
+              Need: {">"}
               {parseFloat(formatEther(estimatedGas?.sub(freeGasBal))).toFixed(
                 6
               )}{" "}
@@ -72,7 +72,7 @@ export default function SetupDeposits({
         <DepositGas
           weiDefaultValue={
             estimatedGas?.gt(freeGasBal)
-              ? estimatedGas?.sub(freeGasBal)
+              ? estimatedGas?.mul(2).sub(freeGasBal)
               : BigNumber.from(0)
           }
         />
