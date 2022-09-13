@@ -99,6 +99,13 @@ export default function use1inchRetrieveQuote(
         parseEther(data.estimatedGasDcaFormatted)
       );
 
+      data.estimatedGasDcaFormattedSafe = formatEther(
+        calcGas.mul(bufferMultiplier).toString()
+      );
+      data.estimatedGasDcaSafe = BigNumber.from(
+        parseEther(data.estimatedGasDcaFormattedSafe)
+      );
+
       let minGas = data.estimatedGasSingleTradeWei.mul(numExec);
 
       data.minGasDcaFormatted = formatEther(minGas.toString());

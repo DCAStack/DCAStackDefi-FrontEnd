@@ -339,7 +339,7 @@ export default function NewSchedule({
           <Group align="end" position="left" spacing="xs">
             <Text size="lg">Your minimum gas deposit is</Text>
             <Text weight={700} color="green">
-              {quoteDetails?.estimatedGasDcaFormatted} {networkCurrency}
+              {quoteDetails?.estimatedGasDcaFormattedSafe} {networkCurrency}
             </Text>
             <Text size="lg">because you're swapping</Text>
             <Text weight={700} color="green">
@@ -348,7 +348,7 @@ export default function NewSchedule({
           </Group>
 
           {freeGasBal.gt(0) && //run if additional deposit needed
-            quoteDetails?.estimatedGasDca.gt(freeGasBal) && (
+            quoteDetails?.estimatedGasDcaSafe.gt(freeGasBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you have</Text>
                 <Text weight={700} color="green">
@@ -356,14 +356,16 @@ export default function NewSchedule({
                 </Text>
                 <Text size="lg">available so your deposit is just</Text>
                 <Text weight={700} color="green">
-                  {formatEther(quoteDetails?.estimatedGasDca.sub(freeGasBal))}{" "}
+                  {formatEther(
+                    quoteDetails?.estimatedGasDcaSafe.sub(freeGasBal)
+                  )}{" "}
                   {networkCurrency}
                 </Text>
               </Group>
             )}
 
           {freeGasBal.lt(0) && //run if negative
-            quoteDetails?.estimatedGasDca.gt(freeGasBal) && (
+            quoteDetails?.estimatedGasDcaSafe.gt(freeGasBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you need</Text>
                 <Text weight={700} color="red">
@@ -371,14 +373,16 @@ export default function NewSchedule({
                 </Text>
                 <Text size="lg">available so your deposit is </Text>
                 <Text weight={700} color="green">
-                  {formatEther(quoteDetails?.estimatedGasDca.sub(freeGasBal))}{" "}
+                  {formatEther(
+                    quoteDetails?.estimatedGasDcaSafe.sub(freeGasBal)
+                  )}{" "}
                   {networkCurrency}
                 </Text>
               </Group>
             )}
 
           {!freeGasBal.eq(0) && //run if zero needed
-            quoteDetails?.estimatedGasDca.lte(freeGasBal) && (
+            quoteDetails?.estimatedGasDcaSafe.lte(freeGasBal) && (
               <Group align="end" position="left" spacing="xs">
                 <Text size="lg">But you have</Text>
                 <Text weight={700} color="green">
