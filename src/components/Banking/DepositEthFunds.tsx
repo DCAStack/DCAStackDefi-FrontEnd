@@ -29,6 +29,7 @@ export default function DepositEthFunds({
 }: TokenBadgeProps) {
   const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
+  const [updateState, setUpdate] = useState(true);
 
   let depositEthActions = DepositEthFundsFlow(token, depositAmount);
 
@@ -36,12 +37,15 @@ export default function DepositEthFunds({
     const re = /^\d*\.?\d*$/;
     if (event.target.value === "" || re.test(event.target.value)) {
       setDeposit(event.target.value);
+      setUpdate(false);
     }
   };
 
   useEffect(() => {
-    setDeposit(formatEther(weiDefaultValue).toString());
-  }, [weiDefaultValue]);
+    if (updateState) {
+      setDeposit(formatEther(weiDefaultValue).toString());
+    }
+  }, [weiDefaultValue, updateState]);
 
   return (
     <Container my="deposit_funds">
@@ -66,13 +70,14 @@ export default function DepositEthFunds({
               compact
               radius="xl"
               size="md"
-              onClick={() =>
+              onClick={() => {
                 depositEthActions?.max
                   ? setDeposit(
                       formatEther(depositEthActions?.max?.value.toString())
                     )
-                  : setDeposit("0")
-              }
+                  : setDeposit("0");
+                setUpdate(false);
+              }}
             >
               MAX
             </Button>

@@ -29,6 +29,7 @@ export default function DepositFunds({
 }: TokenBadgeProps) {
   const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
+  const [updateState, setUpdate] = useState(true);
 
   let depositTokenActions = DepositFundsFlow(token, depositAmount);
 
@@ -36,14 +37,15 @@ export default function DepositFunds({
     const re = /^\d*\.?\d*$/;
     if (event.target.value === "" || re.test(event.target.value)) {
       setDeposit(event.target.value);
+      setUpdate(false);
     }
   };
 
   useEffect(() => {
-    if (token?.decimals) {
+    if (token?.decimals && updateState) {
       setDeposit(formatUnits(weiDefaultValue, token?.decimals).toString());
     }
-  }, [token?.decimals, weiDefaultValue]);
+  }, [token?.decimals, weiDefaultValue, updateState]);
 
   return (
     <Container my="deposit_funds">
@@ -68,7 +70,7 @@ export default function DepositFunds({
               compact
               radius="xl"
               size="md"
-              onClick={() =>
+              onClick={() => {
                 depositTokenActions?.max
                   ? setDeposit(
                       formatUnits(
@@ -76,8 +78,9 @@ export default function DepositFunds({
                         token?.decimals
                       )
                     )
-                  : setDeposit("0")
-              }
+                  : setDeposit("0");
+                setUpdate(false);
+              }}
             >
               MAX
             </Button>

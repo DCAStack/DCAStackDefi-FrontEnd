@@ -30,17 +30,21 @@ export default function DepositGas({
 }: ISetup) {
   const [depositAmount, setDeposit] = useState("0");
   const { classes } = useStyles();
+  const [updateState, setUpdate] = useState(true);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const re = /^\d*\.?\d*$/;
     if (event.target.value === "" || re.test(event.target.value)) {
       setDeposit(event.target.value);
+      setUpdate(false);
     }
   };
 
   useEffect(() => {
-    setDeposit(formatEther(weiDefaultValue.toString()));
-  }, [weiDefaultValue]);
+    if (updateState) {
+      setDeposit(formatEther(weiDefaultValue.toString()));
+    }
+  }, [weiDefaultValue, updateState]);
 
   let depositGasActions = DepositGasFlow(depositAmount);
 
@@ -67,13 +71,14 @@ export default function DepositGas({
               compact
               radius="xl"
               size="md"
-              onClick={() =>
+              onClick={() => {
                 depositGasActions?.max
                   ? setDeposit(
                       formatEther(depositGasActions?.max?.value.toString())
                     )
-                  : setDeposit("0")
-              }
+                  : setDeposit("0");
+                setUpdate(false);
+              }}
             >
               MAX
             </Button>
