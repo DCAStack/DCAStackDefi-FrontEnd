@@ -64,6 +64,7 @@ export default function use1inchRetrieveQuote(
   const { data, error } = useSWR(
     sellCrypto !== nullToken &&
       buyCrypto !== nullToken &&
+      sellCrypto !== buyCrypto &&
       tradeAmountFormatted !== "0" &&
       tradeFreq > 0 &&
       startDate !== null &&
