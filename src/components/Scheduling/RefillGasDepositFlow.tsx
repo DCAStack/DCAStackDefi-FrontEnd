@@ -12,7 +12,7 @@ import { IToken } from "../../models/Interfaces";
 import DepositGasFlow from "../Banking/DepositGasFlow";
 
 export default function RefillGasDepositFlow(
-  enableFunc: boolean = false,
+  scheduleStatus: boolean,
   tradeAmount: BigNumber,
   tradeFrequency: BigNumber,
   startDate: BigNumber,
@@ -64,7 +64,7 @@ export default function RefillGasDepositFlow(
       startDate,
       endDate,
     ],
-    enabled: enableFunc && enableRead,
+    enabled: enableRead,
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get Gas Needed Deposit Success", data.toString());

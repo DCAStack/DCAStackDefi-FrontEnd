@@ -12,7 +12,7 @@ import DepositEthFundsFlow from "../Banking/DepositEthFundsFlow";
 import DepositFundsFlow from "../Banking/DepositFundsFlow";
 
 export default function RefillTokenDepositFlow(
-  enableFunc: boolean = false,
+  scheduleStatus: boolean,
   tradeAmount: BigNumber,
   tradeFrequency: BigNumber,
   startDate: BigNumber,
@@ -34,14 +34,17 @@ export default function RefillTokenDepositFlow(
     contractInterface: contractABI,
     functionName: "calculateDeposit",
     args: [tradeAmount, tradeFrequency, startDate, endDate, sellToken.address],
-    enabled: enableFunc,
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get Token Needed Deposit Success", data.toString());
-      const adjustData = data.sub(currScheduleBalance).gt(0)
+      const adjustData = data.sub(currScheduleBalance).gte(0)
         ? data.sub(currScheduleBalance)
         : BigNumber.from(0);
-      setNeedToken(formatUnits(adjustData, sellToken?.decimals));
+      if (scheduleStatus) {
+        setNeedToken(formatUnits(adjustData, sellToken?.decimals));
+      } else {
+        setNeedToken(formatUnits(data, sellToken?.decimals));
+      }
     },
     onError(error) {
       console.error("Get Token Needed Deposit Error", error);
