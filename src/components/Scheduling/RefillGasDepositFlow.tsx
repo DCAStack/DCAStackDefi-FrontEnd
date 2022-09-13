@@ -68,7 +68,11 @@ export default function RefillGasDepositFlow(
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get Gas Needed Deposit Success", data.toString());
-      setNeedGas(formatEther(data));
+      if (scheduleStatus) {
+        setNeedGas(formatEther(data));
+      } else {
+        setNeedGas(formatEther(data.mul(2)));
+      }
     },
     onError(error) {
       console.error("Get Gas Needed Deposit Error", error);
