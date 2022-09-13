@@ -337,7 +337,7 @@ export default function NewSchedule({
           </Group>
 
           <Group align="end" position="left" spacing="xs">
-            <Text size="lg">Your total gas deposit is</Text>
+            <Text size="lg">Your minimum gas deposit is</Text>
             <Text weight={700} color="green">
               {quoteDetails?.estimatedGasDcaFormatted} {networkCurrency}
             </Text>
@@ -345,7 +345,6 @@ export default function NewSchedule({
             <Text weight={700} color="green">
               {numExec} times
             </Text>
-            <Text size="xs">(+ some buffer)</Text>
           </Group>
 
           {freeGasBal.gt(0) && //run if additional deposit needed

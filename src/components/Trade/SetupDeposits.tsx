@@ -72,7 +72,7 @@ export default function SetupDeposits({
         <DepositGas
           weiDefaultValue={
             estimatedGas?.gt(freeGasBal)
-              ? estimatedGas?.mul(2).sub(freeGasBal)
+              ? estimatedGas?.sub(freeGasBal)
               : BigNumber.from(0)
           }
         />
