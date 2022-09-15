@@ -1,56 +1,19 @@
-import { useContext, useState } from "react";
-
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 
-import { BigNumber } from "@ethersproject/bignumber";
 import { formatUnits } from "ethers/lib/utils";
-import { useAccount, useContractRead } from "wagmi";
-import { ContractContext } from "../../App";
 import { IToken } from "../../models/Interfaces";
 import DepositEthFundsFlow from "../Banking/DepositEthFundsFlow";
 import DepositFundsFlow from "../Banking/DepositFundsFlow";
 
 export default function RefillTokenDepositFlow(
-  scheduleStatus: boolean,
-  tradeAmount: BigNumber,
-  tradeFrequency: BigNumber,
-  startDate: BigNumber,
-  endDate: BigNumber,
   sellToken: IToken,
-  currScheduleBalance: BigNumber
+  needToken: string
 ) {
-  const { address: contractAddr, abi: contractABI } =
-    useContext(ContractContext);
-  const { address } = useAccount();
-
-  const [needToken, setNeedToken] = useState("0.0");
-
   let depositEthActions = DepositEthFundsFlow(sellToken, needToken);
   let depositTokenActions = DepositFundsFlow(sellToken, needToken);
 
-  useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "calculateDeposit",
-    args: [tradeAmount, tradeFrequency, startDate, endDate, sellToken.address],
-    overrides: { from: address },
-    onSuccess(data) {
-      console.log("Get Token Needed Deposit Success", data.toString());
-      const adjustData = data.sub(currScheduleBalance).gte(0)
-        ? data.sub(currScheduleBalance)
-        : BigNumber.from(0);
-      if (scheduleStatus) {
-        setNeedToken(formatUnits(adjustData, sellToken?.decimals));
-      } else {
-        setNeedToken(formatUnits(data, sellToken?.decimals));
-      }
-    },
-    onError(error) {
-      console.error("Get Token Needed Deposit Error", error);
-      setNeedToken("0.0");
-    },
-  });
+  console.log("checking", sellToken, needToken);
 
   function triggerRefill() {
     if (

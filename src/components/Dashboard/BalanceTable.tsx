@@ -1,4 +1,4 @@
-import { Button, Group, ScrollArea, Table } from "@mantine/core";
+import { Button, ScrollArea, Stack, Table, Tooltip } from "@mantine/core";
 
 import { createStyles } from "@mantine/core";
 
@@ -8,6 +8,9 @@ import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
 import { UserFundsProps } from "../../models/PropTypes";
 import WithdrawFundsFlow from "../Banking/WithdrawFundsFlow";
+import { BigNumber } from "ethers";
+import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
+import { formatUnits } from "ethers/lib/utils";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -48,6 +51,9 @@ interface IUserBalanceInfo {
     freeBalance: string;
     withdrawMax: any;
     withdrawFree: any;
+    topupDeposit: any;
+    freeBalanceRaw: BigNumber;
+    balanceRaw: BigNumber;
   }[];
 }
 export function UsersTable({ data }: IUserBalanceInfo) {
@@ -61,31 +67,68 @@ export function UsersTable({ data }: IUserBalanceInfo) {
       </td>
       <td>{parseFloat(`${item.balance}`).toFixed(6)}</td>
       <td>{parseFloat(`${item.freeBalance}`).toFixed(6)}</td>
+      <td>
+        {parseFloat(
+          `${formatUnits(
+            item.balanceRaw.sub(item.freeBalanceRaw),
+            item.decimals
+          )}`
+        ).toFixed(6)}
+      </td>
 
       <td>
-        <Group spacing="xs" position="center">
-          <Button
-            radius="xl"
-            size="md"
-            compact
-            onClick={() => {
-              item.withdrawFree?.action?.();
-            }}
-          >
-            Withdraw Available
-          </Button>
-          <Button
-            color="red"
-            radius="xl"
-            size="md"
-            compact
-            onClick={() => {
-              item.withdrawMax?.action?.();
-            }}
-          >
-            Withdraw All
-          </Button>
-        </Group>
+        <Stack align="center" spacing="xs">
+          {item.freeBalanceRaw.lt(0) && (
+            <Button
+              radius="xl"
+              size="md"
+              compact
+              onClick={() => {
+                item.topupDeposit?.refill?.();
+              }}
+            >
+              Topup Deposit
+            </Button>
+          )}
+
+          {item.freeBalanceRaw.gt(0) && (
+            <Button
+              radius="xl"
+              size="md"
+              compact
+              onClick={() => {
+                item.withdrawFree?.action?.();
+              }}
+            >
+              Withdraw Available
+            </Button>
+          )}
+
+          {item.balanceRaw.gt(0) && (
+            <Tooltip
+              position="bottom"
+              wrapLines
+              width={220}
+              withArrow
+              transition="fade"
+              transitionDuration={200}
+              label="Please note that selecting WITHDRAW ALL will withdraw all tokens
+              including those used in schedules which will cause them to not run!"
+            >
+              <Button
+                color="red"
+                radius="xl"
+                size="md"
+                compact
+                onClick={() => {
+                  item.withdrawMax?.action?.();
+                }}
+              >
+                Withdraw All
+              </Button>
+            </Tooltip>
+          )}
+        </Stack>
       </td>
     </tr>
   ));
@@ -106,7 +149,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
           <tr>
             <th>Token</th>
             <th>Total Balance</th>
-            <th>Balance Not Used in Schedules</th>
+            <th>Free Balance</th>
+            <th>In Use Balance</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -121,6 +165,7 @@ export function UserBalancesPopulated({
 }: UserFundsProps) {
   let formattedUserData: IUserBalanceInfo["data"] = [];
 
+  console.log("all", parsedTokenBalances);
   if (parsedTokenBalances) {
     Object.keys(parsedTokenBalances).map((key) => {
       if (parsedTokenBalances[Number(key)].address) {
@@ -132,6 +177,13 @@ export function UserBalancesPopulated({
           withdrawFree: WithdrawFundsFlow(
             parsedTokenBalances[Number(key)],
             parsedTokenBalances[Number(key)].freeBalance
+          ),
+          topupDeposit: RefillTokenDepositFlow(
+            parsedTokenBalances[Number(key)],
+            formatUnits(
+              parsedTokenBalances[Number(key)].freeBalanceRaw.abs().toString(),
+              parsedTokenBalances[Number(key)].decimals
+            )
           ),
         };
 
