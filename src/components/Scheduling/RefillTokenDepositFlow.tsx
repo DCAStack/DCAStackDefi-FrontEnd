@@ -13,8 +13,6 @@ export default function RefillTokenDepositFlow(
   let depositEthActions = DepositEthFundsFlow(sellToken, needToken);
   let depositTokenActions = DepositFundsFlow(sellToken, needToken);
 
-  console.log("checking", sellToken, needToken);
-
   function triggerRefill() {
     if (
       sellToken?.address.toLowerCase() ===
