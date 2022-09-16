@@ -1,4 +1,4 @@
-import { ContractInterface } from 'ethers';
+import { BigNumber, ContractInterface } from 'ethers';
 
 export interface IToken {
   name: string;
@@ -21,4 +21,6 @@ export interface IUserFunds {
   decimals: number;
   balance: string;
   freeBalance: string;
+  freeBalanceRaw: BigNumber
+  balanceRaw: BigNumber
 }
