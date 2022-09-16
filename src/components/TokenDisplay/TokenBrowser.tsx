@@ -19,14 +19,12 @@ import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 
 interface ISwapInfo {
   updateToken: React.Dispatch<React.SetStateAction<IToken>>;
-  currToken: IToken;
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function TokenBrowser({
   updateToken,
-  currToken,
   opened,
   setOpened,
 }: ISwapInfo) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button, Group } from "@mantine/core";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
@@ -16,17 +16,11 @@ interface ISwapInfo {
 
 export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
   const [opened, setOpened] = useState(false);
-  const [token, setToken] = useState(currToken);
-
-  useEffect(() => {
-    setToken(currToken);
-  }, [currToken]);
 
   return (
     <>
       <TokenBrowser
         updateToken={updateToken}
-        currToken={currToken}
         opened={opened}
         setOpened={setOpened}
       />
@@ -39,7 +33,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
           onClick={() => setOpened(true)}
         >
           {text}&nbsp;&nbsp;
-          <TokenBadgeDisplay token={token} />
+          <TokenBadgeDisplay token={currToken} />
         </Button>
       </Group>
     </>

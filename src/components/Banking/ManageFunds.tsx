@@ -105,7 +105,6 @@ function ManageFunds({
     <Container my="manage_funds">
       <TokenBrowser
         updateToken={setCurrToken}
-        currToken={currToken}
         opened={openModal}
         setOpened={setModal}
       />
