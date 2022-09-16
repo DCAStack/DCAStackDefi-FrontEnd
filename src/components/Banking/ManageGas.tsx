@@ -5,9 +5,9 @@ import { showNotification } from "@mantine/notifications";
 import {
   AlertOctagon,
   ArrowBigLeftLine,
-  ArrowBigLeftLines,
   ArrowBigRightLine,
-  ArrowBigRightLines,
+  ArrowsMaximize,
+  ArrowsMinimize,
 } from "tabler-icons-react";
 import GasToken from "../TokenDisplay/GasToken";
 
@@ -105,7 +105,7 @@ export default function ManageGas({
           </Menu.Item>
 
           <Menu.Item
-            icon={<ArrowBigLeftLines size={26} color={theme.colors.pink[6]} />}
+            icon={<ArrowsMaximize size={26} color={theme.colors.pink[6]} />}
             onClick={() => {
               if (depositGasActions?.max?.formatted === "0.0") {
                 showNotification({
@@ -158,9 +158,7 @@ export default function ManageGas({
 
           {enableWithdraw && (
             <Menu.Item
-              icon={
-                <ArrowBigRightLines size={26} color={theme.colors.violet[6]} />
-              }
+              icon={<ArrowsMinimize size={26} color={theme.colors.violet[6]} />}
               onClick={() => {
                 if (withdrawGasActions?.max === "0.0") {
                   showNotification({
