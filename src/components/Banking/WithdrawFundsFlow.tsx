@@ -26,6 +26,26 @@ export default function WithdrawFundsFlow(
   const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
+  const { data: maxWithdraw } = useContractRead({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "userTokenBalances",
+    enabled:
+      token !== null && token !== nullToken && token !== undefined
+        ? true
+        : false,
+    args: [address, token?.address],
+    cacheOnBlock: true,
+    watch: true,
+    overrides: { from: address },
+    onSuccess(data) {
+      console.log("Get Max Withdraw Success", data);
+    },
+    onError(error) {
+      console.error("Get Max Withdraw Error", error);
+    },
+  });
+
   const { config: withdrawFundsSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
@@ -36,7 +56,9 @@ export default function WithdrawFundsFlow(
       defaultValue !== "" &&
       token !== null &&
       token !== nullToken &&
-      token !== undefined
+      token !== undefined &&
+      maxWithdraw?.toString() !== "0" &&
+      maxWithdraw?.toString() !== "0.0"
         ? true
         : false,
     functionName: "withdrawFunds",
@@ -121,26 +143,6 @@ export default function WithdrawFundsFlow(
     },
   });
 
-  const { data: maxWithdraw } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "userTokenBalances",
-    enabled:
-      token !== null && token !== nullToken && token !== undefined
-        ? true
-        : false,
-    args: [address, token?.address],
-    cacheOnBlock: true,
-    watch: true,
-    overrides: { from: address },
-    onSuccess(data) {
-      console.log("Get Max Withdraw Success", data);
-    },
-    onError(error) {
-      console.error("Get Max Withdraw Error", error);
-    },
-  });
-
   return {
     action:
       defaultValue !== "0" &&
@@ -149,7 +151,9 @@ export default function WithdrawFundsFlow(
       defaultValue !== "" &&
       token !== null &&
       token !== nullToken &&
-      token !== undefined
+      token !== undefined &&
+      maxWithdraw?.toString() !== "0" &&
+      maxWithdraw?.toString() !== "0.0"
         ? withdrawFunds
         : null,
     max: maxWithdraw ? formatUnits(maxWithdraw, token?.decimals) : "0.0",
