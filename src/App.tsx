@@ -8,7 +8,6 @@ import { NotificationsProvider } from "@mantine/notifications";
 import Home from "./components/Pages/Home";
 import Dashboard from "./components/Pages/Dashboard";
 import Trade from "./components/Pages/Trade";
-import Gas from "./components/Pages/Gas";
 
 import { IContract } from "./models/Interfaces";
 import { Interface } from "ethers/lib/utils";
@@ -40,7 +39,6 @@ function App() {
               <Route path="*" element={<Home />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="trade" element={<Trade />} />
-              <Route path="gas" element={<Gas />} />
               <Route path="disclaimer" element={<Disclaimer />} />
               <Route path="privacy" element={<Privacy />} />
             </Routes>
