@@ -5,7 +5,7 @@ import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { BigNumber } from "ethers";
-import { parseUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import {
   useAccount,
   useContractRead,
@@ -142,7 +142,16 @@ export default function WithdrawFundsFlow(
   });
 
   return {
-    action: withdrawFunds,
-    max: maxWithdraw,
+    action:
+      defaultValue !== "0" &&
+      defaultValue !== "0.0" &&
+      !defaultValue.includes("-") &&
+      defaultValue !== "" &&
+      token !== null &&
+      token !== nullToken &&
+      token !== undefined
+        ? withdrawFunds
+        : null,
+    max: maxWithdraw ? formatUnits(maxWithdraw, token?.decimals) : "0.0",
   };
 }

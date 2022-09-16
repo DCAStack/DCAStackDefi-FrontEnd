@@ -279,7 +279,10 @@ export default function DepositFundsFlow(
   return {
     approveMax: depositApproveSetup,
     approve: approveFunds,
-    deposit: depositFunds,
+    deposit:
+      defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"
+        ? depositFunds
+        : null,
     max: maxTokenDeposit,
   };
 }

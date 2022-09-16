@@ -4,11 +4,9 @@ import { BigNumber } from "ethers";
 import { formatEther, formatUnits } from "ethers/lib/utils";
 import { useNetwork } from "wagmi";
 
-import DepositEthFunds from "../Banking/DepositEthFunds";
-import DepositFunds from "../Banking/DepositFunds";
-import DepositGas from "../Banking/DepositGas";
-
 import { IToken } from "../../models/Interfaces";
+import ManageGas from "../Banking/ManageGas";
+import ManageFunds from "../Banking/ManageFunds";
 
 interface ISetupDeposits {
   sellToken: IToken;
@@ -16,6 +14,7 @@ interface ISetupDeposits {
   depositAmount: BigNumber;
   freeTokenBal: BigNumber;
   freeGasBal: BigNumber;
+  enableWithdraw?: boolean;
 }
 
 export default function SetupDeposits({
@@ -24,6 +23,7 @@ export default function SetupDeposits({
   depositAmount: weiDepositAmount,
   freeTokenBal,
   freeGasBal,
+  enableWithdraw = false,
 }: ISetupDeposits) {
   const { chain } = useNetwork();
 
@@ -69,12 +69,13 @@ export default function SetupDeposits({
           )}
         </Stack>
 
-        <DepositGas
+        <ManageGas
           weiDefaultValue={
             estimatedGas?.gt(freeGasBal)
               ? estimatedGas?.sub(freeGasBal)
               : BigNumber.from(0)
           }
+          enableWithdraw={enableWithdraw}
         />
       </Group>
 
@@ -125,28 +126,16 @@ export default function SetupDeposits({
             </Text>
           )}
         </Stack>
-        {sellToken.address.toLowerCase() !==
-          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
-          <DepositFunds
-            token={sellToken}
-            weiDefaultValue={
-              freeTokenBal.lt(weiDepositAmount)
-                ? weiDepositAmount.sub(freeTokenBal)
-                : BigNumber.from(0)
-            }
-          />
-        )}
-        {sellToken.address.toLowerCase() ===
-          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
-          <DepositEthFunds
-            token={sellToken}
-            weiDefaultValue={
-              freeTokenBal.lt(weiDepositAmount)
-                ? weiDepositAmount.sub(freeTokenBal)
-                : BigNumber.from(0)
-            }
-          />
-        )}
+        <ManageFunds
+          selectedToken={sellToken}
+          weiDefaultValue={
+            freeTokenBal.lt(weiDepositAmount)
+              ? weiDepositAmount.sub(freeTokenBal)
+              : BigNumber.from(0)
+          }
+          enableWithdraw={enableWithdraw}
+        />
+
         {(freeTokenBal.lt(0) || freeGasBal?.lt(0)) && (
           <Text size="xs" color="orange">
             If you're seeing negative balances, you may have forgot to pause an
