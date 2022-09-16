@@ -1,15 +1,8 @@
-import { ChangeEvent, useContext, useState } from "react";
+import { useContext } from "react";
 
-import {
-  Button,
-  Container,
-  createStyles,
-  Group,
-  TextInput,
-} from "@mantine/core";
+import { createStyles } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { AlertOctagon, CircleCheck } from "tabler-icons-react";
-import GasToken from "../TokenDisplay/GasToken";
 
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { formatEther, parseEther } from "ethers/lib/utils";
@@ -28,27 +21,22 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function WithdrawGas() {
+export default function WithdrawGasFlow(defaultValue: string) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const [withdrawAmount, setWithdraw] = useState("0");
   const { classes } = useStyles();
   const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const re = /^\d*\.?\d*$/;
-    if (event.target.value === "" || re.test(event.target.value)) {
-      setWithdraw(event.target.value);
-    }
-  };
-
   const { config: withdrawGasSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    enabled: withdrawAmount !== "" ? true : false,
+    enabled: defaultValue !== "" ? true : false,
     functionName: "withdrawGas",
-    args: withdrawAmount !== "" ? parseEther(withdrawAmount) : parseEther("0"),
+    args:
+      defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"
+        ? parseEther(defaultValue)
+        : parseEther("0"),
     overrides: {
       from: address,
     },
@@ -141,50 +129,11 @@ export default function WithdrawGas() {
     },
   });
 
-  return (
-    <Container my="withdraw_gas">
-      <Group align="end" position="center" spacing="xs">
-        <TextInput
-          styles={{
-            input: {
-              textAlign: "center",
-            },
-          }}
-          label="Withdraw Gas Amount"
-          value={withdrawAmount?.toString()}
-          radius="xs"
-          size="xl"
-          onChange={handleChange}
-          icon={<GasToken />}
-          iconWidth={115}
-          rightSection={
-            <Button
-              variant="subtle"
-              className={classes.input}
-              compact
-              radius="xs"
-              size="md"
-              onClick={() =>
-                maxWithdraw
-                  ? setWithdraw(formatEther(maxWithdraw?.toString()))
-                  : setWithdraw("0")
-              }
-            >
-              MAX
-            </Button>
-          }
-          rightSectionWidth={65}
-        />
-        <Button
-          compact
-          className={classes.input}
-          radius="xs"
-          size="xl"
-          onClick={() => withdrawGas?.()}
-        >
-          Withdraw
-        </Button>{" "}
-      </Group>
-    </Container>
-  );
+  return {
+    withdraw:
+      defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"
+        ? withdrawGas
+        : null,
+    max: maxWithdraw ? formatEther(maxWithdraw) : "0.0",
+  };
 }

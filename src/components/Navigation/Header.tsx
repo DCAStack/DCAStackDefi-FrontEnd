@@ -248,10 +248,7 @@ const headerLinks = {
       link: "/dashboard",
       label: "Dashboard",
     },
-    {
-      link: "/gas",
-      label: "Gas",
-    },
+
     {
       link: "/trade",
       label: "Trade",

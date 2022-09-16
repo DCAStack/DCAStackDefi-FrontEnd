@@ -218,10 +218,7 @@ const footerLinks = {
           label: "Dashboard",
           link: "/dashboard",
         },
-        {
-          label: "Gas",
-          link: "/gas",
-        },
+
         {
           label: "Trade",
           link: "/trade",

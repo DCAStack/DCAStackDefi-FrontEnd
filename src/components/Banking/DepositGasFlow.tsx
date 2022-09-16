@@ -23,7 +23,10 @@ export default function DepositGasFlow(defaultValue: string) {
   const { config: depositGasSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    enabled: defaultValue !== "" ? true : false,
+    enabled:
+      defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"
+        ? true
+        : false,
     functionName: "depositGas",
     overrides: {
       from: address,
@@ -113,7 +116,10 @@ export default function DepositGasFlow(defaultValue: string) {
   });
 
   return {
-    deposit: depositGas,
+    deposit:
+      defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"
+        ? depositGas
+        : null,
     max: maxDeposit,
   };
 }
