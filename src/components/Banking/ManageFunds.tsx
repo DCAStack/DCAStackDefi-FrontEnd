@@ -1,19 +1,23 @@
 import { ChangeEvent, useEffect, useState } from "react";
 
 import {
+  ActionIcon,
   Button,
   Container,
   Group,
   Menu,
+  Text,
   TextInput,
+  Tooltip,
+  UnstyledButton,
   useMantineTheme,
 } from "@mantine/core";
 import {
   ChevronDown,
   ArrowBigLeftLine,
-  ArrowBigLeftLines,
   ArrowBigRightLine,
-  ArrowBigRightLines,
+  ArrowsMaximize,
+  ArrowsMinimize,
 } from "tabler-icons-react";
 import { formatUnits } from "ethers/lib/utils";
 
@@ -26,11 +30,16 @@ import { BigNumber } from "ethers";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
+import TokenBrowser from "../TokenDisplay/TokenBrowser";
+import { UserFundsProps } from "../../models/PropTypes";
+import { X } from "tabler-icons-react";
 
 interface ISetup {
   weiDefaultValue?: BigNumber;
   enableWithdraw?: boolean;
   selectedToken?: IToken;
+  userBalanceList?: any;
+  userFunds?: UserFundsProps;
 }
 
 function ManageFunds({
@@ -40,8 +49,39 @@ function ManageFunds({
 }: ISetup) {
   const theme = useMantineTheme();
 
+  const tooltip = (
+    <div style={{ display: "flex", marginRight: -5 }}>
+      <Text
+        size="xs"
+        style={{
+          color:
+            theme.colorScheme === "dark" ? theme.colors.dark[9] : theme.white,
+        }}
+      >
+        You can select tokens to fund by clicking here!
+      </Text>
+      <ActionIcon
+        ml={5}
+        style={{
+          color: theme.colorScheme === "dark" ? theme.black : theme.white,
+        }}
+        size="xs"
+        onClick={() => setToggle(false)}
+      >
+        <X size={12} />
+      </ActionIcon>
+    </div>
+  );
+
   const [tokenAmount, setAmount] = useState("0");
   const [updateState, setUpdate] = useState(true);
+  const [openModal, setModal] = useState(false);
+
+  const [currToken, setCurrToken] = useState(selectedToken);
+
+  const [openToggle, setToggle] = useState(
+    currToken == nullToken && enableWithdraw ? true : false
+  );
 
   let withdrawActions = WithdrawFundsFlow(selectedToken, tokenAmount);
 
@@ -66,19 +106,49 @@ function ManageFunds({
 
   return (
     <Container my="manage_funds">
+      <TokenBrowser
+        updateToken={setCurrToken}
+        currToken={currToken}
+        opened={openModal}
+        setOpened={setModal}
+      />
       <Group align="end" position="center" spacing="xs">
         <TextInput
           styles={{
             input: {
               textAlign: "center",
             },
+            icon: { pointerEvents: "all" },
           }}
           value={tokenAmount?.toString()}
           label="Fund DCA Amount"
           radius="xs"
           size="xl"
           onChange={handleChange}
-          icon={<TokenBadgeDisplay token={selectedToken} />}
+          icon={
+            <Tooltip
+              label={tooltip}
+              opened={openToggle}
+              allowPointerEvents
+              withArrow
+              wrapLines
+              transition="rotate-left"
+              transitionDuration={250}
+              width={220}
+              gutter={theme.spacing.xs}
+            >
+              <UnstyledButton
+                onClick={() => {
+                  if (enableWithdraw) {
+                    setModal(true);
+                    setToggle(false);
+                  }
+                }}
+              >
+                <TokenBadgeDisplay token={currToken} />
+              </UnstyledButton>
+            </Tooltip>
+          }
           iconWidth={115}
         />
         <Menu
@@ -146,7 +216,7 @@ function ManageFunds({
           </Menu.Item>
 
           <Menu.Item
-            icon={<ArrowBigLeftLines size={26} color={theme.colors.pink[6]} />}
+            icon={<ArrowsMaximize size={26} color={theme.colors.pink[6]} />}
             onClick={() => {
               if (
                 selectedToken?.address.toLowerCase() ===
@@ -213,9 +283,7 @@ function ManageFunds({
 
           {enableWithdraw && (
             <Menu.Item
-              icon={
-                <ArrowBigRightLines size={26} color={theme.colors.violet[6]} />
-              }
+              icon={<ArrowsMinimize size={26} color={theme.colors.violet[6]} />}
               onClick={() => {
                 setAmount(
                   withdrawActions?.max ? withdrawActions?.max.toString() : "0"
