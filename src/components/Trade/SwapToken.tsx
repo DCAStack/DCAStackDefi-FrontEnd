@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { Button, Group } from "@mantine/core";
-import { useNetwork } from "wagmi";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
 import { Selector } from "tabler-icons-react";

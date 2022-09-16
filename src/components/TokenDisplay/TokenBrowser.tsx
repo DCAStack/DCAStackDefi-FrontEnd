@@ -31,19 +31,15 @@ export default function TokenBrowser({
   setOpened,
 }: ISwapInfo) {
   const { chain } = useNetwork();
-  // const [opened, setOpened] = useState(false);
   const currentChain: number = chain ? chain?.id : 0;
 
   const { tokens: masterTokenList } = use1inchRetrieveTokens(currentChain);
 
-  const [token, setToken] = useState(currToken);
   const tokensList: IToken[] = swapTokens[currentChain];
   const [filteredTokens, setFilteredTokens] = useState(tokensList);
   useEffect(() => {
     setFilteredTokens(tokensList);
-    setToken(currToken);
-    // setOpened(openModal);
-  }, [tokensList, currToken]);
+  }, [tokensList]);
 
   const searchTokens = (event: ChangeEvent<HTMLInputElement>): void => {
     if (masterTokenList) {
@@ -88,7 +84,6 @@ export default function TokenBrowser({
               key={token.address}
               onClick={() => {
                 setOpened(false);
-                setToken(token);
                 updateToken(token);
               }}
             >
@@ -109,7 +104,6 @@ export default function TokenBrowser({
                   key={token.address}
                   onClick={() => {
                     setOpened(false);
-                    setToken(token);
                     updateToken(token);
                   }}
                 >

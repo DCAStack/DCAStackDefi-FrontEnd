@@ -31,15 +31,12 @@ import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 import TokenBrowser from "../TokenDisplay/TokenBrowser";
-import { UserFundsProps } from "../../models/PropTypes";
 import { X } from "tabler-icons-react";
 
 interface ISetup {
   weiDefaultValue?: BigNumber;
   enableWithdraw?: boolean;
   selectedToken?: IToken;
-  userBalanceList?: any;
-  userFunds?: UserFundsProps;
 }
 
 function ManageFunds({
@@ -80,7 +77,7 @@ function ManageFunds({
   const [currToken, setCurrToken] = useState(selectedToken);
 
   const [openToggle, setToggle] = useState(
-    currToken == nullToken && enableWithdraw ? true : false
+    currToken === nullToken && enableWithdraw ? true : false
   );
 
   let withdrawActions = WithdrawFundsFlow(selectedToken, tokenAmount);

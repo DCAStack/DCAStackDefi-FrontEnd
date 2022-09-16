@@ -43,6 +43,7 @@ export default function SetupDeposits({
     : "?";
 
   const [opened, setOpened] = useState(true);
+
   const theme = useMantineTheme();
 
   const tooltip = (
