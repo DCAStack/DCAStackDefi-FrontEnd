@@ -1,4 +1,13 @@
-import { Group, Space, Stack, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Group,
+  Space,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
+  useMantineTheme,
+} from "@mantine/core";
 
 import { BigNumber } from "ethers";
 import { formatEther, formatUnits } from "ethers/lib/utils";
@@ -7,6 +16,8 @@ import { useNetwork } from "wagmi";
 import { IToken } from "../../models/Interfaces";
 import ManageGas from "../Banking/ManageGas";
 import ManageFunds from "../Banking/ManageFunds";
+import { useState } from "react";
+import { X } from "tabler-icons-react";
 
 interface ISetupDeposits {
   sellToken: IToken;
@@ -31,6 +42,35 @@ export default function SetupDeposits({
     ? chain.nativeCurrency.symbol
     : "?";
 
+  const [opened, setOpened] = useState(true);
+  const theme = useMantineTheme();
+
+  const tooltip = (
+    <div style={{ display: "flex", marginRight: -5 }}>
+      <Text
+        size="xs"
+        style={{
+          color:
+            theme.colorScheme === "dark" ? theme.colors.dark[9] : theme.white,
+        }}
+      >
+        If you're seeing negative balances, you may be low on gas / token
+        deposits for running schedules. Head over to the dashboard to see what's
+        up.
+      </Text>
+      <ActionIcon
+        ml={5}
+        style={{
+          color: theme.colorScheme === "dark" ? theme.black : theme.white,
+        }}
+        size="xs"
+        onClick={() => setOpened(false)}
+      >
+        <X size={12} />
+      </ActionIcon>
+    </div>
+  );
+
   return (
     <div>
       <Group align="center" position="center" grow>
@@ -48,10 +88,22 @@ export default function SetupDeposits({
             </Text>
           )}
           {freeGasBal?.lt(0) && (
-            <Text size="lg" color="red">
-              Have: {parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
-              {networkCurrency}
-            </Text>
+            <Tooltip
+              label={tooltip}
+              opened={opened}
+              allowPointerEvents
+              withArrow
+              wrapLines
+              transition="rotate-left"
+              transitionDuration={250}
+              width={220}
+              gutter={theme.spacing.xs}
+            >
+              <Text size="lg" color="red">
+                Have: {parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
+                {networkCurrency}
+              </Text>
+            </Tooltip>
           )}
           {estimatedGas?.lte(freeGasBal) && (
             <Text size="lg" color="green">
@@ -99,13 +151,25 @@ export default function SetupDeposits({
             </Text>
           )}
           {freeTokenBal.lt(0) && (
-            <Text size="lg" color="red">
-              Have:{" "}
-              {parseFloat(
-                formatUnits(freeTokenBal, sellToken.decimals)
-              ).toFixed(6)}{" "}
-              {sellToken.symbol}
-            </Text>
+            <Tooltip
+              label={tooltip}
+              opened={opened}
+              allowPointerEvents
+              withArrow
+              wrapLines
+              transition="rotate-left"
+              transitionDuration={250}
+              width={220}
+              gutter={theme.spacing.xs}
+            >
+              <Text size="lg" color="red">
+                Have:{" "}
+                {parseFloat(
+                  formatUnits(freeTokenBal, sellToken.decimals)
+                ).toFixed(6)}{" "}
+                {sellToken.symbol}
+              </Text>
+            </Tooltip>
           )}
 
           {freeTokenBal?.lt(weiDepositAmount) && (
@@ -135,14 +199,6 @@ export default function SetupDeposits({
           }
           enableWithdraw={enableWithdraw}
         />
-
-        {(freeTokenBal.lt(0) || freeGasBal?.lt(0)) && (
-          <Text size="xs" color="orange">
-            If you're seeing negative balances, you may have forgot to pause an
-            active schedule. Or you may be low on gas / token deposits for
-            running schedules. Head over to the dashboard to see what's up.
-          </Text>
-        )}
       </Group>
     </div>
   );
