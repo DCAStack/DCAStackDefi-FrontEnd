@@ -1,24 +1,13 @@
-import { Container, createStyles, Paper, Space, Title } from "@mantine/core";
+import { Container, Paper, Space, Title } from "@mantine/core";
 
 import { Alert } from "@mantine/core";
 import { AlertCircle } from "tabler-icons-react";
 
 import TradeDCA from "../Trade/TradeDCA";
 
-const useStyles = createStyles((theme) => ({
-  // could improve this
-  wrapper: {
-    position: "relative",
-    paddingTop: 20,
-    paddingBottom: 80,
-  },
-}));
-
 const Trade = () => {
-  const { classes } = useStyles();
-
   return (
-    <Container className={classes.wrapper} my="setup_trade">
+    <Container my="setup_trade">
       <Title order={1} align="center">
         Setup New Schedule
       </Title>
