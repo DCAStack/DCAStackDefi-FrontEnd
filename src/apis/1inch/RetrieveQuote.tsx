@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   parseEther,
   formatUnits,
@@ -62,19 +62,14 @@ export default function use1inchRetrieveQuote(
         : "0";
   }
 
-  const { mappedTokenBalances, parsedTokenBalances, userSchedules } =
-    RetrieveUserInfo();
-  const { estimatedGas, freeGasBal } = EstimateGas(
-    mappedTokenBalances,
-    userSchedules
-  );
+  const { mappedTokenBalances, userSchedules } = RetrieveUserInfo();
+  const { estimatedGas } = EstimateGas(mappedTokenBalances, userSchedules);
 
   let bufferAddWei = BigNumber.from(0);
   if (fetchScheduleEstimates) {
     bufferAddWei = estimatedGas;
+    console.log("buffer added", bufferAddWei.toString());
   }
-
-  console.log("buffer added", bufferAddWei.toString());
 
   const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${tradeAmountFormatted}`;
 
