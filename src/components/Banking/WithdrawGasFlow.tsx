@@ -1,14 +1,12 @@
 import { useContext } from "react";
 
-import { createStyles } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { AlertOctagon, CircleCheck } from "tabler-icons-react";
 
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { formatEther, parseEther } from "ethers/lib/utils";
+import { parseEther } from "ethers/lib/utils";
 import {
   useAccount,
-  useContractRead,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -108,28 +106,10 @@ export default function WithdrawGasFlow(
     },
   });
 
-  const { data: maxWithdraw } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "userGasBalances",
-    args: address,
-    cacheOnBlock: true,
-    watch: true,
-    enabled: address !== undefined,
-    overrides: { from: address },
-    onSuccess(data) {
-      console.log("Get User Gas for max withdraw Success", data);
-    },
-    onError(error) {
-      console.error("Get User Gas for max withdraw Error", error);
-    },
-  });
-
   return {
     withdraw:
       defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"
         ? withdrawGas
         : null,
-    max: maxWithdraw ? formatEther(maxWithdraw) : "0.0",
   };
 }

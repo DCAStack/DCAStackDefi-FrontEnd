@@ -21,11 +21,13 @@ import { ChevronDown } from "tabler-icons-react";
 interface ISetup {
   weiDefaultValue?: BigNumber;
   enableWithdraw?: boolean;
+  maxWithdraw?: string;
 }
 
 export default function ManageGas({
   weiDefaultValue = BigNumber.from(0),
   enableWithdraw = false,
+  maxWithdraw = "0",
 }: ISetup) {
   const theme = useMantineTheme();
 
@@ -85,7 +87,10 @@ export default function ManageGas({
           <Menu.Item
             icon={<ArrowBigLeftLine size={26} color={theme.colors.blue[6]} />}
             onClick={() => {
-              if (depositGasActions?.max?.formatted === "0.0") {
+              if (
+                depositGasActions?.max?.formatted === "0.0" ||
+                depositGasActions?.max?.formatted === "0"
+              ) {
                 showNotification({
                   id: "deposit-balance-error",
                   color: "red",
@@ -107,7 +112,10 @@ export default function ManageGas({
           <Menu.Item
             icon={<ArrowsMaximize size={26} color={theme.colors.pink[6]} />}
             onClick={() => {
-              if (depositGasActions?.max?.formatted === "0.0") {
+              if (
+                depositGasActions?.max?.formatted === "0.0" ||
+                depositGasActions?.max?.formatted === "0"
+              ) {
                 showNotification({
                   id: "deposit-balance-error",
                   color: "red",
@@ -136,7 +144,7 @@ export default function ManageGas({
                 <ArrowBigRightLine size={26} color={theme.colors.cyan[6]} />
               }
               onClick={() => {
-                if (withdrawGasActions?.max === "0.0") {
+                if (maxWithdraw === "0.0" || maxWithdraw === "0") {
                   showNotification({
                     id: "withdraw-balance-error",
                     color: "red",
@@ -160,7 +168,7 @@ export default function ManageGas({
             <Menu.Item
               icon={<ArrowsMinimize size={26} color={theme.colors.violet[6]} />}
               onClick={() => {
-                if (withdrawGasActions?.max === "0.0") {
+                if (maxWithdraw === "0.0" || maxWithdraw === "0") {
                   showNotification({
                     id: "withdraw-balance-error",
                     color: "red",
@@ -172,7 +180,7 @@ export default function ManageGas({
                     icon: <AlertOctagon />,
                   });
                 } else {
-                  setAmount(withdrawGasActions?.max);
+                  setAmount(maxWithdraw);
                 }
               }}
             >

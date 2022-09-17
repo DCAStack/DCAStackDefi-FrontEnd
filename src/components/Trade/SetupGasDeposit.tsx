@@ -10,11 +10,12 @@ import {
 
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
-import { useNetwork } from "wagmi";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
 
 import ManageGas from "../Banking/ManageGas";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { X } from "tabler-icons-react";
+import { ContractContext } from "../../App";
 
 interface ISetupGasDeposit {
   estimatedGas: BigNumber;
@@ -34,6 +35,34 @@ export default function SetupGasDeposit({
     : "?";
 
   const [opened, setOpened] = useState(true);
+  const [maxWithdraw, setMaxWithdraw] = useState(BigNumber.from(0));
+
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
+  const { address } = useAccount();
+
+  const { data } = useContractRead({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "userGasBalances",
+    args: address,
+    cacheOnBlock: true,
+    watch: true,
+    enabled: address !== undefined,
+    overrides: { from: address },
+    onSuccess(data) {
+      console.log(
+        "Get User Gas for max withdraw Success",
+        data,
+        data.toString()
+      );
+      setMaxWithdraw(BigNumber.from(data));
+    },
+    onError(error) {
+      console.error("Get User Gas for max withdraw Error", error);
+      setMaxWithdraw(BigNumber.from(0));
+    },
+  });
 
   const theme = useMantineTheme();
 
@@ -68,15 +97,26 @@ export default function SetupGasDeposit({
       <Group align="center" position="center" grow>
         <Stack>
           <Title order={4}>Contract Gas Bal.</Title>
+          {maxWithdraw?.gt(0) && (
+            <Text size="lg" color="green">
+              Total: ~{parseFloat(formatEther(maxWithdraw)).toFixed(6)}{" "}
+              {networkCurrency}
+            </Text>
+          )}
+          {maxWithdraw?.eq(0) && (
+            <Text size="lg" color="red">
+              Total: 0 {networkCurrency}
+            </Text>
+          )}
           {freeGasBal?.gt(0) && (
             <Text size="lg" color="green">
-              Have: ~{parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
+              Free: ~{parseFloat(formatEther(freeGasBal)).toFixed(6)}{" "}
               {networkCurrency}
             </Text>
           )}
           {freeGasBal?.eq(0) && (
             <Text size="lg" color="red">
-              Have: 0 {networkCurrency}
+              Free: 0 {networkCurrency}
             </Text>
           )}
           {freeGasBal?.lt(0) && (
@@ -120,6 +160,7 @@ export default function SetupGasDeposit({
               : BigNumber.from(0)
           }
           enableWithdraw={enableWithdraw}
+          maxWithdraw={formatEther(maxWithdraw)}
         />
       </Group>
     </div>
