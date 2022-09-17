@@ -32,6 +32,7 @@ import { nullToken } from "../../data/gasTokens";
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 import TokenBrowser from "../TokenDisplay/TokenBrowser";
 import { X } from "tabler-icons-react";
+import { useNetwork } from "wagmi";
 
 interface ISetup {
   weiDefaultValue?: BigNumber;
@@ -72,11 +73,16 @@ function ManageFunds({
     </div>
   );
 
+  const { chain } = useNetwork();
+  const currentChain: number = chain ? chain?.id : 0;
+
   const [tokenAmount, setAmount] = useState("0");
   const [updateState, setUpdate] = useState(true);
   const [openModal, setModal] = useState(false);
   const [openToggle, setToggle] = useState(
-    selectedToken === nullToken && enableWithdraw ? true : false
+    selectedToken === nullToken && enableWithdraw && currentChain !== 0
+      ? true
+      : false
   );
 
   let withdrawActions = WithdrawFundsFlow(selectedToken, tokenAmount);
@@ -134,7 +140,7 @@ function ManageFunds({
             >
               <UnstyledButton
                 onClick={() => {
-                  if (enableWithdraw) {
+                  if (enableWithdraw && currentChain !== 0) {
                     setModal(true);
                     setToggle(false);
                   }
