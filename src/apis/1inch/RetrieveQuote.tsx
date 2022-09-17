@@ -13,6 +13,8 @@ import Big from "big.js";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import { useFeeData } from "wagmi";
+import RetrieveUserInfo from "../../components/Dashboard/RetrieveUserInfo";
+import EstimateGas from "../../components/Banking/EstimateGas";
 
 export default function use1inchRetrieveQuote(
   currentChain: number,
@@ -23,6 +25,7 @@ export default function use1inchRetrieveQuote(
   startDate: Date | null,
   endDate: Date | null,
   numExec: number,
+  fetchScheduleEstimates: boolean = true,
   alreadyFormatted?: boolean,
   bufferMultiplier: number = 2
 ) {
@@ -59,6 +62,20 @@ export default function use1inchRetrieveQuote(
         : "0";
   }
 
+  const { mappedTokenBalances, parsedTokenBalances, userSchedules } =
+    RetrieveUserInfo();
+  const { estimatedGas, freeGasBal } = EstimateGas(
+    mappedTokenBalances,
+    userSchedules
+  );
+
+  let bufferAddWei = BigNumber.from(0);
+  if (fetchScheduleEstimates) {
+    bufferAddWei = estimatedGas;
+  }
+
+  console.log("buffer added", bufferAddWei.toString());
+
   const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto.address}&toTokenAddress=${buyCrypto.address}&amount=${tradeAmountFormatted}`;
 
   const { data, error } = useSWR(
@@ -79,16 +96,20 @@ export default function use1inchRetrieveQuote(
   if (data) {
     console.log("1inch fetch quote success", data, feeData.toString());
     if (data?.estimatedGas) {
-      data.estimatedGasSingleTradeWei = BigNumber.from(data.estimatedGas).mul(
-        feeData
-      );
+      data.estimatedGasSingleTradeWei = BigNumber.from(data.estimatedGas)
+        .mul(feeData)
+        .add(bufferAddWei);
+
       data.estimatedGasFormattedMin = formatEther(
         data.estimatedGasSingleTradeWei
       );
 
       //buffer used for single trade calcs
+      data.estimatedGasSingleTrade =
+        data.estimatedGasSingleTradeWei.mul(bufferMultiplier);
+
       data.estimatedGasFormatted = formatEther(
-        data.estimatedGasSingleTradeWei.mul(bufferMultiplier).toString()
+        data.estimatedGasSingleTrade.toString()
       );
 
       let calcGas = data.estimatedGasSingleTradeWei
