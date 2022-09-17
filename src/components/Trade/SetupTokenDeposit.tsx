@@ -13,8 +13,11 @@ import { formatUnits } from "ethers/lib/utils";
 
 import { IToken } from "../../models/Interfaces";
 import ManageFunds from "../Banking/ManageFunds";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { X } from "tabler-icons-react";
+import { useAccount, useContractRead } from "wagmi";
+import { ContractContext } from "../../App";
+import { nullToken } from "../../data/gasTokens";
 
 interface ISetupDeposits {
   sellToken: IToken;
@@ -32,6 +35,33 @@ export default function SetupTokenDeposit({
   setToken,
 }: ISetupDeposits) {
   const [opened, setOpened] = useState(true);
+  const [maxWithdraw, setMaxWithdraw] = useState(BigNumber.from(0));
+
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
+  const { address } = useAccount();
+
+  useContractRead({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "userTokenBalances",
+    enabled:
+      sellToken !== null && sellToken !== nullToken && sellToken !== undefined
+        ? true
+        : false,
+    args: [address, sellToken?.address],
+    cacheOnBlock: true,
+    watch: true,
+    overrides: { from: address },
+    onSuccess(data) {
+      console.log("Get Max Withdraw Success", data);
+      setMaxWithdraw(BigNumber.from(data));
+    },
+    onError(error) {
+      console.error("Get Max Withdraw Error", error);
+      setMaxWithdraw(BigNumber.from(0));
+    },
+  });
 
   const theme = useMantineTheme();
 
@@ -65,9 +95,23 @@ export default function SetupTokenDeposit({
       <Group align="center" position="center" grow>
         <Stack>
           <Title order={4}>Contract Deposit Bal.</Title>
+          {maxWithdraw.gt(0) && (
+            <Text size="lg" color="green">
+              Total: ~
+              {parseFloat(formatUnits(maxWithdraw, sellToken.decimals)).toFixed(
+                6
+              )}{" "}
+              {sellToken.symbol}
+            </Text>
+          )}
+          {maxWithdraw.eq(0) && (
+            <Text size="lg" color="red">
+              Total: 0 {sellToken.symbol}
+            </Text>
+          )}
           {freeTokenBal.gt(0) && (
             <Text size="lg" color="green">
-              Have: ~
+              Free: ~
               {parseFloat(
                 formatUnits(freeTokenBal, sellToken.decimals)
               ).toFixed(6)}{" "}
@@ -76,7 +120,7 @@ export default function SetupTokenDeposit({
           )}
           {freeTokenBal.eq(0) && (
             <Text size="lg" color="red">
-              Have: 0 {sellToken.symbol}
+              Free: 0 {sellToken.symbol}
             </Text>
           )}
           {freeTokenBal.lt(0) && (
@@ -92,7 +136,7 @@ export default function SetupTokenDeposit({
               gutter={theme.spacing.xs}
             >
               <Text size="lg" color="red">
-                Have:{" "}
+                Free:{" "}
                 {parseFloat(
                   formatUnits(freeTokenBal, sellToken.decimals)
                 ).toFixed(6)}{" "}
@@ -128,6 +172,10 @@ export default function SetupTokenDeposit({
               : BigNumber.from(0)
           }
           enableWithdraw={enableWithdraw}
+          maxWithdraw={formatUnits(
+            maxWithdraw,
+            sellToken?.decimals ? sellToken?.decimals : "0"
+          )}
         />
       </Group>
     </div>

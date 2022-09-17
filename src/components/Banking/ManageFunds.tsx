@@ -39,6 +39,7 @@ interface ISetup {
   enableWithdraw?: boolean;
   selectedToken?: IToken;
   setToken: React.Dispatch<React.SetStateAction<IToken>>;
+  maxWithdraw?: string;
 }
 
 function ManageFunds({
@@ -46,6 +47,7 @@ function ManageFunds({
   enableWithdraw = false,
   selectedToken = nullToken,
   setToken,
+  maxWithdraw,
 }: ISetup) {
   const theme = useMantineTheme();
 
@@ -286,9 +288,7 @@ function ManageFunds({
             <Menu.Item
               icon={<ArrowsMinimize size={26} color={theme.colors.violet[6]} />}
               onClick={() => {
-                setAmount(
-                  withdrawActions?.max ? withdrawActions?.max.toString() : "0"
-                );
+                setAmount(maxWithdraw ? maxWithdraw.toString() : "0");
               }}
             >
               Get Max Withdrraw
