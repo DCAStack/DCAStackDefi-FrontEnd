@@ -21,6 +21,7 @@ interface ISetupDeposits {
   depositAmount: BigNumber;
   freeTokenBal: BigNumber;
   enableWithdraw?: boolean;
+  setToken: React.Dispatch<React.SetStateAction<IToken>>;
 }
 
 export default function SetupTokenDeposit({
@@ -28,6 +29,7 @@ export default function SetupTokenDeposit({
   depositAmount: weiDepositAmount,
   freeTokenBal,
   enableWithdraw = false,
+  setToken,
 }: ISetupDeposits) {
   const [opened, setOpened] = useState(true);
 
@@ -119,6 +121,7 @@ export default function SetupTokenDeposit({
         </Stack>
         <ManageFunds
           selectedToken={sellToken}
+          setToken={setToken}
           weiDefaultValue={
             freeTokenBal.lt(weiDepositAmount)
               ? weiDepositAmount.sub(freeTokenBal)

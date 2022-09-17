@@ -1,6 +1,7 @@
 import { Space } from "@mantine/core";
 
 import { BigNumber } from "ethers";
+import { useState } from "react";
 
 import { IToken } from "../../models/Interfaces";
 import SetupGasDeposit from "./SetupGasDeposit";
@@ -23,6 +24,8 @@ export default function SetupDeposits({
   freeGasBal,
   enableWithdraw = false,
 }: ISetupDeposits) {
+  const [currToken, setCurrToken] = useState(sellToken);
+
   return (
     <div>
       <SetupGasDeposit
@@ -34,6 +37,7 @@ export default function SetupDeposits({
 
       <SetupTokenDeposit
         sellToken={sellToken}
+        setToken={setCurrToken}
         depositAmount={depositAmount}
         freeTokenBal={freeTokenBal}
         enableWithdraw={enableWithdraw}

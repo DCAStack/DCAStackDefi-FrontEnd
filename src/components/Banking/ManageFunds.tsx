@@ -37,12 +37,14 @@ interface ISetup {
   weiDefaultValue?: BigNumber;
   enableWithdraw?: boolean;
   selectedToken?: IToken;
+  setToken: React.Dispatch<React.SetStateAction<IToken>>;
 }
 
 function ManageFunds({
   weiDefaultValue = BigNumber.from(0),
   enableWithdraw = false,
   selectedToken = nullToken,
+  setToken,
 }: ISetup) {
   const theme = useMantineTheme();
 
@@ -73,11 +75,8 @@ function ManageFunds({
   const [tokenAmount, setAmount] = useState("0");
   const [updateState, setUpdate] = useState(true);
   const [openModal, setModal] = useState(false);
-
-  const [currToken, setCurrToken] = useState(selectedToken);
-
   const [openToggle, setToggle] = useState(
-    currToken === nullToken && enableWithdraw ? true : false
+    selectedToken === nullToken && enableWithdraw ? true : false
   );
 
   let withdrawActions = WithdrawFundsFlow(selectedToken, tokenAmount);
@@ -104,7 +103,7 @@ function ManageFunds({
   return (
     <Container my="manage_funds">
       <TokenBrowser
-        updateToken={setCurrToken}
+        updateToken={setToken}
         opened={openModal}
         setOpened={setModal}
       />
@@ -141,7 +140,7 @@ function ManageFunds({
                   }
                 }}
               >
-                <TokenBadgeDisplay token={currToken} />
+                <TokenBadgeDisplay token={selectedToken} />
               </UnstyledButton>
             </Tooltip>
           }
