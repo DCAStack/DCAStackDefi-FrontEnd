@@ -15,7 +15,7 @@ import { formatUnits } from "ethers/lib/utils";
 const useStyles = createStyles((theme) => ({
   header: {
     position: "sticky",
-    zIndex: 1000,
+    zIndex: 1,
     top: 0,
     backgroundColor:
       theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
