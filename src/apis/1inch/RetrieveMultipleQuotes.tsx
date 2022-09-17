@@ -151,6 +151,7 @@ export default function use1inchRetrieveMultipleQuotes(
           data[Number(key)].swapQuote = bnToAmount.div(bnFromAmount).toString();
         }
       }
+      return true;
     });
   }
 

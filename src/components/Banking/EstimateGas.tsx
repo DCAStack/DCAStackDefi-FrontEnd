@@ -37,17 +37,17 @@ function EstimateGas(
           )
         );
       }
+      return true;
     });
   }
 
-  const { totalEstimatedGas: totalEstimatedGas } =
-    use1inchRetrieveMultipleQuotes(
-      currentChain,
-      scheduleSellTokens,
-      scheduleBuyTokens,
-      scheduleTradeAmounts,
-      scheduleNumExecs
-    );
+  const { totalEstimatedGas } = use1inchRetrieveMultipleQuotes(
+    currentChain,
+    scheduleSellTokens,
+    scheduleBuyTokens,
+    scheduleTradeAmounts,
+    scheduleNumExecs
+  );
 
   useContractRead({
     addressOrName: contractAddr,

@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { useAccount, useNetwork, useContractReads } from "wagmi";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 import { ContractContext } from "../../App";
