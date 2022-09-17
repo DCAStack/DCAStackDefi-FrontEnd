@@ -104,7 +104,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             </Button>
           )}
 
-          {item.balanceRaw.gt(0) && (
+          {item.balanceRaw.gt(0) && !item.freeBalanceRaw.eq(item.balanceRaw) && (
             <Tooltip
               position="bottom"
               wrapLines
