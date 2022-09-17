@@ -136,7 +136,7 @@ const Dashboard = () => {
         <Container my="setup_deposits">
           <ManageDeposits
             enableWithdraw={true}
-            userFunds={parsedTokenBalances}
+            mappedUserFunds={mappedTokenBalances}
             userSchedules={userSchedules}
           />
         </Container>
