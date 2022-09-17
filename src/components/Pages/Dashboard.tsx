@@ -1,18 +1,9 @@
 import { useContext } from "react";
 
-import {
-  Alert,
-  Container,
-  createStyles,
-  Paper,
-  Space,
-  Title,
-} from "@mantine/core";
-
-import ManageScheduleFunds from "../Banking/ManageScheduleFunds";
+import { Container, Paper, Space, Title } from "@mantine/core";
 
 import { Tabs } from "@mantine/core";
-import { AlertCircle, BuildingBank, Clock } from "tabler-icons-react";
+import { BuildingBank, Clock } from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
 import { formatUnits } from "ethers/lib/utils";
@@ -23,19 +14,10 @@ import { UserBalancesPopulated } from "../Dashboard/BalanceTable";
 import { UserSchedulesPopulated } from "../Dashboard/ScheduleTable";
 
 import { BigNumber } from "ethers";
-import { IToken, IUserFunds } from "../../models/Interfaces";
-
-const useStyles = createStyles((theme) => ({
-  // could improve this
-  wrapper: {
-    position: "relative",
-    paddingTop: 20,
-    paddingBottom: 80,
-  },
-}));
+import { IUserFunds } from "../../models/Interfaces";
+import ManageDeposits from "../Dashboard/ManageDeposits";
 
 const Dashboard = () => {
-  const { classes } = useStyles();
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
   const { address } = useAccount();
@@ -64,15 +46,15 @@ const Dashboard = () => {
     enabled: address !== undefined,
     overrides: { from: address },
     onSuccess(data) {
-      console.log("Get All User Token Info Success", data);
+      console.log("Get All User Data Info Success", data);
     },
     onError(error) {
-      console.error("Get All User Token Info Error", error);
+      console.error("Get All User Data Info Error", error);
     },
   });
 
   let parsedTokenBalances: IUserFunds[] = [];
-  let mappedTokenBalances: Record<string, IToken> = {};
+  let mappedTokenBalances: Record<string, IUserFunds> = {};
   let userTokenBalances = userTokenInfo ? userTokenInfo[0] : [[], [], []];
   let userTokenPurchasing = userTokenInfo ? userTokenInfo[1] : [[]];
   let userSchedules = userTokenInfo ? userTokenInfo[1] : [[]];
@@ -118,6 +100,8 @@ const Dashboard = () => {
               joinNeededTokens[2][index],
               tokenDetails.decimals
             ),
+            balanceRaw: joinNeededTokens[1][index],
+            freeBalanceRaw: joinNeededTokens[2][index],
           };
           if (!parsedTokenBalances.includes(addDetails)) {
             if (
@@ -126,6 +110,7 @@ const Dashboard = () => {
             ) {
               parsedTokenBalances.push(addDetails);
             }
+
             mappedTokenBalances[`${tokenAddr}`] = addDetails;
           }
         }
@@ -134,23 +119,10 @@ const Dashboard = () => {
   }
 
   return (
-    <Container className={classes.wrapper} my="setup_trade">
-      <Title order={1} align="center">
-        Dashboard
-      </Title>
+    <Container my="user_dashboard">
+      <Title align="center">Dashboard</Title>
       <Space h="xl" />
-      <Alert
-        icon={<AlertCircle size={16} />}
-        title="Token Balances"
-        color="orange"
-        radius="xs"
-      >
-        Please note that selecting WITHDRAW ALL will withdraw all tokens
-        including those used in schedules which will cause them to not run!
-        Select WITHDRAW AVAILABLE to withdraw what is not being used in a
-        schedule.
-      </Alert>
-      <Space h="xl" />
+
       <Paper
         shadow="xl"
         radius="xl"
@@ -161,29 +133,27 @@ const Dashboard = () => {
           borderBlockColor: theme.white,
         })}
       >
-        <ManageScheduleFunds userFunds={parsedTokenBalances} />
+        <Container my="setup_deposits">
+          <ManageDeposits
+            enableWithdraw={true}
+            userFunds={parsedTokenBalances}
+            userSchedules={userSchedules}
+          />
+        </Container>
       </Paper>
       <Space h="xl" />
 
       <Tabs tabPadding="xl" position="center" grow>
-        <Tabs.Tab label="Schedule Balances" icon={<BuildingBank size={30} />}>
-          <UserBalancesPopulated userFunds={parsedTokenBalances} />
-        </Tabs.Tab>
-
         <Tabs.Tab label="Schedules" icon={<Clock size={30} />}>
           <UserSchedulesPopulated
             mappedUserFunds={mappedTokenBalances}
             userSchedules={userSchedules}
           />
         </Tabs.Tab>
-        {/* 
-        <Tabs.Tab label="Trades" icon={<Cash size={30} />}> 
-          <UserTradesPopulated />
-        </Tabs.Tab>
 
-        <Tabs.Tab label="History" icon={<History size={30} />}>
-          <UserHistoryPopulated />
-        </Tabs.Tab> */}
+        <Tabs.Tab label="Funds" icon={<BuildingBank size={30} />}>
+          <UserBalancesPopulated userFunds={parsedTokenBalances} />
+        </Tabs.Tab>
       </Tabs>
     </Container>
   );
