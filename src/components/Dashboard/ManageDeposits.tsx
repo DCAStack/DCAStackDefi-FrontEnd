@@ -4,14 +4,15 @@ import { BigNumber, utils } from "ethers";
 import { useEffect, useState } from "react";
 import { nullToken } from "../../data/gasTokens";
 
-import { IToken, IUserFunds } from "../../models/Interfaces";
+import { IUserFunds } from "../../models/Interfaces";
+import EstimateGas from "../Banking/EstimateGas";
 import SetupGasDeposit from "../Trade/SetupGasDeposit";
 import SetupTokenDeposit from "../Trade/SetupTokenDeposit";
 
 interface IManageDeposits {
   enableWithdraw: boolean;
-  mappedUserFunds?: Record<string, IUserFunds>;
-  userSchedules?: Record<string, any>;
+  mappedUserFunds: Record<string, IUserFunds>;
+  userSchedules: Record<string, any>;
 }
 
 export default function ManageDeposits({
@@ -22,6 +23,11 @@ export default function ManageDeposits({
   const [currToken, setCurrToken] = useState(nullToken);
   const [freeTokenBal, setFreeTokenBal] = useState(BigNumber.from(0));
 
+  const { estimatedGas, freeGasBal } = EstimateGas(
+    mappedUserFunds,
+    userSchedules
+  );
+
   useEffect(() => {
     if (
       currToken !== nullToken &&
@@ -31,16 +37,16 @@ export default function ManageDeposits({
       setFreeTokenBal(
         mappedUserFunds[utils.getAddress(currToken.address)].freeBalanceRaw
       );
+    } else {
+      setFreeTokenBal(BigNumber.from(0));
     }
   }, [currToken, mappedUserFunds]);
-
-  //get all schedule info run through quote and summate estimated gas (just double)
 
   return (
     <div>
       <SetupGasDeposit
-        estimatedGas={BigNumber.from(0)}
-        freeGasBal={BigNumber.from(0)}
+        estimatedGas={estimatedGas}
+        freeGasBal={freeGasBal}
         enableWithdraw={enableWithdraw}
       />
       <Space h="md" />
