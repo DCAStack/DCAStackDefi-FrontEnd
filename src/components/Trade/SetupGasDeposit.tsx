@@ -41,7 +41,7 @@ export default function SetupGasDeposit({
     useContext(ContractContext);
   const { address } = useAccount();
 
-  const { data } = useContractRead({
+  useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "userGasBalances",
