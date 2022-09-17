@@ -165,7 +165,6 @@ export function UserBalancesPopulated({
 }: UserFundsProps) {
   let formattedUserData: IUserBalanceInfo["data"] = [];
 
-  console.log("all", parsedTokenBalances);
   if (parsedTokenBalances) {
     Object.keys(parsedTokenBalances).map((key) => {
       if (parsedTokenBalances[Number(key)].address) {
