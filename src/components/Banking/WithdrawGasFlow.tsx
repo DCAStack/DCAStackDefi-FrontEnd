@@ -15,23 +15,19 @@ import {
 } from "wagmi";
 import { ContractContext } from "../../App";
 
-const useStyles = createStyles((theme) => ({
-  input: {
-    height: 60,
-  },
-}));
-
-export default function WithdrawGasFlow(defaultValue: string) {
+export default function WithdrawGasFlow(
+  defaultValue: string,
+  enableWithdraw: boolean = false
+) {
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  const { classes } = useStyles();
   const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
 
   const { config: withdrawGasSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
     contractInterface: contractABI,
-    enabled: defaultValue !== "" ? true : false,
+    enabled: defaultValue !== "" && enableWithdraw ? true : false,
     functionName: "withdrawGas",
     args:
       defaultValue !== "" && defaultValue !== "0" && defaultValue !== "0.0"

@@ -47,7 +47,7 @@ export default function ManageGas({
   }, [weiDefaultValue, updateState]);
 
   let depositGasActions = DepositGasFlow(gasAmount);
-  let withdrawGasActions = WithdrawGasFlow(gasAmount);
+  let withdrawGasActions = WithdrawGasFlow(gasAmount, enableWithdraw);
 
   return (
     <Container my="manage_gas">
