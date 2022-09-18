@@ -48,22 +48,14 @@ export default function use1inchRetrieveMultipleQuotes(
 
   let urlArray = [];
   for (let i = 0; i < sellCrypto.length; i++) {
-    let tradeAmountFormatted =
-      sellCrypto[i]?.decimals !== 0
-        ? parseUnits(
-            tradeAmount[i] !== "" ? tradeAmount[i] : "0",
-            sellCrypto[i]?.decimals
-          ).toString()
-        : "0";
-
     if (
       sellCrypto[i] !== nullToken &&
       buyCrypto[i] !== nullToken &&
-      sellCrypto !== buyCrypto &&
-      tradeAmountFormatted[i] !== "0" &&
+      sellCrypto[i] !== buyCrypto[i] &&
+      tradeAmount[i] !== "0" &&
       numExec[i] !== 0
     ) {
-      let readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto[i].address}&toTokenAddress=${buyCrypto[i].address}&amount=${tradeAmountFormatted}`;
+      let readyUrl = `https://api.1inch.io/v4.0/${currentChain}/quote?fromTokenAddress=${sellCrypto[i].address}&toTokenAddress=${buyCrypto[i].address}&amount=${tradeAmount[i]}`;
       urlArray.push(readyUrl);
     } else {
       console.log(`schedule ${i} has invalid parameters!`);
