@@ -257,12 +257,11 @@ function ManageFunds({
                       icon: <AlertOctagon />,
                     });
                   } else {
-                    formatUnits(
-                      depositTokenActions?.approveMax,
-                      selectedToken?.decimals
-                    ) === "0.0"
-                      ? depositTokenActions?.approve?.()
-                      : depositTokenActions?.deposit?.();
+                    setAmount(
+                      depositTokenActions?.max?.formatted
+                        ? depositTokenActions?.max?.formatted.toString()
+                        : "0"
+                    );
                   }
                 }
               }
