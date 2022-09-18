@@ -97,7 +97,7 @@ export default function use1inchRetrieveMultipleQuotes(
           );
 
           let calcGas = data[Number(key)].estimatedGasSingleTradeWei
-            .mul(numExec)
+            .mul(numExec[Number(key)])
             .mul(bufferMultiplier);
 
           data[Number(key)].estimatedGasDcaFormatted = formatEther(
@@ -114,8 +114,9 @@ export default function use1inchRetrieveMultipleQuotes(
             parseEther(data[Number(key)].estimatedGasDcaFormattedSafe)
           );
 
-          let minGas =
-            data[Number(key)].estimatedGasSingleTradeWei.mul(numExec);
+          let minGas = data[Number(key)].estimatedGasSingleTradeWei.mul(
+            numExec[Number(key)]
+          );
 
           data[Number(key)].minGasDcaFormatted = formatEther(minGas.toString());
           data[Number(key)].minGasDca = BigNumber.from(
