@@ -8,7 +8,6 @@ import { BigNumber } from "ethers";
 import { parseUnits } from "ethers/lib/utils";
 import {
   useAccount,
-  useContractRead,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -37,7 +36,10 @@ export default function WithdrawFundsFlow(
       token !== null &&
       token !== nullToken &&
       token !== undefined
-        ? true
+        ? // &&
+          // maxWithdraw?.toString() !== "0" &&
+          // maxWithdraw?.toString() !== "0.0"
+          true
         : false,
     functionName: "withdrawFunds",
     args: [
@@ -121,28 +123,20 @@ export default function WithdrawFundsFlow(
     },
   });
 
-  const { data: maxWithdraw } = useContractRead({
-    addressOrName: contractAddr,
-    contractInterface: contractABI,
-    functionName: "userTokenBalances",
-    enabled:
-      token !== null && token !== nullToken && token !== undefined
-        ? true
-        : false,
-    args: [address, token?.address],
-    cacheOnBlock: true,
-    watch: true,
-    overrides: { from: address },
-    onSuccess(data) {
-      console.log("Get Max Withdraw Success", data);
-    },
-    onError(error) {
-      console.error("Get Max Withdraw Error", error);
-    },
-  });
-
   return {
-    action: withdrawFunds,
-    max: maxWithdraw,
+    action:
+      defaultValue !== "0" &&
+      defaultValue !== "0.0" &&
+      !defaultValue.includes("-") &&
+      defaultValue !== "" &&
+      token !== null &&
+      token !== nullToken &&
+      token !== undefined
+        ? // &&
+          // maxWithdraw?.toString() !== "0" &&
+          // maxWithdraw?.toString() !== "0.0"
+          withdrawFunds
+        : null,
+    // max: maxWithdraw ? formatUnits(maxWithdraw, token?.decimals) : "0.0",
   };
 }

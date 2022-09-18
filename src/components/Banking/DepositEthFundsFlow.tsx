@@ -32,7 +32,9 @@ export default function DepositEthFundsFlow(
     functionName: "depositFunds",
     enabled:
       token?.address.toLowerCase() ===
-      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" &&
+      defaultValue !== "0" &&
+      defaultValue !== "0.0"
         ? true
         : false,
     args: [
@@ -129,7 +131,13 @@ export default function DepositEthFundsFlow(
   return {
     approveMax: null,
     approve: null,
-    deposit: depositEth,
+    deposit:
+      token?.address.toLowerCase() ===
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" &&
+      defaultValue !== "0" &&
+      defaultValue !== "0.0"
+        ? depositEth
+        : null,
     max: maxEthDeposit,
   };
 }

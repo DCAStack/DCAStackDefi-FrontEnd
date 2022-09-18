@@ -20,7 +20,7 @@ export const TokenBadgeDisplay = ({
           </Avatar>
         }
       >
-        {token.symbol}
+        {token.symbol ? token.symbol : "..."}
       </Badge>
       {displayTokenName === true && <Text size="md">{token.name}</Text>}
     </Stack>

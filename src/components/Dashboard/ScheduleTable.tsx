@@ -9,6 +9,7 @@ import {
   Stack,
   Table,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { Coin } from "tabler-icons-react";
 
@@ -20,15 +21,11 @@ import { UserFundsProps } from "../../models/PropTypes";
 import Big from "big.js";
 import { useNetwork } from "wagmi";
 import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
-import PauseScheduleFlow from "../Scheduling/PauseScheduleFlow";
-import RefillGasDepositFlow from "../Scheduling/RefillGasDepositFlow";
-import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
-import ResumeScheduleFlow from "../Scheduling/ResumeScheduleFlow";
 
 const useStyles = createStyles((theme) => ({
   header: {
     position: "sticky",
-    zIndex: 1000,
+    zIndex: 1,
     top: 0,
     backgroundColor:
       theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
@@ -70,11 +67,8 @@ interface IUserScheduleInfo {
     totalGas: string;
     numExecLeft: number;
     remainingBudget: string;
-    gasRefillActions: any;
-    tokenRefillActions: any;
-    pauseSchedule: any;
-    resumeSchedule: any;
     deleteSchedule: any;
+    freeBalanceRaw: BigNumber;
   }[];
 }
 
@@ -86,15 +80,6 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const networkCurrency: string = chain?.nativeCurrency
     ? chain.nativeCurrency.symbol
     : "?";
-
-  // const dateOptions = {
-  //   year: "2-digit",
-  //   month: "2-digit",
-  //   day: "numeric",
-  //   hour: "numeric",
-  //   minute: "numeric",
-  //   second: "numeric",
-  // };
 
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
@@ -125,31 +110,31 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             {row.sellToken?.symbol} / {row.buyToken?.symbol}
           </Badge>
 
-          {row.isActive === true &&
-            row.remainingBudget !== "0" &&
-            (row.tokenRefillActions.needAmount !== "0.0" ||
-              row.gasRefillActions.needAmount !== "0.0") && (
-              <Badge color="red" size="md">
-                Error
-              </Badge>
-            )}
-          {row.isActive === true &&
-            row.remainingBudget !== "0" &&
-            row.tokenRefillActions.needAmount === "0.0" &&
-            row.gasRefillActions.needAmount === "0.0" && (
-              <Badge color="teal" size="md">
-                Active
-              </Badge>
-            )}
-          {row.isActive === false && row.remainingBudget !== "0" && (
-            <Badge color="orange" size="md">
-              Paused
+          {row.isActive === true && row.remainingBudget !== "0" && (
+            <Badge color="teal" size="md">
+              Active
             </Badge>
           )}
+
           {row.isActive === false && row.remainingBudget === "0" && (
             <Badge color="violet" size="md">
               Complete
             </Badge>
+          )}
+          {row.remainingBudget !== "0" && row.freeBalanceRaw.lt(0) && (
+            <Tooltip
+              position="bottom"
+              wrapLines
+              width={220}
+              withArrow
+              transition="fade"
+              transitionDuration={200}
+              label="Switch tabs to the Manage Funds to see which schedule deposits need a topup or select token in DCA Amount."
+            >
+              <Badge color="red" size="md">
+                {row.sellToken.symbol} Low Bal!
+              </Badge>
+            </Tooltip>
           )}
         </Stack>
       </td>
@@ -206,10 +191,9 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       <td>
         {!row.boughtAmount.eq(0) && !row.soldAmount.eq(0) && (
           <Text>
-            ~
             {parseFloat(
-              Big(row.boughtAmount.toString())
-                .div(Big(row.soldAmount.toString()))
+              Big(formatUnits(row.boughtAmount, row.buyToken.decimals))
+                .div(Big(formatUnits(row.soldAmount, row.sellToken.decimals)))
                 .toString()
             ).toFixed(6)}{" "}
             {row.buyToken?.symbol}
@@ -229,62 +213,6 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
 
       <td>
         <Stack align="center" spacing="xs">
-          {row.isActive === true && row.remainingBudget !== "0" && (
-            <Button
-              color="orange"
-              radius="xl"
-              size="md"
-              compact
-              onClick={() => {
-                row.pauseSchedule?.();
-              }}
-            >
-              Pause
-            </Button>
-          )}
-          {row.isActive === false && row.remainingBudget !== "0" && (
-            <Button
-              color="orange"
-              radius="xl"
-              size="md"
-              compact
-              onClick={() => {
-                row.resumeSchedule?.resume?.();
-              }}
-              disabled={!row.resumeSchedule?.resumeStatus}
-            >
-              Resume
-            </Button>
-          )}
-
-          {row.remainingBudget !== "0" &&
-            row.tokenRefillActions.needAmount !== "0.0" && (
-              <Button
-                radius="xl"
-                size="md"
-                compact
-                onClick={() => {
-                  row.tokenRefillActions.refill?.();
-                }}
-              >
-                Topup Deposit
-              </Button>
-            )}
-
-          {row.remainingBudget !== "0" &&
-            row.gasRefillActions.needAmount !== "0.0" && (
-              <Button
-                radius="xl"
-                size="md"
-                compact
-                onClick={() => {
-                  row.gasRefillActions.refill?.();
-                }}
-              >
-                Topup Gas
-              </Button>
-            )}
-
           <Button
             color="red"
             radius="xl"
@@ -364,60 +292,10 @@ export function UserSchedulesPopulated({
               userSchedules[key].tradeFrequency.toString() /
               1000
           ),
-          // freeBalance:
-          //   mappedUserFunds[userSchedules[key].sellToken].freeBalance,
-          // totalBalance: mappedUserFunds[userSchedules[key].sellToken].balance,
+          freeBalanceRaw:
+            mappedUserFunds[userSchedules[key].sellToken].freeBalanceRaw,
 
-          tokenRefillActions: RefillTokenDepositFlow(
-            userSchedules[key].isActive,
-            userSchedules[key].tradeAmount,
-            userSchedules[key].tradeFrequency,
-            userSchedules[key].scheduleDates[2],
-            userSchedules[key].scheduleDates[3],
-            mappedUserFunds[userSchedules[key].sellToken],
-            userSchedules[key].remainingBudget
-          ),
-
-          gasRefillActions: RefillGasDepositFlow(
-            userSchedules[key].isActive,
-            userSchedules[key].tradeAmount,
-            userSchedules[key].tradeFrequency,
-            userSchedules[key].scheduleDates[2],
-            userSchedules[key].scheduleDates[3],
-            mappedUserFunds[userSchedules[key].sellToken],
-            mappedUserFunds[userSchedules[key].buyToken],
-            Math.floor(
-              (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
-                new Date(
-                  userSchedules[key].scheduleDates[2] * 1000
-                ).valueOf()) /
-                userSchedules[key].tradeFrequency.toString() /
-                1000
-            )
-          ),
-          //actions
-          pauseSchedule: PauseScheduleFlow(
-            Number(key),
-            userSchedules[key].isActive
-          )?.pause,
           deleteSchedule: DeleteScheduleFlow(Number(key), true)?.delete,
-          resumeSchedule: ResumeScheduleFlow(
-            Number(key),
-            !userSchedules[key].isActive,
-            userSchedules[key].remainingBudget,
-            userSchedules[key].tradeAmount,
-            userSchedules[key].tradeFrequency,
-            mappedUserFunds[userSchedules[key].sellToken],
-            mappedUserFunds[userSchedules[key].buyToken],
-            Math.floor(
-              (new Date(userSchedules[key].scheduleDates[3] * 1000).valueOf() -
-                new Date(
-                  userSchedules[key].scheduleDates[2] * 1000
-                ).valueOf()) /
-                userSchedules[key].tradeFrequency.toString() /
-                1000
-            )
-          ),
         };
 
         formattedUserSchedulesData.push(addSchedule);

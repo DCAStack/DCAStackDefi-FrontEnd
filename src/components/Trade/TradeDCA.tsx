@@ -75,7 +75,8 @@ function TradeDCA() {
     tradeFreq,
     date[0],
     date[1],
-    numExec
+    numExec,
+    true
   );
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
