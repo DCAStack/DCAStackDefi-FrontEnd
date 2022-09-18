@@ -225,7 +225,7 @@ export default function DepositFundsFlow(
         id: "deposit-approve-pending",
         color: "teal",
         title: "Deposit Spend Approved",
-        message: "Now you can deposit funds!",
+        message: "Now you can deposit funds! Please wait for prompt...",
         icon: <CircleCheck />,
         autoClose: true,
       });
