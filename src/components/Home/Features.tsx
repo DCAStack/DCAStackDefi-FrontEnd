@@ -1,80 +1,20 @@
-import { Container, createStyles, SimpleGrid, Text } from "@mantine/core";
-import React from "react";
+import {
+  createStyles,
+  Badge,
+  Group,
+  Text,
+  Card,
+  SimpleGrid,
+  Container,
+} from "@mantine/core";
 import { Coin, Key, ShieldLock, World } from "tabler-icons-react";
 
-const useStyles = createStyles((theme) => ({
-  feature: {
-    position: "relative",
-    paddingTop: theme.spacing.xl,
-    paddingLeft: theme.spacing.xl,
-  },
-
-  overlay: {
-    position: "absolute",
-    height: 100,
-    width: 160,
-    top: 0,
-    left: 0,
-    backgroundColor:
-      theme.colorScheme === "dark"
-        ? theme.fn.rgba(theme.colors[theme.primaryColor][7], 0.2)
-        : theme.colors[theme.primaryColor][0],
-    zIndex: 1,
-  },
-
-  content: {
-    position: "relative",
-    zIndex: 2,
-  },
-
-  icon: {
-    color:
-      theme.colors[theme.primaryColor][theme.colorScheme === "dark" ? 4 : 6],
-  },
-
-  title: {
-    color: theme.colorScheme === "dark" ? theme.white : theme.black,
-  },
-}));
-
-interface FeatureProps extends React.ComponentPropsWithoutRef<"div"> {
-  icon: React.FC<React.ComponentProps<typeof Coin>>;
-  title: string;
-  description: string;
-}
-
-function Feature({
-  icon: Icon,
-  title,
-  description,
-  className,
-  ...others
-}: FeatureProps) {
-  const { classes, cx } = useStyles();
-
-  return (
-    <div className={cx(classes.feature, className)} {...others}>
-      <div className={classes.overlay} />
-
-      <div className={classes.content}>
-        <Icon size={38} className={classes.icon} />
-        <Text weight={700} size="lg" mb="xs" mt={5} className={classes.title}>
-          {title}
-        </Text>
-        <Text color="dimmed" size="sm">
-          {description}
-        </Text>
-      </div>
-    </div>
-  );
-}
-
-const data = [
+const mockdata = [
   {
     icon: Key,
     title: "Your Keys",
     description:
-      "Your keys never leave you. Everything takes place on the blockchain via your wallet.",
+      "Your keys never leave you. Everything takes place on the blockchain through your wallet.",
   },
   {
     icon: Coin,
@@ -92,21 +32,96 @@ const data = [
     icon: World,
     title: "All Defi",
     description:
-      "Use the wonders of decentralized finance to automate your dollar cost averaging. Trustless, Transparent, Trading. ",
+      "Use the wonders of decentralized finance to automate your dollar cost averaging.",
   },
 ];
 
-export function FeaturesAsymmetrical() {
-  const items = data.map((item) => <Feature {...item} key={item.title} />);
+const useStyles = createStyles((theme) => ({
+  title: {
+    fontSize: 34,
+    fontWeight: 900,
+    [theme.fn.smallerThan("sm")]: {
+      fontSize: 24,
+    },
+  },
 
+  description: {
+    maxWidth: 600,
+    margin: "auto",
+
+    "&::after": {
+      content: '""',
+      display: "block",
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.fn.rgba(theme.colors[theme.primaryColor][7], 1)
+          : theme.colors[theme.primaryColor][0],
+      width: 45,
+      height: 2,
+      marginTop: theme.spacing.sm,
+      marginLeft: "auto",
+      marginRight: "auto",
+    },
+  },
+
+  card: {
+    border: `1px solid ${
+      theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[1]
+    }`,
+  },
+
+  cardTitle: {
+    "&::after": {
+      content: '""',
+      display: "block",
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.fn.rgba(theme.colors[theme.primaryColor][7], 1)
+          : theme.colors[theme.primaryColor][0],
+      width: 45,
+      height: 2,
+      marginTop: theme.spacing.sm,
+    },
+  },
+}));
+
+export function FeaturesAsymmetrical() {
+  const { classes, theme } = useStyles();
+  const features = mockdata.map((feature) => (
+    <Card
+      key={feature.title}
+      shadow="md"
+      radius="md"
+      className={classes.card}
+      p="xl"
+    >
+      <feature.icon
+        size={50}
+        strokeWidth={2}
+        color={theme.fn.rgba(theme.colors[theme.primaryColor][7], 1)}
+      />
+      <Text size="lg" weight={500} className={classes.cardTitle} mt="md">
+        {feature.title}
+      </Text>
+      <Text size="sm" color="dimmed" mt="sm">
+        {feature.description}
+      </Text>
+    </Card>
+  ));
   return (
-    <Container mt={30} mb={30} size="lg">
+    <Container size="lg" py="xl">
+      <Group position="center">
+        <Badge variant="filled" size="lg">
+          Trustless, Transparent, Trading
+        </Badge>
+      </Group>
       <SimpleGrid
         cols={4}
-        breakpoints={[{ maxWidth: "sm", cols: 1 }]}
-        spacing={50}
+        spacing="xl"
+        mt={50}
+        breakpoints={[{ maxWidth: "md", cols: 1 }]}
       >
-        {items}
+        {features}
       </SimpleGrid>
     </Container>
   );
