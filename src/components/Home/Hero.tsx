@@ -105,14 +105,14 @@ export function HeroText() {
         <Title className={classes.title}>
           Welcome to{" "}
           <Text component="span" color={theme.primaryColor} inherit>
-            DCA Stack
+            DCA
           </Text>{" "}
-          on Defi
+          Stack
         </Title>
 
         <Container p={0} size={600}>
           <Text size="lg" color="dimmed" className={classes.description}>
-            An Automated Dollar Cost Averaging Bot For Your Crypto
+            Automate Your Crypto Dollar Cost Averaging on Defi
           </Text>
         </Container>
 
