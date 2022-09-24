@@ -1,11 +1,6 @@
 import useSWR from "swr";
 import { useState } from "react";
-import {
-  parseEther,
-  formatUnits,
-  parseUnits,
-  formatEther,
-} from "ethers/lib/utils";
+import { parseEther, formatUnits, formatEther } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
 import { BigNumber } from "ethers";

@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import SwapToken from "./SwapToken";
 
 import { BigNumber } from "ethers";
-import { useAccount, useContractReads, useNetwork } from "wagmi";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
 
 import { SwitchHorizontal } from "tabler-icons-react";
 import { ContractContext } from "../../App";
@@ -129,35 +129,44 @@ function TradeDCA() {
   const [freeGasBal, setUserGasBal] = useState<BigNumber>(bnZero);
   const [freeTokenBal, setUserBal] = useState<BigNumber>(bnZero);
 
-  useContractReads({
-    contracts: [
-      {
-        addressOrName: contractAddr,
-        contractInterface: contractABI,
-        functionName: "getFreeGasBalance",
-        args: [parseEther(quote1inch.estimatedGasFormatted)], //gas for single trade
-      },
-      {
-        addressOrName: contractAddr,
-        contractInterface: contractABI,
-        functionName: "getFreeTokenBalance",
-        args: [sellToken?.address],
-      },
-    ],
+  useContractRead({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "getFreeGasBalance",
+    args: [parseEther(quote1inch.estimatedGasFormatted)], //gas for single trade
     enabled: enableRead,
     cacheOnBlock: true,
     watch: true,
     overrides: { from: address },
     onSuccess(data) {
-      console.log("Get User Funds Success", data);
-      let userGasBalance = data[0];
+      console.log("Get User Free Gas Success", data);
+      let userGasBalance = data;
       userGasBalance
         ? setUserGasBal(BigNumber.from(userGasBalance._hex))
         : setUserGasBal(bnZero);
 
       console.log("Free gas balance is", userGasBalance?.toString());
+    },
+    onError(error) {
+      console.error("Get User Free Gas Error", error);
+      setUserGasBal(bnZero);
+      setUserBal(bnZero);
+    },
+  });
 
-      let userFundBalance = data[1];
+  useContractRead({
+    addressOrName: contractAddr,
+    contractInterface: contractABI,
+    functionName: "getFreeTokenBalance",
+    args: [sellToken?.address],
+    enabled: enableRead,
+    cacheOnBlock: true,
+    watch: true,
+    overrides: { from: address },
+    onSuccess(data) {
+      console.log("Get User Free Token Success", data);
+
+      let userFundBalance = data;
       userFundBalance
         ? setUserBal(BigNumber.from(userFundBalance._hex))
         : setUserBal(bnZero);
@@ -169,7 +178,7 @@ function TradeDCA() {
       );
     },
     onError(error) {
-      console.error("Get User Funds Error", error);
+      console.error("Get User Free Token Error", error);
       setUserGasBal(bnZero);
       setUserBal(bnZero);
     },
