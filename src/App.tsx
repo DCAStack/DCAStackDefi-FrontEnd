@@ -11,7 +11,7 @@ import Trade from "./components/Pages/Trade";
 
 import { IContract } from "./models/Interfaces";
 import { Interface } from "ethers/lib/utils";
-import DCAStack from "./deployments/localhost/DCAStack.json";
+import DCAStack from "./deployments/polygon/DCAStack.json";
 import Disclaimer from "./components/Pages/Disclaimer";
 import Privacy from "./components/Pages/Privacy";
 
