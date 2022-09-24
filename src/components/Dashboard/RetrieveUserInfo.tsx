@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
-import { formatUnits } from "ethers/lib/utils";
-import { useContext } from "react";
+import { formatUnits, Result } from "ethers/lib/utils";
+import { useContext, useState } from "react";
 import { useAccount, useNetwork, useContractRead } from "wagmi";
 import use1inchRetrieveTokens from "../../apis/1inch/RetrieveTokens";
 import { ContractContext } from "../../App";
@@ -17,7 +17,16 @@ function RetrieveUserInfo() {
 
   const { tokens: masterTokenList } = use1inchRetrieveTokens(currentChain);
 
-  const { data: userTokenInfo } = useContractRead({
+  const [userTokenInfoState, setUserTokenInfo] = useState<Result | never>([
+    [],
+    [],
+    [],
+  ]);
+  const [userScheduleInfoState, setUserScheduleInfo] = useState<Result | never>(
+    [[], [], []]
+  );
+
+  useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "getUserAllTokenBalances",
@@ -27,13 +36,14 @@ function RetrieveUserInfo() {
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get user token balances success", data);
+      setUserTokenInfo(data);
     },
     onError(error) {
       console.error("Get user token balances Error", error);
     },
   });
 
-  const { data: userScheduleInfo } = useContractRead({
+  useContractRead({
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "getUserSchedules",
@@ -43,6 +53,7 @@ function RetrieveUserInfo() {
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get user schedules success", data);
+      setUserScheduleInfo(data);
     },
     onError(error) {
       console.error("Get user schedules Error", error);
@@ -51,9 +62,9 @@ function RetrieveUserInfo() {
 
   let parsedTokenBalances: IUserFunds[] = [];
   let mappedTokenBalances: Record<string, IUserFunds> = {};
-  let userTokenBalances = userTokenInfo ? userTokenInfo : [[], [], []];
-  let userTokenPurchasing = userScheduleInfo ? userScheduleInfo : [[]];
-  let userSchedules = userScheduleInfo ? userScheduleInfo : [[]];
+  let userTokenBalances = userTokenInfoState;
+  let userTokenPurchasing = userScheduleInfoState;
+  let userSchedules = userScheduleInfoState;
 
   let joinNeededTokens: any = [[], [], []];
 
