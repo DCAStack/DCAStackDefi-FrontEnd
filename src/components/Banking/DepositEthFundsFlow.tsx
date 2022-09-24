@@ -8,6 +8,7 @@ import {
   useAccount,
   useBalance,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useWaitForTransaction,
 } from "wagmi";
@@ -25,6 +26,11 @@ export default function DepositEthFundsFlow(
     useContext(ContractContext);
   const { address } = useAccount();
   const addRecentTransaction = useAddRecentTransaction();
+  const { chain } = useNetwork();
+
+  const networkCurrency: string = chain?.nativeCurrency
+    ? chain.nativeCurrency.symbol
+    : "?";
 
   const { config: prepareDepositEthSetup } = usePrepareContractWrite({
     addressOrName: contractAddr,
@@ -61,7 +67,7 @@ export default function DepositEthFundsFlow(
       showNotification({
         id: "deposit-eth-pending",
         loading: true,
-        title: "Pending ETH Deposit",
+        title: `Pending ${networkCurrency} Deposit`,
         message: "Waiting for your tx. Check status on your account tab.",
         autoClose: false,
         disallowClose: false,
@@ -74,7 +80,7 @@ export default function DepositEthFundsFlow(
       showNotification({
         id: "deposit-eth-error",
         color: "red",
-        title: "Error ETH Deposit",
+        title: `Error ${networkCurrency} Deposit`,
         message: error.message,
         autoClose: true,
         disallowClose: false,
@@ -90,13 +96,13 @@ export default function DepositEthFundsFlow(
 
       addRecentTransaction({
         hash: data.transactionHash,
-        description: "Deposit ETH",
+        description: `Deposit ${networkCurrency}`,
       });
 
       updateNotification({
         id: "deposit-eth-pending",
         color: "teal",
-        title: "ETH Deposit Received",
+        title: `${networkCurrency} Deposit Received`,
         message: "Happy DCAing :)",
         icon: <CircleCheck />,
         autoClose: true,
@@ -108,7 +114,7 @@ export default function DepositEthFundsFlow(
       updateNotification({
         id: "deposit-eth-pending",
         color: "red",
-        title: "Error ETH Deposit",
+        title: `Error ${networkCurrency} Deposit`,
         message: error.message,
         autoClose: true,
         disallowClose: false,
