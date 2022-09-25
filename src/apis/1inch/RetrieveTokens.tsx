@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
-import swapTokens from "../../data/swapTokens";
+import { mockTokens } from "../../data/goerliTokens";
 
 export default function use1inchRetrieveTokens(currentChain: number) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -52,8 +52,8 @@ export default function use1inchRetrieveTokens(currentChain: number) {
 
   if (currentChain === 5) {
     const newData = {
-      tokens: swapTokens[currentChain],
-      flattenData: Object.values(swapTokens[currentChain]),
+      tokens: mockTokens,
+      flattenData: Object.values(mockTokens), //indexed by address
     };
     return {
       tokens: newData,

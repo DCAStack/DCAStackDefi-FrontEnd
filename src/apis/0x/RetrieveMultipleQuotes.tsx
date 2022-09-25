@@ -47,7 +47,9 @@ export default function use0xRetrieveMultipleQuotes(
   for (let i = 0; i < sellCrypto.length; i++) {
     if (
       sellCrypto[i] !== nullToken &&
+      sellCrypto[i] !== undefined &&
       buyCrypto[i] !== nullToken &&
+      buyCrypto[i] !== undefined &&
       sellCrypto[i] !== buyCrypto[i] &&
       tradeAmount[i] !== "0" &&
       numExec[i] !== 0
@@ -74,7 +76,7 @@ export default function use0xRetrieveMultipleQuotes(
   let totalEstimatedGas = BigNumber.from(0);
 
   if (data) {
-    console.log("1inch fetch multi quote success", data, feeData.toString());
+    console.log("0x fetch multi quote success", data, feeData.toString());
 
     Object.keys(data).map((key) => {
       if (data[Number(key)]) {
@@ -153,9 +155,9 @@ export default function use0xRetrieveMultipleQuotes(
   }
 
   if (error) {
-    console.error("1inch fetch quote error", error);
+    console.error("0x fetch quote error", error);
     showNotification({
-      id: "1inch-quote-error",
+      id: "0x-quote-error",
       color: "red",
       title: "Error Fetching Swap Details",
       message: error.message,

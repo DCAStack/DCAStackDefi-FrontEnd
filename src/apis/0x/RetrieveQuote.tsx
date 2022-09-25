@@ -126,9 +126,9 @@ export default function use0xRetrieveQuote(
     }
 
     if (data.statusCode) {
-      console.error("1inch fetch quote error", data.error);
+      console.error("0x fetch quote error", data.error);
       showNotification({
-        id: "1inch-quote-error",
+        id: "0x-quote-error",
         color: "red",
         title: "Error Fetching Swap Details",
         message: data.description,
@@ -140,9 +140,9 @@ export default function use0xRetrieveQuote(
   }
 
   if (error) {
-    console.error("1inch fetch quote error", error);
+    console.error("0x fetch quote error", error);
     showNotification({
-      id: "1inch-quote-error",
+      id: "0x-quote-error",
       color: "red",
       title: "Error Fetching Swap Details",
       message: error.message,
