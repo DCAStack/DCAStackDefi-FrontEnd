@@ -163,13 +163,6 @@ const swapTokens: Record<number, IToken[]> = {
             symbol: "ETH"
         },
         {
-            "name": "Wrapped Ether",
-            "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-            "symbol": "WETH",
-            "decimals": 18,
-            "logoURI": "https://tokens.1inch.io/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png",
-        },
-        {
             address: "0x2899a03ffDab5C90BADc5920b4f53B0884EB13cC",
             decimals: 18,
             logoURI: "https://tokens.1inch.io/0x6b175474e89094c44da98b954eedeac495271d0f.png",
