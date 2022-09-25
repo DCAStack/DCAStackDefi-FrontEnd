@@ -23,7 +23,7 @@ import { useAccount, useContractRead, useNetwork } from "wagmi";
 import { SwitchHorizontal } from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
+import use0xRetrieveQuote from "../../apis/0x/RetrieveQuote";
 
 import { parseEther, parseUnits } from "ethers/lib/utils";
 import { nullToken } from "../../data/gasTokens";
@@ -67,7 +67,7 @@ function TradeDCA() {
     estimatedGasFormatted: "0",
   });
 
-  const { quote: quoteDetails, isError: quoteError } = use1inchRetrieveQuote(
+  const { quote: quoteDetails, isError: quoteError } = use0xRetrieveQuote(
     currentChain,
     sellToken,
     buyToken,
@@ -202,6 +202,7 @@ function TradeDCA() {
                   text={"I want to sell"}
                   updateToken={setSellToken}
                   currToken={sellToken}
+                  isSell={true}
                 />
                 <ActionIcon
                   size="xl"
@@ -221,6 +222,7 @@ function TradeDCA() {
                   text={"To purchase"}
                   updateToken={setBuyToken}
                   currToken={buyToken}
+                  isSell={false}
                 />
               </Group>
             </Container>
