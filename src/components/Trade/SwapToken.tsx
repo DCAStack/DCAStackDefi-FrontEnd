@@ -12,9 +12,15 @@ interface ISwapInfo {
   text: string;
   updateToken: React.Dispatch<React.SetStateAction<IToken>>;
   currToken: IToken;
+  isSell: boolean;
 }
 
-export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
+export default function SwapToken({
+  text,
+  updateToken,
+  currToken,
+  isSell,
+}: ISwapInfo) {
   const [opened, setOpened] = useState(false);
 
   return (
@@ -23,6 +29,7 @@ export default function SwapToken({ text, updateToken, currToken }: ISwapInfo) {
         updateToken={updateToken}
         opened={opened}
         setOpened={setOpened}
+        isSell={isSell}
       />
       <Group position="center">
         <Button

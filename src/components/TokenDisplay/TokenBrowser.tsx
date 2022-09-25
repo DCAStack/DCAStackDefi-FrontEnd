@@ -21,12 +21,14 @@ interface ISwapInfo {
   updateToken: React.Dispatch<React.SetStateAction<IToken>>;
   opened: boolean;
   setOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  isSell: boolean;
 }
 
 export default function TokenBrowser({
   updateToken,
   opened,
   setOpened,
+  isSell,
 }: ISwapInfo) {
   const { chain } = useNetwork();
   const currentChain: number = chain ? chain?.id : 0;
@@ -42,8 +44,8 @@ export default function TokenBrowser({
   const searchTokens = (event: ChangeEvent<HTMLInputElement>): void => {
     if (masterTokenList) {
       const searchValue = event.target.value.toLowerCase();
+      //improve search performance
       if (searchValue.length >= 3) {
-        //improve search performance
         const filtered = masterTokenList?.flattenData.filter(
           (token: IToken) =>
             token.symbol.toLowerCase().includes(searchValue) ||
@@ -86,7 +88,12 @@ export default function TokenBrowser({
                   updateToken(token);
                 }}
               >
-                <TokenBadgeDisplay key={index} token={token} />
+                {isSell &&
+                  token.address.toLowerCase() !==
+                    "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
+                    <TokenBadgeDisplay key={index} token={token} />
+                  )}
+                {!isSell && <TokenBadgeDisplay key={index} token={token} />}
               </div>
             ))}
         </Group>
@@ -106,7 +113,17 @@ export default function TokenBrowser({
                     updateToken(token);
                   }}
                 >
-                  <TokenBadgeDisplay token={token} displayTokenName={true} />
+                  {isSell &&
+                    token.address.toLowerCase() !==
+                      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
+                      <TokenBadgeDisplay
+                        token={token}
+                        displayTokenName={true}
+                      />
+                    )}
+                  {!isSell && (
+                    <TokenBadgeDisplay token={token} displayTokenName={true} />
+                  )}
                   <Divider my="sm" variant="dashed" />
                 </div>
               ))
@@ -115,6 +132,11 @@ export default function TokenBrowser({
             )}
           </Group>
         </ScrollArea>
+        {isSell && (
+          <Text size="xs" color="red" align="center">
+            We do not support selling native token at this time!
+          </Text>
+        )}
       </Modal>
     </>
   );

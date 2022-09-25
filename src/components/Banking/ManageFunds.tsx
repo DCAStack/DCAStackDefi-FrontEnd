@@ -114,6 +114,7 @@ function ManageFunds({
         updateToken={setToken}
         opened={openModal}
         setOpened={setModal}
+        isSell={false}
       />
       <Group align="end" position="center" spacing="xs">
         <TextInput
