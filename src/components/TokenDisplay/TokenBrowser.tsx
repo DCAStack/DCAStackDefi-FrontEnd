@@ -137,6 +137,17 @@ export default function TokenBrowser({
             We do not support selling native token at this time!
           </Text>
         )}
+        {currentChain === 5 && (
+          <Text
+            size="xs"
+            color="green"
+            variant="link"
+            component="a"
+            href="https://app.compound.finance/"
+          >
+            How do I get goerli faucet funds?
+          </Text>
+        )}
       </Modal>
     </>
   );

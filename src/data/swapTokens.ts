@@ -167,15 +167,43 @@ const swapTokens: Record<number, IToken[]> = {
             "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "symbol": "WETH",
             "decimals": 18,
-            "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/logo.png"
+            "logoURI": "https://tokens.1inch.io/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png",
         },
         {
-            "name": "Uniswap",
-            "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-            "symbol": "UNI",
-            "decimals": 18,
-            "logoURI": "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg"
-        }
+            address: "0x2899a03ffDab5C90BADc5920b4f53B0884EB13cC",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+            name: "Dai Stablecoin",
+            symbol: "DAI"
+        },
+        {
+            address: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
+            decimals: 6,
+            logoURI: "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+            name: "USD Coin",
+            symbol: "USDC"
+        },
+        {
+            address: "0x79C950C7446B234a6Ad53B908fBF342b01c4d446",
+            decimals: 6,
+            logoURI: "https://tokens.1inch.io/0xdac17f958d2ee523a2206206994597c13d831ec7.png",
+            name: "Tether USD",
+            symbol: "USDT"
+        },
+        {
+            address: "0x208F73527727bcB2D9ca9bA047E3979559EB08cC",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png",
+            name: "Uniswap",
+            symbol: "UNI"
+        },
+        {
+            address: "0x3587b2F7E0E2D6166d6C14230e7Fe160252B0ba4",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0xc00e94cb662c3520282e6f5717214004a7f26888.png",
+            name: "Compound",
+            symbol: "COMP"
+        },
     ]
 };
 

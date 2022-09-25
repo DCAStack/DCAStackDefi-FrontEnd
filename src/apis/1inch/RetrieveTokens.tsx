@@ -1,7 +1,7 @@
 import useSWR from "swr";
-import React from "react";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
+import swapTokens from "../../data/swapTokens";
 
 export default function use1inchRetrieveTokens(currentChain: number) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -13,7 +13,10 @@ export default function use1inchRetrieveTokens(currentChain: number) {
 
   const readyUrl = `https://api.1inch.io/v4.0/${currentChain}/tokens`;
 
-  const { data, error } = useSWR(currentChain !== 0 ? readyUrl : null, fetcher);
+  const { data, error } = useSWR(
+    currentChain !== 0 && currentChain !== 5 ? readyUrl : null,
+    fetcher
+  );
 
   if (data) {
     if (data.tokens) {
@@ -47,9 +50,22 @@ export default function use1inchRetrieveTokens(currentChain: number) {
     });
   }
 
-  return {
-    tokens: data,
-    isLoading: !error && !data,
-    isError: error,
-  };
+  if (currentChain === 5) {
+    const newData = {
+      tokens: swapTokens[currentChain],
+      flattenData: Object.values(swapTokens[currentChain]),
+    };
+    return {
+      tokens: newData,
+      isLoading: null,
+      isError: null,
+    };
+  } else {
+    console.log("else", data);
+    return {
+      tokens: data,
+      isLoading: !error && !data,
+      isError: error,
+    };
+  }
 }
