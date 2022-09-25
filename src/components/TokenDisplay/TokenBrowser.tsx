@@ -77,17 +77,18 @@ export default function TokenBrowser({
         <Space h="xs" />
 
         <Group align="center" position="center" spacing="xs">
-          {swapTokens[currentChain].map((token: IToken, index: number) => (
-            <div
-              key={token.address}
-              onClick={() => {
-                setOpened(false);
-                updateToken(token);
-              }}
-            >
-              <TokenBadgeDisplay key={index} token={token} />
-            </div>
-          ))}
+          {currentChain in swapTokens &&
+            swapTokens[currentChain].map((token: IToken, index: number) => (
+              <div
+                key={token.address}
+                onClick={() => {
+                  setOpened(false);
+                  updateToken(token);
+                }}
+              >
+                <TokenBadgeDisplay key={index} token={token} />
+              </div>
+            ))}
         </Group>
 
         <Space h="md" />
@@ -96,7 +97,7 @@ export default function TokenBrowser({
 
         <ScrollArea style={{ height: 250 }} offsetScrollbars>
           <Group align="left" position="center" spacing="xs" direction="column">
-            {filteredTokens.length > 0 ? (
+            {filteredTokens?.length > 0 ? (
               filteredTokens.map((token: IToken) => (
                 <div
                   key={token.address}
