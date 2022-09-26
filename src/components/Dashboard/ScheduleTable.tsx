@@ -248,7 +248,19 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody>
+          {rows.length > 0 ? (
+            rows
+          ) : (
+            <tr>
+              <td colSpan={9}>
+                <Text weight={500} align="center">
+                  Nothing found...yet
+                </Text>
+              </td>
+            </tr>
+          )}
+        </tbody>
       </Table>
     </ScrollArea>
   );
