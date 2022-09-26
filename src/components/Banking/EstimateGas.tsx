@@ -24,7 +24,10 @@ function EstimateGas(
 
   if (userSchedules && mappedUserFunds) {
     Object.keys(userSchedules).map((key) => {
-      if (userSchedules[key].scheduleDates) {
+      if (
+        userSchedules[key].scheduleDates &&
+        userSchedules[key].isActive === true
+      ) {
         scheduleSellTokens.push(mappedUserFunds[userSchedules[key].sellToken]);
         scheduleBuyTokens.push(mappedUserFunds[userSchedules[key].buyToken]);
         scheduleTradeAmounts.push(userSchedules[key].tradeAmount.toString());
