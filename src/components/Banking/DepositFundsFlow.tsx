@@ -107,7 +107,7 @@ export default function DepositFundsFlow(
           id: "deposit-token-pending",
           loading: true,
           title: "Pending Token Deposit",
-          message: "Waiting for your tx. Check status on your account tab.",
+          message: "Waiting for your tx...",
           autoClose: false,
           disallowClose: false,
         });
@@ -192,7 +192,7 @@ export default function DepositFundsFlow(
           id: "deposit-approve-pending",
           loading: true,
           title: "Pending Deposit Spend Approval",
-          message: "Waiting for your tx. Check status on your account tab.",
+          message: "Waiting for your tx...",
           autoClose: false,
           disallowClose: false,
         });

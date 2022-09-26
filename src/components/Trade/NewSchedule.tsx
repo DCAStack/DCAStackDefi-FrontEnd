@@ -152,7 +152,7 @@ export default function NewSchedule({
         id: "new-schedule-pending",
         loading: true,
         title: "Pending Schedule Creation",
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });

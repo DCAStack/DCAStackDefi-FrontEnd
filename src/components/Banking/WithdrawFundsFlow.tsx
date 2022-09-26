@@ -68,7 +68,7 @@ export default function WithdrawFundsFlow(
         id: "withdraw-token-pending",
         loading: true,
         title: "Pending Token Withdrawal",
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });

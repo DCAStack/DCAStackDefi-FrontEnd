@@ -47,7 +47,7 @@ export default function DeleteScheduleFlow(
         id: "delete-schedule-pending",
         loading: true,
         title: "Delete Schedule Pending",
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });
