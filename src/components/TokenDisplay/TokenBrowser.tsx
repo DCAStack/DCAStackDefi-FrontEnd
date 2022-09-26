@@ -6,6 +6,7 @@ import {
   Modal,
   ScrollArea,
   Space,
+  Stack,
   Text,
   TextInput,
 } from "@mantine/core";
@@ -132,22 +133,24 @@ export default function TokenBrowser({
             )}
           </Group>
         </ScrollArea>
-        {isSell && (
-          <Text size="xs" color="red" align="center">
-            We do not support selling native token at this time!
-          </Text>
-        )}
-        {currentChain === 5 && (
-          <Text
-            size="xs"
-            color="green"
-            variant="link"
-            component="a"
-            href="https://app.compound.finance/"
-          >
-            How do I get goerli faucet funds?
-          </Text>
-        )}
+        <Stack align="center">
+          {isSell && (
+            <Text size="xs" color="red" align="center">
+              We do not support selling native token at this time!
+            </Text>
+          )}
+          {currentChain === 5 && (
+            <Text
+              size="xs"
+              color="green"
+              variant="link"
+              component="a"
+              href="https://defidocs.dcastack.com/guides/where-do-i-get-goerli-testnet-funds"
+            >
+              How do I get goerli faucet funds?
+            </Text>
+          )}
+        </Stack>
       </Modal>
     </>
   );
