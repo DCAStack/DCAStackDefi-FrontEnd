@@ -255,7 +255,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             <tr>
               <td colSpan={9}>
                 <Text weight={500} align="center">
-                  Nothing found...yet
+                  Nothing found...
                 </Text>
               </td>
             </tr>

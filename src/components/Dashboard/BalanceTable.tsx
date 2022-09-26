@@ -161,7 +161,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             <tr>
               <td colSpan={5}>
                 <Text weight={500} align="center">
-                  Nothing found...yet
+                  Nothing found...
                 </Text>
               </td>
             </tr>
