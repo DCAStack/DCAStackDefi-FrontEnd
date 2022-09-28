@@ -96,7 +96,8 @@ export default function NewSchedule({
       unixEndDate !== 0 &&
       freeTokenBal.gte(weiDepositAmount) &&
       freeGasBal.gte(quoteDetails.estimatedGasDca) &&
-      quoteDetails.estimatedGasFormatted !== "0"
+      quoteDetails.estimatedGasFormatted !== "0" &&
+      quoteDetails.active
     ) {
       setPrep(true);
       setButtonTxt("Start DCA");

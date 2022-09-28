@@ -84,6 +84,13 @@ export default function use0xRetrieveQuote(
   );
 
   if (data) {
+    data.active = false;
+    data.estimatedGasDcaSafe = BigNumber.from(0);
+    data.estimatedGasFormatted = "0";
+    data.estimatedGasDca = BigNumber.from(0);
+  }
+
+  if (data && !data.code) {
     console.log("0x fetch quote success", data);
     if (data?.estimatedGas) {
       data.estimatedGasSingleTradeWei = BigNumber.from(data.estimatedGas)
@@ -123,15 +130,17 @@ export default function use0xRetrieveQuote(
       data.minGasDcaFormatted = formatEther(minGas.toString());
       data.minGasDca = BigNumber.from(parseEther(data.minGasDcaFormatted));
       data.swapQuote = data.price;
-    }
 
-    if (data.statusCode) {
-      console.error("0x fetch quote error", data.error);
+      data.active = true;
+    }
+  } else {
+    if (data?.code) {
+      console.error("0x fetch quote error", data);
       showNotification({
         id: "0x-quote-error",
         color: "red",
-        title: "Error Fetching Swap Details",
-        message: data.description,
+        title: "Error Fetching API Swap Details",
+        message: `Error code is ${data.code}`,
         autoClose: true,
         disallowClose: false,
         icon: <AlertOctagon />,
@@ -140,11 +149,11 @@ export default function use0xRetrieveQuote(
   }
 
   if (error) {
-    console.error("0x fetch quote error", error);
+    console.error("0x API quote error", error);
     showNotification({
       id: "0x-quote-error",
       color: "red",
-      title: "Error Fetching Swap Details",
+      title: "Error Fetching Quote Swap Details",
       message: error.message,
       autoClose: true,
       disallowClose: false,
@@ -154,7 +163,7 @@ export default function use0xRetrieveQuote(
 
   return {
     quote: data,
-    isLoading: !error && !data,
-    isError: error,
+    isLoading: !error && !data && !data?.code,
+    isError: error || data?.code,
   };
 }

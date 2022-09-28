@@ -62,9 +62,11 @@ function TradeDCA() {
   const [numExec, setNumExec] = useState(0);
   const [enableRead, setEnableRead] = useState(false);
 
-  const [quote1inch, setQuote1inch] = useState({
+  const [swapQuote, setSwapQuote] = useState({
     estimatedGasDcaSafe: BigNumber.from(0),
+    estimatedGasDca: BigNumber.from(0),
     estimatedGasFormatted: "0",
+    active: false,
   });
 
   const { quote: quoteDetails, isError: quoteError } = use0xRetrieveQuote(
@@ -101,7 +103,7 @@ function TradeDCA() {
       );
 
       if (quoteDetails) {
-        setQuote1inch(quoteDetails);
+        setSwapQuote(quoteDetails);
         setEnableRead(true);
       }
 
@@ -116,7 +118,7 @@ function TradeDCA() {
     }
   }, [
     quoteDetails,
-    quote1inch,
+    swapQuote,
     date,
     tradeFreq,
     sellAmount,
@@ -133,7 +135,7 @@ function TradeDCA() {
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "getFreeGasBalance",
-    args: [parseEther(quote1inch.estimatedGasFormatted)], //gas for single trade
+    args: [parseEther(swapQuote.estimatedGasFormatted)], //gas for single trade
     enabled: enableRead,
     cacheOnBlock: true,
     watch: true,
@@ -314,7 +316,7 @@ function TradeDCA() {
             <Container my="setup_deposits">
               <SetupDeposits
                 sellToken={sellToken}
-                estimatedGas={quote1inch?.estimatedGasDcaSafe}
+                estimatedGas={swapQuote?.estimatedGasDcaSafe}
                 depositAmount={depositAmount}
                 freeGasBal={freeGasBal}
                 freeTokenBal={freeTokenBal}
@@ -336,7 +338,7 @@ function TradeDCA() {
               startDate={date[0]}
               endDate={date[1]}
               startTime={time}
-              quoteDetails={quote1inch}
+              quoteDetails={swapQuote}
               freeGasBal={freeGasBal}
               freeTokenBal={freeTokenBal}
               depositAmount={depositAmount}
