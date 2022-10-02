@@ -270,6 +270,10 @@ const headerLinks = {
           label: "Contact Us",
         },
         {
+          link: "https://discord.gg/UGzTnZ8k58",
+          label: "Get Support",
+        },
+        {
           link: "https://status.dcastack.com/",
           label: "Server Status",
         },

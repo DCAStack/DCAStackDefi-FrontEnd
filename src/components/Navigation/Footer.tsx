@@ -202,7 +202,7 @@ export function FooterLinks({ data }: FooterLinksProps) {
           <ActionIcon
             size="lg"
             component="a"
-            href={"https://discord.gg/GYENsDkJDJ"}
+            href={"https://discord.gg/UGzTnZ8k58"}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -246,7 +246,7 @@ const footerLinks = {
         },
         {
           label: "Discord",
-          link: "https://discord.gg/GYENsDkJDJ",
+          link: "https://discord.gg/UGzTnZ8k58",
         },
       ],
       title: "Community",
