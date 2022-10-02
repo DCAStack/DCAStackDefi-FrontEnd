@@ -53,7 +53,7 @@ const localChain: Chain = {
 
 const { chains, provider, webSocketProvider } = configureChains(
   [
-    chain.polygon,
+    chain.goerli,
     ...(process.env.REACT_APP_ENABLE_DEV === "true" ? [localChain] : []),
   ],
   [

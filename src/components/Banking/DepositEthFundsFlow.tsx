@@ -68,7 +68,7 @@ export default function DepositEthFundsFlow(
         id: "deposit-eth-pending",
         loading: true,
         title: `Pending ${networkCurrency} Deposit`,
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });

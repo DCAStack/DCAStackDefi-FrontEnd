@@ -51,7 +51,7 @@ export default function WithdrawGasFlow(
         id: "withdraw-gas-pending",
         loading: true,
         title: "Pending Gas Withdrawal",
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });

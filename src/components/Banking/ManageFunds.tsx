@@ -114,6 +114,7 @@ function ManageFunds({
         updateToken={setToken}
         opened={openModal}
         setOpened={setModal}
+        isSell={false}
       />
       <Group align="end" position="center" spacing="xs">
         <TextInput
@@ -221,6 +222,7 @@ function ManageFunds({
           <Menu.Item
             icon={<ArrowsMaximize size={26} color={theme.colors.pink[6]} />}
             onClick={() => {
+              setUpdate(false);
               if (
                 selectedToken?.address.toLowerCase() ===
                 "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
@@ -287,6 +289,7 @@ function ManageFunds({
             <Menu.Item
               icon={<ArrowsMinimize size={26} color={theme.colors.violet[6]} />}
               onClick={() => {
+                setUpdate(false);
                 setAmount(maxWithdraw ? maxWithdraw.toString() : "0");
               }}
             >

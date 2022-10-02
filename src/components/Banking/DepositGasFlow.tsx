@@ -49,7 +49,7 @@ export default function DepositGasFlow(defaultValue: string) {
         id: "deposit-gas-pending",
         loading: true,
         title: "Pending Gas Deposit",
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });

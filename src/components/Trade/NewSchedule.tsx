@@ -96,7 +96,8 @@ export default function NewSchedule({
       unixEndDate !== 0 &&
       freeTokenBal.gte(weiDepositAmount) &&
       freeGasBal.gte(quoteDetails.estimatedGasDca) &&
-      quoteDetails.estimatedGasFormatted !== "0"
+      quoteDetails.estimatedGasFormatted !== "0" &&
+      quoteDetails.active
     ) {
       setPrep(true);
       setButtonTxt("Start DCA");
@@ -152,7 +153,7 @@ export default function NewSchedule({
         id: "new-schedule-pending",
         loading: true,
         title: "Pending Schedule Creation",
-        message: "Waiting for your tx. Check status on your account tab.",
+        message: "Waiting for your tx...",
         autoClose: false,
         disallowClose: false,
       });

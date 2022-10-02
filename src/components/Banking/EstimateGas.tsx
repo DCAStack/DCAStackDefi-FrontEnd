@@ -2,7 +2,7 @@ import { BigNumber } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 import { useContext, useState } from "react";
 import { useAccount, useContractRead, useNetwork } from "wagmi";
-import use1inchRetrieveMultipleQuotes from "../../apis/1inch/RetrieveMultipleQuotes";
+import use0xRetrieveMultipleQuotes from "../../apis/0x/RetrieveMultipleQuotes";
 import { ContractContext } from "../../App";
 import { IToken, IUserFunds } from "../../models/Interfaces";
 
@@ -24,7 +24,10 @@ function EstimateGas(
 
   if (userSchedules && mappedUserFunds) {
     Object.keys(userSchedules).map((key) => {
-      if (userSchedules[key].scheduleDates) {
+      if (
+        userSchedules[key].scheduleDates &&
+        userSchedules[key].isActive === true
+      ) {
         scheduleSellTokens.push(mappedUserFunds[userSchedules[key].sellToken]);
         scheduleBuyTokens.push(mappedUserFunds[userSchedules[key].buyToken]);
         scheduleTradeAmounts.push(userSchedules[key].tradeAmount.toString());
@@ -41,7 +44,7 @@ function EstimateGas(
     });
   }
 
-  const { totalEstimatedGas } = use1inchRetrieveMultipleQuotes(
+  const { totalEstimatedGas } = use0xRetrieveMultipleQuotes(
     currentChain,
     scheduleSellTokens,
     scheduleBuyTokens,

@@ -127,6 +127,7 @@ export default function ManageGas({
                   icon: <AlertOctagon />,
                 });
               } else {
+                setUpdate(false);
                 setAmount(
                   depositGasActions?.max?.formatted
                     ? depositGasActions?.max?.formatted
@@ -180,6 +181,7 @@ export default function ManageGas({
                     icon: <AlertOctagon />,
                   });
                 } else {
+                  setUpdate(false);
                   setAmount(maxWithdraw);
                 }
               }}

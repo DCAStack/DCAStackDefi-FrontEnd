@@ -23,7 +23,7 @@ import { useAccount, useContractRead, useNetwork } from "wagmi";
 import { SwitchHorizontal } from "tabler-icons-react";
 import { ContractContext } from "../../App";
 
-import use1inchRetrieveQuote from "../../apis/1inch/RetrieveQuote";
+import use0xRetrieveQuote from "../../apis/0x/RetrieveQuote";
 
 import { parseEther, parseUnits } from "ethers/lib/utils";
 import { nullToken } from "../../data/gasTokens";
@@ -62,12 +62,14 @@ function TradeDCA() {
   const [numExec, setNumExec] = useState(0);
   const [enableRead, setEnableRead] = useState(false);
 
-  const [quote1inch, setQuote1inch] = useState({
+  const [swapQuote, setSwapQuote] = useState({
     estimatedGasDcaSafe: BigNumber.from(0),
+    estimatedGasDca: BigNumber.from(0),
     estimatedGasFormatted: "0",
+    active: false,
   });
 
-  const { quote: quoteDetails, isError: quoteError } = use1inchRetrieveQuote(
+  const { quote: quoteDetails, isError: quoteError } = use0xRetrieveQuote(
     currentChain,
     sellToken,
     buyToken,
@@ -101,7 +103,7 @@ function TradeDCA() {
       );
 
       if (quoteDetails) {
-        setQuote1inch(quoteDetails);
+        setSwapQuote(quoteDetails);
         setEnableRead(true);
       }
 
@@ -116,7 +118,7 @@ function TradeDCA() {
     }
   }, [
     quoteDetails,
-    quote1inch,
+    swapQuote,
     date,
     tradeFreq,
     sellAmount,
@@ -133,7 +135,7 @@ function TradeDCA() {
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "getFreeGasBalance",
-    args: [parseEther(quote1inch.estimatedGasFormatted)], //gas for single trade
+    args: [parseEther(swapQuote.estimatedGasFormatted)], //gas for single trade
     enabled: enableRead,
     cacheOnBlock: true,
     watch: true,
@@ -202,6 +204,7 @@ function TradeDCA() {
                   text={"I want to sell"}
                   updateToken={setSellToken}
                   currToken={sellToken}
+                  isSell={true}
                 />
                 <ActionIcon
                   size="xl"
@@ -221,6 +224,7 @@ function TradeDCA() {
                   text={"To purchase"}
                   updateToken={setBuyToken}
                   currToken={buyToken}
+                  isSell={false}
                 />
               </Group>
             </Container>
@@ -312,7 +316,7 @@ function TradeDCA() {
             <Container my="setup_deposits">
               <SetupDeposits
                 sellToken={sellToken}
-                estimatedGas={quote1inch?.estimatedGasDcaSafe}
+                estimatedGas={swapQuote?.estimatedGasDcaSafe}
                 depositAmount={depositAmount}
                 freeGasBal={freeGasBal}
                 freeTokenBal={freeTokenBal}
@@ -334,7 +338,7 @@ function TradeDCA() {
               startDate={date[0]}
               endDate={date[1]}
               startTime={time}
-              quoteDetails={quote1inch}
+              quoteDetails={swapQuote}
               freeGasBal={freeGasBal}
               freeTokenBal={freeTokenBal}
               depositAmount={depositAmount}

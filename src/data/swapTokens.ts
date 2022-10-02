@@ -154,6 +154,50 @@ const swapTokens: Record<number, IToken[]> = {
                 symbol: "WETH"
             }
         ],
+    5: [ //goerli
+        {
+            address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
+            name: "Ethereum",
+            symbol: "ETH"
+        },
+        {
+            address: "0x2899a03ffDab5C90BADc5920b4f53B0884EB13cC",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+            name: "Dai Stablecoin",
+            symbol: "DAI"
+        },
+        {
+            address: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
+            decimals: 6,
+            logoURI: "https://tokens.1inch.io/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png",
+            name: "USD Coin",
+            symbol: "USDC"
+        },
+        {
+            address: "0x79C950C7446B234a6Ad53B908fBF342b01c4d446",
+            decimals: 6,
+            logoURI: "https://tokens.1inch.io/0xdac17f958d2ee523a2206206994597c13d831ec7.png",
+            name: "Tether USD",
+            symbol: "USDT"
+        },
+        {
+            address: "0x208F73527727bcB2D9ca9bA047E3979559EB08cC",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png",
+            name: "Uniswap",
+            symbol: "UNI"
+        },
+        {
+            address: "0x3587b2F7E0E2D6166d6C14230e7Fe160252B0ba4",
+            decimals: 18,
+            logoURI: "https://tokens.1inch.io/0xc00e94cb662c3520282e6f5717214004a7f26888.png",
+            name: "Compound",
+            symbol: "COMP"
+        },
+    ]
 };
 
 

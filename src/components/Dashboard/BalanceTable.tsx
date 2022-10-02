@@ -1,4 +1,4 @@
-import { Button, ScrollArea, Stack, Table, Tooltip } from "@mantine/core";
+import { Button, ScrollArea, Stack, Table, Tooltip, Text } from "@mantine/core";
 
 import { createStyles } from "@mantine/core";
 
@@ -154,7 +154,19 @@ export function UsersTable({ data }: IUserBalanceInfo) {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody>
+          {rows.length > 0 ? (
+            rows
+          ) : (
+            <tr>
+              <td colSpan={5}>
+                <Text weight={500} align="center">
+                  Nothing found...
+                </Text>
+              </td>
+            </tr>
+          )}
+        </tbody>
       </Table>
     </ScrollArea>
   );

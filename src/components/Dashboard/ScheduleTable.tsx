@@ -248,7 +248,19 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody>
+          {rows.length > 0 ? (
+            rows
+          ) : (
+            <tr>
+              <td colSpan={9}>
+                <Text weight={500} align="center">
+                  Nothing found...
+                </Text>
+              </td>
+            </tr>
+          )}
+        </tbody>
       </Table>
     </ScrollArea>
   );
@@ -262,7 +274,10 @@ export function UserSchedulesPopulated({
 
   if (userSchedules && mappedUserFunds) {
     Object.keys(userSchedules).map((key) => {
-      if (userSchedules[key].scheduleDates) {
+      if (
+        userSchedules[key].scheduleDates &&
+        mappedUserFunds[userSchedules[key].sellToken]
+      ) {
         let addSchedule = {
           scheduleID: Number(key),
           isActive: userSchedules[key].isActive,

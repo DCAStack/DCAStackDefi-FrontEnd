@@ -6,7 +6,7 @@ import {
   Group,
   Anchor,
 } from "@mantine/core";
-import { BrandTwitter, BrandGithub } from "tabler-icons-react";
+import { BrandTwitter, BrandGithub, BrandDiscord } from "tabler-icons-react";
 import { Link } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
@@ -199,6 +199,15 @@ export function FooterLinks({ data }: FooterLinksProps) {
           >
             <BrandGithub size={18} />
           </ActionIcon>
+          <ActionIcon
+            size="lg"
+            component="a"
+            href={"https://discord.gg/GYENsDkJDJ"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <BrandDiscord size={18} />
+          </ActionIcon>
         </Group>
       </Container>
     </footer>
@@ -228,12 +237,16 @@ const footerLinks = {
     {
       externalLinks: [
         {
-          label: "Follow on Twitter",
+          label: "Twitter",
           link: "https://twitter.com/DcaStack",
         },
         {
-          label: "Follow on Github",
+          label: "Github",
           link: "https://github.com/DCAStack",
+        },
+        {
+          label: "Discord",
+          link: "https://discord.gg/GYENsDkJDJ",
         },
       ],
       title: "Community",
