@@ -22,7 +22,7 @@ export default function use0xRetrieveMultipleQuotes(
   buyCrypto: IToken[],
   tradeAmount: string[],
   numExec: number[],
-  bufferMultiplier: number = 2
+  bufferMultiplier: number = 10
 ) {
   const [feeData, setFeeData] = useState(BigNumber.from(0));
 

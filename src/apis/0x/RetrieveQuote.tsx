@@ -28,7 +28,7 @@ export default function use0xRetrieveQuote(
   numExec: number,
   fetchScheduleEstimates: boolean = true,
   alreadyFormatted?: boolean,
-  bufferMultiplier: number = 2
+  bufferMultiplier: number = 10
 ) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
