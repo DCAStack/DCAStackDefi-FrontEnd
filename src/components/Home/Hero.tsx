@@ -124,7 +124,7 @@ export function HeroText() {
             to="/trade"
             leftIcon={<Speedboat size={20} />}
           >
-            Enter App
+            Start Trading
           </Button>
 
           <Button
