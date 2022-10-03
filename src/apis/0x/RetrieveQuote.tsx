@@ -135,12 +135,16 @@ export default function use0xRetrieveQuote(
     }
   } else {
     if (data?.code) {
+      let msg = "Unknown Error";
+      if (data?.validationErrors) {
+        msg = data?.validationErrors[0]?.reason;
+      }
       console.error("0x fetch quote error", data);
       showNotification({
         id: "0x-quote-error",
         color: "red",
         title: "Error Fetching API Swap Details",
-        message: `Error code is ${data.code}`,
+        message: msg,
         autoClose: true,
         disallowClose: false,
         icon: <AlertOctagon />,
