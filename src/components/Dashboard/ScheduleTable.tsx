@@ -208,7 +208,8 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       </td>
 
       <td>
-        ~ {formatUnits(row.totalGas.toString(), "gwei")} {"gwei"}
+        ~ {parseFloat(formatUnits(row.totalGas.toString(), "gwei")).toFixed(0)}{" "}
+        {"gwei"}
       </td>
 
       <td>
