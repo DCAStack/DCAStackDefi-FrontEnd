@@ -47,10 +47,10 @@ function RetrieveUserInfo() {
     addressOrName: contractAddr,
     contractInterface: contractABI,
     functionName: "getUserSchedules",
+    args: address,
     cacheOnBlock: true,
     watch: true,
     enabled: address !== undefined,
-    overrides: { from: address },
     onSuccess(data) {
       console.log("Get user schedules success", data);
       setUserScheduleInfo(data);
