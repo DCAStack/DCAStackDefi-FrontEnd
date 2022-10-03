@@ -180,13 +180,15 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
           })}
       </td>
       <td>
-        {row.nextRun.toLocaleDateString(undefined, {
-          year: "2-digit",
-          month: "2-digit",
-          day: "numeric",
-          hour: "numeric",
-          minute: "numeric",
-        })}
+        {row.isActive === false && row.remainingBudget === "0" && "N/A"}
+        {row.isActive === true &&
+          row.nextRun.toLocaleDateString(undefined, {
+            year: "2-digit",
+            month: "2-digit",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          })}
       </td>
       <td>
         {!row.boughtAmount.eq(0) && !row.soldAmount.eq(0) && (
@@ -206,9 +208,7 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
       </td>
 
       <td>
-        ~
-        {parseFloat(formatEther(row.totalGas.toString()).toString()).toFixed(6)}{" "}
-        {networkCurrency}{" "}
+        ~ {formatUnits(row.totalGas.toString(), "gwei")} {"gwei"}
       </td>
 
       <td>
