@@ -266,6 +266,10 @@ const footerLinks = {
           link: "https://twitter.com/DcaStack",
         },
         {
+          label: "Get Support",
+          link: "https://discord.gg/UGzTnZ8k58",
+        },
+        {
           label: "Server Status",
           link: "https://status.dcastack.com/",
         },
