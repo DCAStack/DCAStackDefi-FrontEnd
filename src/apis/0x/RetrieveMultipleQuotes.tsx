@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { parseEther, formatUnits, formatEther } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
@@ -10,6 +10,7 @@ import { AlertOctagon } from "tabler-icons-react";
 import { useFeeData } from "wagmi";
 import { createQueryString } from "./RetrieveQuote";
 import { apiEndpoint } from "./endPoints";
+import { ContractContext } from "../../App";
 
 function arrayFetcher(...urlArr: any[]) {
   const f = (u: RequestInfo | URL) => fetch(u).then((r) => r.json());
@@ -25,7 +26,8 @@ export default function use0xRetrieveMultipleQuotes(
   bufferMultiplier: number = 10
 ) {
   const [feeData, setFeeData] = useState(BigNumber.from(0));
-
+  const { address: contractAddr, abi: contractABI } =
+    useContext(ContractContext);
   useFeeData({
     watch: true,
     onSuccess(data) {
@@ -59,6 +61,7 @@ export default function use0xRetrieveMultipleQuotes(
         buyToken: buyCrypto[i].address,
         sellAmount: tradeAmount[i],
         slippagePercentage: 0.01,
+        takerAdddress: contractAddr,
       });
 
       const readyUrl = `${apiEndpoint[currentChain]}swap/v1/quote?${qs}`;
@@ -80,9 +83,9 @@ export default function use0xRetrieveMultipleQuotes(
 
     Object.keys(data).map((key) => {
       if (data[Number(key)]) {
-        if (data[Number(key)]?.estimatedGas) {
+        if (data[Number(key)]?.gas) {
           data[Number(key)].estimatedGasSingleTradeWei = BigNumber.from(
-            data[Number(key)].estimatedGas
+            data[Number(key)].gas
           ).mul(feeData);
           data[Number(key)].estimatedGasFormattedMin = formatEther(
             data[Number(key)].estimatedGasSingleTradeWei

@@ -92,8 +92,8 @@ export default function use0xRetrieveQuote(
 
   if (data && !data.code) {
     console.log("0x fetch quote success", data);
-    if (data?.estimatedGas) {
-      data.estimatedGasSingleTradeWei = BigNumber.from(data.estimatedGas)
+    if (data?.gas) {
+      data.estimatedGasSingleTradeWei = BigNumber.from(data.gas)
         .mul(data.gasPrice)
         .add(bufferAddWei);
 
