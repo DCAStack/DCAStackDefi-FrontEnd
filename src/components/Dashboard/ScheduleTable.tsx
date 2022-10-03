@@ -14,12 +14,11 @@ import {
 import { Coin } from "tabler-icons-react";
 
 import { BigNumber } from "ethers";
-import { formatEther, formatUnits } from "ethers/lib/utils";
+import { formatUnits } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { UserFundsProps } from "../../models/PropTypes";
 
 import Big from "big.js";
-import { useNetwork } from "wagmi";
 import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
 
 const useStyles = createStyles((theme) => ({
@@ -75,11 +74,6 @@ interface IUserScheduleInfo {
 function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
-  const { chain } = useNetwork();
-
-  const networkCurrency: string = chain?.nativeCurrency
-    ? chain.nativeCurrency.symbol
-    : "?";
 
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
