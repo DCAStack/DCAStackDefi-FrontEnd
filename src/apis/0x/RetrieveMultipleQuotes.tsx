@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { parseEther, formatUnits, formatEther } from "ethers/lib/utils";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
@@ -7,7 +7,6 @@ import { BigNumber } from "ethers";
 import Big from "big.js";
 import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
-import { useFeeData } from "wagmi";
 import { createQueryString } from "./RetrieveQuote";
 import { apiEndpoint } from "./endPoints";
 import { ContractContext } from "../../App";
@@ -25,20 +24,8 @@ export default function use0xRetrieveMultipleQuotes(
   numExec: number[],
   bufferMultiplier: number = 10
 ) {
-  const [feeData, setFeeData] = useState(BigNumber.from(0));
   const { address: contractAddr, abi: contractABI } =
     useContext(ContractContext);
-  useFeeData({
-    watch: true,
-    onSuccess(data) {
-      console.log("Retrieved fee data:", data);
-      setFeeData(data.maxFeePerGas ? data.maxFeePerGas : BigNumber.from(0));
-    },
-    onError(error) {
-      console.error("Could not retrieve fee data:", error);
-      setFeeData(BigNumber.from(0));
-    },
-  });
 
   if (currentChain === 31337) {
     //help with local testing
@@ -79,14 +66,14 @@ export default function use0xRetrieveMultipleQuotes(
   let totalEstimatedGas = BigNumber.from(0);
 
   if (data) {
-    console.log("0x fetch multi quote success", data, feeData.toString());
+    console.log("0x fetch multi quote success", data);
 
     Object.keys(data).map((key) => {
       if (data[Number(key)]) {
         if (data[Number(key)]?.gas) {
           data[Number(key)].estimatedGasSingleTradeWei = BigNumber.from(
             data[Number(key)].gas
-          ).mul(feeData);
+          ).mul(data[Number(key)].gasPrice);
           data[Number(key)].estimatedGasFormattedMin = formatEther(
             data[Number(key)].estimatedGasSingleTradeWei
           );
