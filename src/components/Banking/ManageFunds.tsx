@@ -25,7 +25,6 @@ import { showNotification } from "@mantine/notifications";
 import { AlertOctagon } from "tabler-icons-react";
 import DepositEthFundsFlow from "./DepositEthFundsFlow";
 import DepositFundsFlow from "./DepositFundsFlow";
-import WithdrawFundsFlow from "./WithdrawFundsFlow";
 import { BigNumber } from "ethers";
 import { IToken } from "../../models/Interfaces";
 import { nullToken } from "../../data/gasTokens";
@@ -33,6 +32,7 @@ import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 import TokenBrowser from "../TokenDisplay/TokenBrowser";
 import { X } from "tabler-icons-react";
 import { useNetwork } from "wagmi";
+import useWithdrawFundsFlow from "./WithdrawFundsFlow";
 
 interface ISetup {
   weiDefaultValue?: BigNumber;
@@ -87,7 +87,7 @@ function ManageFunds({
       : false
   );
 
-  let withdrawActions = WithdrawFundsFlow(selectedToken, tokenAmount);
+  let withdrawActions = useWithdrawFundsFlow(selectedToken, tokenAmount);
 
   let depositEthActions = DepositEthFundsFlow(selectedToken, tokenAmount);
   let depositTokenActions = DepositFundsFlow(selectedToken, tokenAmount);

@@ -6,7 +6,7 @@ import { IToken } from "../../models/Interfaces";
 import DepositEthFundsFlow from "../Banking/DepositEthFundsFlow";
 import DepositFundsFlow from "../Banking/DepositFundsFlow";
 
-export default function RefillTokenDepositFlow(
+export default function useRefillTokenDepositFlow(
   sellToken: IToken,
   needToken: string
 ) {

@@ -12,7 +12,7 @@ import {
 } from "wagmi";
 import { ContractContext } from "../../App";
 
-export default function DeleteScheduleFlow(
+export default function useDeleteScheduleFlow(
   scheduleId: number,
   enableFunc: boolean = false
 ) {

@@ -16,7 +16,7 @@ import { ContractContext } from "../../App";
 import { nullToken } from "../../data/gasTokens";
 import { IToken } from "../../models/Interfaces";
 
-export default function WithdrawFundsFlow(
+export default function useWithdrawFundsFlow(
   token: IToken | null,
   defaultValue: string
 ) {

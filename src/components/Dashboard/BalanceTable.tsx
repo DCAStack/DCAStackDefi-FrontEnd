@@ -2,15 +2,17 @@ import { Button, ScrollArea, Stack, Table, Tooltip, Text } from "@mantine/core";
 
 import { createStyles } from "@mantine/core";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { TokenBadgeDisplay } from "../TokenDisplay/TokenBadgeDisplay";
 
 import { UserFundsProps } from "../../models/PropTypes";
-import WithdrawFundsFlow from "../Banking/WithdrawFundsFlow";
 import { BigNumber } from "ethers";
-import RefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
 import { formatUnits } from "ethers/lib/utils";
+import useWithdrawFundsFlow from "../Banking/WithdrawFundsFlow";
+import useRefillTokenDepositFlow from "../Scheduling/RefillTokenDepositFlow";
+import { IToken } from "../../models/Interfaces";
+import { nullToken } from "../../data/gasTokens";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -42,16 +44,9 @@ const useStyles = createStyles((theme) => ({
 
 interface IUserBalanceInfo {
   data: {
-    logoURI: string;
-    symbol: string;
-    address: string;
-    name: string;
-    decimals: number;
+    IToken: IToken;
     balance: string;
     freeBalance: string;
-    withdrawMax: any;
-    withdrawFree: any;
-    topupDeposit: any;
     freeBalanceRaw: BigNumber;
     balanceRaw: BigNumber;
   }[];
@@ -59,11 +54,51 @@ interface IUserBalanceInfo {
 export function UsersTable({ data }: IUserBalanceInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const [useItem, setItem] = useState<any>({
+    IToken: nullToken,
+    balance: "0",
+    freeBalance: "0",
+    freeBalanceRaw: BigNumber.from(0),
+  });
+
+  const doMaxWithdraw = useWithdrawFundsFlow(
+    useItem?.IToken,
+    useItem?.balance
+  )?.action;
+  const [doMax, setDoMax] = useState(false);
+
+  const doFreeWithdraw = useWithdrawFundsFlow(
+    useItem?.IToken,
+    useItem?.freeBalance
+  )?.action;
+  const [doFree, setDoFree] = useState(false);
+
+  const doRefillToken = useRefillTokenDepositFlow(
+    useItem?.IToken,
+    formatUnits(
+      useItem?.freeBalanceRaw.abs().toString(),
+      useItem?.IToken.decimals
+    )
+  )?.refill;
+  const [doRefill, setDoRefill] = useState(false);
+
+  useEffect(() => {
+    if (doMax) {
+      doMaxWithdraw?.();
+      setDoMax(false);
+    } else if (doFree) {
+      doFreeWithdraw?.();
+      setDoFree(false);
+    } else if (doRefill) {
+      doRefillToken?.();
+      setDoRefill(false);
+    }
+  }, [doMax, doFree, doRefill, doFreeWithdraw, doMaxWithdraw, doRefillToken]);
 
   const rows = data.map((item) => (
-    <tr key={item.address}>
+    <tr key={item.IToken.address}>
       <td>
-        <TokenBadgeDisplay token={item} />
+        <TokenBadgeDisplay token={item.IToken} />
       </td>
       <td>{parseFloat(`${item.balance}`).toFixed(6)}</td>
       <td>{parseFloat(`${item.freeBalance}`).toFixed(6)}</td>
@@ -71,7 +106,7 @@ export function UsersTable({ data }: IUserBalanceInfo) {
         {parseFloat(
           `${formatUnits(
             item.balanceRaw.sub(item.freeBalanceRaw),
-            item.decimals
+            item.IToken.decimals
           )}`
         ).toFixed(6)}
       </td>
@@ -84,7 +119,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
               size="md"
               compact
               onClick={() => {
-                item.topupDeposit?.refill?.();
+                setItem(item);
+                setDoRefill(true);
               }}
             >
               Topup Deposit
@@ -97,7 +133,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
               size="md"
               compact
               onClick={() => {
-                item.withdrawFree?.action?.();
+                setItem(item);
+                setDoFree(true);
               }}
             >
               Withdraw Available
@@ -121,7 +158,8 @@ export function UsersTable({ data }: IUserBalanceInfo) {
                 size="md"
                 compact
                 onClick={() => {
-                  item.withdrawMax?.action?.();
+                  setItem(item);
+                  setDoMax(true);
                 }}
               >
                 Withdraw All
@@ -181,21 +219,7 @@ export function UserBalancesPopulated({
     Object.keys(parsedTokenBalances).map((key) => {
       if (parsedTokenBalances[Number(key)].address) {
         let addDetails = {
-          withdrawMax: WithdrawFundsFlow(
-            parsedTokenBalances[Number(key)],
-            parsedTokenBalances[Number(key)].balance
-          ),
-          withdrawFree: WithdrawFundsFlow(
-            parsedTokenBalances[Number(key)],
-            parsedTokenBalances[Number(key)].freeBalance
-          ),
-          topupDeposit: RefillTokenDepositFlow(
-            parsedTokenBalances[Number(key)],
-            formatUnits(
-              parsedTokenBalances[Number(key)].freeBalanceRaw.abs().toString(),
-              parsedTokenBalances[Number(key)].decimals
-            )
-          ),
+          IToken: parsedTokenBalances[Number(key)],
         };
 
         formattedUserData.push({

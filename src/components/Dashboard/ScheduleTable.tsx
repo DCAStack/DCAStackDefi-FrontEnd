@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Avatar,
@@ -19,7 +19,7 @@ import { IToken } from "../../models/Interfaces";
 import { UserFundsProps } from "../../models/PropTypes";
 
 import Big from "big.js";
-import DeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
+import useDeleteScheduleFlow from "../Scheduling/DeleteSchedueFlow";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -66,7 +66,6 @@ interface IUserScheduleInfo {
     totalGas: string;
     numExecLeft: number;
     remainingBudget: string;
-    deleteSchedule: any;
     freeBalanceRaw: BigNumber;
   }[];
 }
@@ -74,6 +73,16 @@ interface IUserScheduleInfo {
 function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const [currSchedule, setSchedule] = useState(0);
+  const [doDelete, setDoDelete] = useState(false);
+  let doDeleteSchedule = useDeleteScheduleFlow(currSchedule, doDelete)?.delete;
+
+  useEffect(() => {
+    if (doDelete) {
+      doDeleteSchedule?.();
+      setDoDelete(false);
+    }
+  }, [doDelete, doDeleteSchedule]);
 
   const rows = tableData.map((row) => (
     <tr key={row.scheduleID}>
@@ -214,7 +223,8 @@ function ScheduleTable({ data: tableData }: IUserScheduleInfo) {
             size="md"
             compact
             onClick={() => {
-              row.deleteSchedule?.();
+              setSchedule(row.scheduleID);
+              setDoDelete(true);
             }}
           >
             Delete
@@ -304,8 +314,6 @@ export function UserSchedulesPopulated({
           ),
           freeBalanceRaw:
             mappedUserFunds[userSchedules[key].sellToken].freeBalanceRaw,
-
-          deleteSchedule: DeleteScheduleFlow(Number(key), true)?.delete,
         };
 
         formattedUserSchedulesData.push(addSchedule);
