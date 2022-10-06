@@ -23,7 +23,7 @@ import App from "./App";
 
 Sentry.init({
   dsn: process.env.REACT_APP_SENTRY_DSN,
-  tunnel: "/tunnel",
+  tunnel: "/tunnel/",
   integrations: [new BrowserTracing()],
   tracesSampleRate: 1.0,
   release: "0.1",
