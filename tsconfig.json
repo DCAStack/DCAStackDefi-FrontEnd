@@ -20,5 +20,6 @@
     "inlineSources": true,
     "sourceRoot": "/"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["functions/**/*"],
 }
