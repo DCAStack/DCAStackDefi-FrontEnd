@@ -32,7 +32,7 @@ function RetrieveUserInfo() {
     functionName: "getUserAllTokenBalances",
     cacheOnBlock: true,
     watch: true,
-    enabled: address !== undefined,
+    enabled: address !== undefined && currentChain == 5, //TODO
     overrides: { from: address },
     onSuccess(data) {
       console.log("Get user token balances success", data);
@@ -50,7 +50,7 @@ function RetrieveUserInfo() {
     args: address,
     cacheOnBlock: true,
     watch: true,
-    enabled: address !== undefined,
+    enabled: address !== undefined && currentChain == 5, //TODO
     onSuccess(data) {
       console.log("Get user schedules success", data);
       setUserScheduleInfo(data);
