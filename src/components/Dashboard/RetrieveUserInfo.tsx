@@ -40,6 +40,7 @@ function RetrieveUserInfo() {
     },
     onError(error) {
       console.error("Get user token balances Error", error);
+      setUserTokenInfo([[], [], []]);
     },
   });
 
@@ -57,6 +58,7 @@ function RetrieveUserInfo() {
     },
     onError(error) {
       console.error("Get user schedules Error", error);
+      setUserScheduleInfo([[], [], []]);
     },
   });
 
@@ -87,7 +89,8 @@ function RetrieveUserInfo() {
     joinNeededTokens[2] = joinNeededTokens[2].concat(userTokenBalances[2]);
   }
 
-  if (joinNeededTokens) {
+  if (joinNeededTokens && currentChain === 5) {
+    //TODO temp fix for crash
     joinNeededTokens[0].forEach(function (tokenAddr: string, index: number) {
       if (tokenAddr) {
         let tokenDetails = masterTokenList?.tokens[tokenAddr?.toLowerCase()];
